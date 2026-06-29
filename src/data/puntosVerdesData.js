@@ -1,0 +1,73 @@
+export const puntosVerdes = [
+  {
+    id: 1,
+    nombre: 'Punto Verde Centro',
+    direccion: 'Av. Presidente Mitre 450, Centro',
+    horario: 'Lun a Sáb: 8:00 - 20:00',
+    posX: 52,
+    posY: 48,
+    materiales: ['Cartón', 'Papel', 'Vidrio', 'Plástico', 'Metales'],
+    activo: true,
+    capacidad: 75,
+  },
+  {
+    id: 2,
+    nombre: 'Punto Verde Plaza Mitre',
+    direccion: 'Frente a Plaza Mitre, Centro',
+    horario: 'Lun a Dom: 6:00 - 22:00',
+    posX: 48,
+    posY: 55,
+    materiales: ['Cartón', 'Papel', 'Plástico'],
+    activo: true,
+    capacidad: 40,
+  },
+  {
+    id: 3,
+    nombre: 'Punto Verde Estación',
+    direccion: 'Av. del Trabajo 120, Estación',
+    horario: 'Lun a Vie: 7:00 - 19:00',
+    posX: 20,
+    posY: 52,
+    materiales: ['Cartón', 'Papel', 'Vidrio', 'Plástico', 'Residuos orgánicos'],
+    activo: true,
+    capacidad: 60,
+  },
+  {
+    id: 4,
+    nombre: 'Punto Verde Hospital',
+    direccion: 'Calle San Martín 890, frente al Hospital',
+    horario: 'Lun a Sáb: 8:00 - 18:00',
+    posX: 78,
+    posY: 65,
+    materiales: ['Cartón', 'Papel', 'Vidrio'],
+    activo: false,
+    capacidad: 90,
+  },
+  {
+    id: 5,
+    nombre: 'Punto Verde Barrio Norte',
+    direccion: 'Av. Belgrano 234, Barrio Norte',
+    horario: 'Mar, Jue y Sáb: 9:00 - 17:00',
+    posX: 65,
+    posY: 30,
+    materiales: ['Plástico', 'Metales', 'Residuos orgánicos'],
+    activo: true,
+    capacidad: 55,
+  },
+]
+
+export const materialesInfo = {
+  'Cartón': { color: '#8B4513', descripcion: 'Cajas y cartón limpio y seco' },
+  'Papel': { color: '#4A90D9', descripcion: 'Diarios, revistas y papel de oficina' },
+  'Vidrio': { color: '#2ECC71', descripcion: 'Botellas y frascos limpios sin tapa' },
+  'Plástico': { color: '#E74C3C', descripcion: 'PET, PEAD y otros envases plásticos' },
+  'Metales': { color: '#95A5A6', descripcion: 'Latas de aluminio y hojalata' },
+  'Residuos orgánicos': { color: '#27AE60', descripcion: 'Restos de frutas, verduras y jardín' },
+}
+
+export const estadisticas = {
+  totalPuntos: 5,
+  puntosActivos: 4,
+  toneladasMes: 12.4,
+  familiasBeneficiadas: 3200,
+}
