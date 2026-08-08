@@ -6,6 +6,7 @@ import { useColeccion } from '../hooks/useColeccion'
 import { paradas, horarios as horariosFijos, alertasCombi as alertasFijas, destinos, datosPago } from '../data/combiData'
 import QRModal from '../components/QRModal'
 import CopiarCampo from '../components/CopiarCampo'
+import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 
 export default function CombiMunicipal() {
   const simulacion = useCombiSimulation()
@@ -29,8 +30,8 @@ export default function CombiMunicipal() {
     }
     if (enVivo.paradaId !== ultimaParadaId.current) {
       ultimaParadaId.current = enVivo.paradaId
-      if (notifActiva && Notification.permission === 'granted') {
-        new Notification('🚌 Mi Baradero — Combi Municipal', {
+      if (notifActiva) {
+        mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
           body: `${enVivo.estadoActual}. ¡Prepará tu pasaje!`,
           icon: '/logo-mibaradero.png',
         })
@@ -43,13 +44,10 @@ export default function CombiMunicipal() {
       setNotifActiva(false)
       return
     }
-    let permiso = Notification.permission
-    if (permiso === 'default') {
-      permiso = await Notification.requestPermission()
-    }
+    const permiso = await pedirPermisoNotificacion()
     if (permiso === 'granted') {
       setNotifActiva(true)
-      new Notification('🚌 Mi Baradero — Combi Municipal', {
+      mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
         body: 'Te avisaremos cuando la combi cambie de posición.',
         icon: '/logo-mibaradero.png',
       })
@@ -73,8 +71,8 @@ export default function CombiMunicipal() {
     }
     if (ultima && ultima.id !== ultimaAlertaId.current) {
       ultimaAlertaId.current = ultima.id
-      if (notifActiva && Notification.permission === 'granted') {
-        new Notification('🚌 Mi Baradero — Combi Municipal', {
+      if (notifActiva) {
+        mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
           body: ultima.mensaje,
           icon: '/logo-mibaradero.png',
         })

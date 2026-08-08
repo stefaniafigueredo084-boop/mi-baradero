@@ -5,6 +5,7 @@ import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, conse
 import { db } from '../firebase'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
+import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 
 function useGpsCamion(activo) {
   const [distancia, setDistancia] = useState(2400)
@@ -22,12 +23,10 @@ function useGpsCamion(activo) {
       setDistancia(prev => {
         const nueva = prev - 80
         if (nueva <= 500 && !notifEnviada) {
-          if (Notification.permission === 'granted') {
-            new Notification('🚛 Mi Baradero — Camión cerca', {
-              body: 'El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!',
-              icon: '/logo-mibaradero.png',
-            })
-          }
+          mostrarNotificacion('🚛 Mi Baradero — Camión cerca', {
+            body: 'El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!',
+            icon: '/logo-mibaradero.png',
+          })
           setNotifEnviada(true)
         }
         return nueva <= 0 ? 0 : nueva
@@ -82,9 +81,7 @@ export default function Residuos() {
 
   const activarGps = async () => {
     if (!gpsActivo) {
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission()
-      }
+      await pedirPermisoNotificacion()
       setGpsActivo(true)
     } else {
       setGpsActivo(false)

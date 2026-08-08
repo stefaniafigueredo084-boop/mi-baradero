@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3 } from 'lucide-react'
+import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -35,18 +36,19 @@ export default function Perfil() {
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
 
   const guardar = async () => {
-    // Pedir permiso de notificaciones si hay alguna activa
+    // Pedir permiso de notificaciones si hay alguna activa (si el
+    // navegador no soporta notificaciones, esto no interrumpe el guardado)
     const hayNotif = Object.values(perfil.notif).some(Boolean)
-    if (hayNotif && Notification.permission === 'default') {
-      await Notification.requestPermission()
+    if (hayNotif) {
+      await pedirPermisoNotificacion()
     }
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
     setGuardado(true)
     setEditando(false)
     setTimeout(() => setGuardado(false), 3000)
 
-    if (hayNotif && Notification.permission === 'granted') {
-      new Notification('✅ Mi Baradero — Perfil guardado', {
+    if (hayNotif) {
+      mostrarNotificacion('✅ Mi Baradero — Perfil guardado', {
         body: `Hola ${perfil.nombre || 'vecino'}, tus notificaciones están activas.`,
         icon: '/logo-mibaradero.png',
       })

@@ -3,6 +3,7 @@ import { Calendar, MapPin, Clock, Filter, Star, Bell, BellOff, CheckCircle, Plus
 import { eventos as eventosFijos, categorias as categoriasBase } from '../data/eventosData'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
+import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-verde/10 text-verde',
@@ -45,13 +46,10 @@ export default function Eventos() {
       setNotifActiva(false)
       return
     }
-    let permiso = Notification.permission
-    if (permiso === 'default') {
-      permiso = await Notification.requestPermission()
-    }
+    const permiso = await pedirPermisoNotificacion()
     if (permiso === 'granted') {
       setNotifActiva(true)
-      new Notification('🎉 Mi Baradero — Eventos', {
+      mostrarNotificacion('🎉 Mi Baradero — Eventos', {
         body: 'Te avisaremos cuando se acerque un evento en Baradero.',
         icon: '/logo-mibaradero.png',
       })
@@ -63,13 +61,10 @@ export default function Eventos() {
       setNotifNuevos(false)
       return
     }
-    let permiso = Notification.permission
-    if (permiso === 'default') {
-      permiso = await Notification.requestPermission()
-    }
+    const permiso = await pedirPermisoNotificacion()
     if (permiso === 'granted') {
       setNotifNuevos(true)
-      new Notification('📅 Mi Baradero — Nuevos eventos', {
+      mostrarNotificacion('📅 Mi Baradero — Nuevos eventos', {
         body: 'Te avisaremos cuando se agregue un nuevo evento a la agenda.',
         icon: '/logo-mibaradero.png',
       })

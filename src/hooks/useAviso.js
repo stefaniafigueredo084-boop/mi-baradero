@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
+import { mostrarNotificacion } from '../utils/notificaciones'
 
 // Escucha el documento config/{nombreDoc} donde el panel de trabajadores
 // publica avisos puntuales (EnviarAviso). Devuelve el último aviso, y si
@@ -22,9 +23,9 @@ export function useAviso(nombreDoc, activo, formatear) {
       }
       if (datos && datos.enviadoEn !== ultimoEnviadoEn.current) {
         ultimoEnviadoEn.current = datos.enviadoEn
-        if (activoRef.current && Notification.permission === 'granted') {
+        if (activoRef.current) {
           const { title, body } = formatear(datos)
-          new Notification(title, { body, icon: '/logo-mibaradero.png' })
+          mostrarNotificacion(title, { body, icon: '/logo-mibaradero.png' })
         }
       }
     })
