@@ -25,7 +25,12 @@ export default function Eventos() {
   // Eventos cargados desde el panel de trabajadores (Firestore), seguidos
   // de los eventos fijos del sitio como respaldo.
   const { items: eventosLive } = useColeccion('eventos')
-  const eventos = useMemo(() => [...eventosLive, ...eventosFijos], [eventosLive])
+  const eventos = useMemo(() => [
+    ...eventosLive,
+    // Si un trabajador ya importó este evento original al panel, no lo
+    // mostramos dos veces — el importado (editable) reemplaza al fijo.
+    ...eventosFijos.filter(e => !eventosLive.some(le => le.idOriginal === e.id)),
+  ], [eventosLive])
 
   const categorias = useMemo(() => {
     const nuevas = [...new Set(eventos.map(e => e.categoria).filter(Boolean))].filter(c => !categoriasBase.includes(c))

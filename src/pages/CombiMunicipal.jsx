@@ -58,8 +58,14 @@ export default function CombiMunicipal() {
   // con los datos fijos del sitio.
   const { items: horariosLive } = useColeccion('horariosCombi')
   const { items: alertasLive } = useColeccion('alertasCombi')
-  const horarios = useMemo(() => [...horariosFijos, ...horariosLive], [horariosLive])
-  const alertasCombi = useMemo(() => [...alertasLive, ...alertasFijas], [alertasLive])
+  const horarios = useMemo(() => [
+    ...horariosFijos.filter(h => !horariosLive.some(lh => lh.idOriginal === h.id)),
+    ...horariosLive,
+  ], [horariosLive])
+  const alertasCombi = useMemo(() => [
+    ...alertasLive,
+    ...alertasFijas.filter(a => !alertasLive.some(la => la.idOriginal === a.id)),
+  ], [alertasLive])
 
   // Notificación cuando se publica una alerta nueva.
   const ultimaAlertaId = useRef(undefined)

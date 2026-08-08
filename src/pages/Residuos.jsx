@@ -66,10 +66,16 @@ export default function Residuos() {
   const calendario = useDocConfig('calendarioResiduos', calendarioFijo, d => d.dias)
 
   const { items: zonasLive } = useColeccion('zonasResiduos')
-  const zonas = useMemo(() => [...zonasFijas, ...zonasLive], [zonasLive])
+  const zonas = useMemo(() => [
+    ...zonasFijas.filter(z => !zonasLive.some(lz => lz.idOriginal === z.id)),
+    ...zonasLive,
+  ], [zonasLive])
 
   const { items: consejosLive } = useColeccion('consejosResiduos')
-  const consejos = useMemo(() => [...consejosFijos, ...consejosLive], [consejosLive])
+  const consejos = useMemo(() => [
+    ...consejosFijos.filter(c => !consejosLive.some(lc => lc.idOriginal === c.titulo)),
+    ...consejosLive,
+  ], [consejosLive])
 
   const avisoResiduos = useAviso('avisoResiduos', notifActiva, aviso => ({
     title: '🚛 Mi Baradero — Recolección de Residuos',

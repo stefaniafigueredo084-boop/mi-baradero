@@ -50,7 +50,10 @@ export default function PuntosVerdes() {
   // el mapa calculada a partir de su id (el formulario no la pide).
   const { items: puntosLive } = useColeccion('puntosVerdesExtra')
   const puntosVerdes = useMemo(
-    () => [...puntosFijos, ...puntosLive.map(p => ({ ...posicionDesdeId(p.id), ...p }))],
+    () => [
+      ...puntosFijos.filter(p => !puntosLive.some(lp => lp.idOriginal === p.id)),
+      ...puntosLive.map(p => ({ ...posicionDesdeId(p.id), ...p })),
+    ],
     [puntosLive]
   )
 

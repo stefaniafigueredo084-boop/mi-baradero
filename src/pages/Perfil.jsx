@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3 } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 import { db } from '../firebase'
-import { idVecino } from '../utils/perfilLocal'
+import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -53,15 +53,15 @@ export default function Perfil() {
     // a tus datos de contacto.
     if (perfil.nombre?.trim()) {
       try {
-        const ref = doc(db, 'vecinos', idVecino())
-        const existe = (await getDoc(ref)).exists()
-        await setDoc(ref, {
+        const esNuevo = esPrimerGuardadoVecino()
+        await setDoc(doc(db, 'vecinos', idVecino()), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
           actualizadoEn: serverTimestamp(),
-          ...(existe ? {} : { creadoEn: serverTimestamp() }),
+          ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
         }, { merge: true })
+        if (esNuevo) marcarVecinoGuardado()
       } catch {
         // Si falla (sin conexión, etc.) el perfil ya quedó guardado
         // localmente igual — no interrumpimos la experiencia del vecino.
@@ -84,7 +84,7 @@ export default function Perfil() {
     if (confirm('¿Querés borrar todos tus datos de perfil?')) {
       localStorage.removeItem('mibaradero_perfil')
       deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
-      localStorage.removeItem('mibaradero_vecino_id')
+      olvidarVecino()
       setPerfil(defaultPerfil)
     }
   }

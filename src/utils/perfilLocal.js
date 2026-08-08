@@ -5,6 +5,7 @@
 
 const CLAVE_PERFIL = 'mibaradero_perfil'
 const CLAVE_ID = 'mibaradero_vecino_id'
+const CLAVE_CREADO = 'mibaradero_vecino_creado'
 
 export function leerPerfilLocal() {
   try {
@@ -26,4 +27,21 @@ export function idVecino() {
     localStorage.setItem(CLAVE_ID, id)
   }
   return id
+}
+
+// Los vecinos no pueden leer su propio documento en Firestore (solo el
+// admin puede leer la colección "vecinos"), así que no se puede
+// consultar si ya existe antes de guardar. Se recuerda localmente si
+// esta es la primera vez, para mandar "creadoEn" una sola vez.
+export function esPrimerGuardadoVecino() {
+  return localStorage.getItem(CLAVE_CREADO) !== '1'
+}
+
+export function marcarVecinoGuardado() {
+  localStorage.setItem(CLAVE_CREADO, '1')
+}
+
+export function olvidarVecino() {
+  localStorage.removeItem(CLAVE_ID)
+  localStorage.removeItem(CLAVE_CREADO)
 }

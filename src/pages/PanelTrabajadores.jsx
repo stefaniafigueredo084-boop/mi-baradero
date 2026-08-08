@@ -13,6 +13,7 @@ import CalendarioResiduos from '../components/panel/CalendarioResiduos'
 import AgregarTrabajador from '../components/panel/AgregarTrabajador'
 import Historial from '../components/panel/Historial'
 import Vecinos from '../components/panel/Vecinos'
+import ImportarDatosFijos from '../components/panel/ImportarDatosFijos'
 import {
   camposEventos,
   camposHorariosCombi,
@@ -21,6 +22,10 @@ import {
   camposConsejosResiduos,
   camposPuntosVerdes,
 } from '../data/panelCampos'
+import { eventos as eventosFijos } from '../data/eventosData'
+import { horarios as horariosFijos, alertasCombi as alertasFijas } from '../data/combiData'
+import { zonas as zonasFijas, consejos as consejosFijos } from '../data/residuosData'
+import { puntosVerdes as puntosFijos } from '../data/puntosVerdesData'
 
 const TODAS_LAS_TABS = [
   { id: 'eventos', label: 'Eventos', icon: Calendar },
@@ -114,6 +119,17 @@ export default function PanelTrabajadores() {
           <div>
             <EnviarAviso nombreDoc="avisoEventos" seccion="eventos" placeholder="Ej: La Fiesta de la Primavera empieza en 30 minutos" />
             <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Eventos</h3>
+            <ImportarDatosFijos
+              coleccion="eventos"
+              seccion="eventos"
+              etiqueta="eventos"
+              datos={eventosFijos}
+              mapear={e => ({
+                titulo: e.titulo, imagenData: e.imagen, categoria: e.categoria, fechaDisplay: e.fechaDisplay,
+                hora: e.hora, ubicacion: e.ubicacion, descripcion: e.descripcion, color: e.color,
+                destacado: e.destacado, idOriginal: e.id,
+              })}
+            />
             <ColeccionCRUD
               coleccion="eventos"
               seccion="eventos"
@@ -128,6 +144,16 @@ export default function PanelTrabajadores() {
           <div>
             <CombiEnVivo />
             <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Horarios de la combi</h3>
+            <ImportarDatosFijos
+              coleccion="horariosCombi"
+              seccion="combi"
+              etiqueta="horarios"
+              datos={horariosFijos}
+              mapear={h => ({
+                salida: h.salida, llegada: h.llegada, origen: h.origen, destino: h.destino,
+                disponibles: h.disponibles, idOriginal: h.id,
+              })}
+            />
             <ColeccionCRUD
               coleccion="horariosCombi"
               seccion="combi"
@@ -139,6 +165,13 @@ export default function PanelTrabajadores() {
             <p className="text-gray-500 text-sm mb-4 -mt-2">
               Cada alerta que agregás acá también le llega como notificación a quienes activaron avisos de la combi.
             </p>
+            <ImportarDatosFijos
+              coleccion="alertasCombi"
+              seccion="combi"
+              etiqueta="alertas"
+              datos={alertasFijas}
+              mapear={a => ({ tipo: a.tipo, horario: a.horario, mensaje: a.mensaje, hora: a.hora, idOriginal: a.id })}
+            />
             <ColeccionCRUD
               coleccion="alertasCombi"
               seccion="combi"
@@ -160,6 +193,13 @@ export default function PanelTrabajadores() {
             />
             <CalendarioResiduos />
             <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Zonas y próxima recolección</h3>
+            <ImportarDatosFijos
+              coleccion="zonasResiduos"
+              seccion="residuos"
+              etiqueta="zonas"
+              datos={zonasFijas}
+              mapear={z => ({ nombre: z.nombre, horario: z.horario, proximaRecoleccion: z.proximaRecoleccion, idOriginal: z.id })}
+            />
             <ColeccionCRUD
               coleccion="zonasResiduos"
               seccion="residuos"
@@ -168,6 +208,13 @@ export default function PanelTrabajadores() {
               renderSubtitulo={i => `${i.horario || ''} · en ${i.proximaRecoleccion} min`}
             />
             <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4 mt-10">Consejos de reciclado</h3>
+            <ImportarDatosFijos
+              coleccion="consejosResiduos"
+              seccion="residuos"
+              etiqueta="consejos"
+              datos={consejosFijos}
+              mapear={c => ({ titulo: c.titulo, descripcion: c.descripcion, icono: c.icono, idOriginal: c.titulo })}
+            />
             <ColeccionCRUD
               coleccion="consejosResiduos"
               seccion="residuos"
@@ -179,13 +226,25 @@ export default function PanelTrabajadores() {
         )}
 
         {tab === 'puntosVerdes' && (
-          <ColeccionCRUD
-            coleccion="puntosVerdesExtra"
-            seccion="puntosVerdes"
-            campos={camposPuntosVerdes}
-            renderTitulo={i => i.nombre}
-            renderSubtitulo={i => i.direccion}
-          />
+          <div>
+            <ImportarDatosFijos
+              coleccion="puntosVerdesExtra"
+              seccion="puntosVerdes"
+              etiqueta="puntos verdes"
+              datos={puntosFijos}
+              mapear={p => ({
+                nombre: p.nombre, direccion: p.direccion, horario: p.horario, materiales: p.materiales,
+                activo: p.activo, capacidad: p.capacidad, posX: p.posX, posY: p.posY, idOriginal: p.id,
+              })}
+            />
+            <ColeccionCRUD
+              coleccion="puntosVerdesExtra"
+              seccion="puntosVerdes"
+              campos={camposPuntosVerdes}
+              renderTitulo={i => i.nombre}
+              renderSubtitulo={i => i.direccion}
+            />
+          </div>
         )}
 
         {tab === 'usuarios' && esAdmin && <AgregarTrabajador />}
