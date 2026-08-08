@@ -5,7 +5,7 @@ import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, conse
 import { db } from '../firebase'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
-import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
+import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 
 function useGpsCamion(activo) {
   const [distancia, setDistancia] = useState(2400)
@@ -24,7 +24,7 @@ function useGpsCamion(activo) {
         const nueva = prev - 80
         if (nueva <= 500 && !notifEnviada) {
           mostrarNotificacion('🚛 Mi Baradero — Camión cerca', {
-            body: 'El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!',
+            body: saludar('El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!'),
             icon: '/logo-mibaradero.png',
           })
           setNotifEnviada(true)
@@ -73,7 +73,7 @@ export default function Residuos() {
 
   const avisoResiduos = useAviso('avisoResiduos', notifActiva, aviso => ({
     title: '🚛 Mi Baradero — Recolección de Residuos',
-    body: aviso.mensaje,
+    body: saludar(aviso.mensaje),
   }))
 
   const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long' })

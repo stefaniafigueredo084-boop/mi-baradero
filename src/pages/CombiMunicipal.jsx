@@ -6,7 +6,7 @@ import { useColeccion } from '../hooks/useColeccion'
 import { paradas, horarios as horariosFijos, alertasCombi as alertasFijas, destinos, datosPago } from '../data/combiData'
 import QRModal from '../components/QRModal'
 import CopiarCampo from '../components/CopiarCampo'
-import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
+import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 
 export default function CombiMunicipal() {
   const simulacion = useCombiSimulation()
@@ -32,7 +32,7 @@ export default function CombiMunicipal() {
       ultimaParadaId.current = enVivo.paradaId
       if (notifActiva) {
         mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
-          body: `${enVivo.estadoActual}. ¡Prepará tu pasaje!`,
+          body: saludar(`${enVivo.estadoActual}. ¡Prepará tu pasaje!`),
           icon: '/logo-mibaradero.png',
         })
       }
@@ -48,7 +48,7 @@ export default function CombiMunicipal() {
     if (permiso === 'granted') {
       setNotifActiva(true)
       mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
-        body: 'Te avisaremos cuando la combi cambie de posición.',
+        body: saludar('Te avisaremos cuando la combi cambie de posición.'),
         icon: '/logo-mibaradero.png',
       })
     }
@@ -73,7 +73,7 @@ export default function CombiMunicipal() {
       ultimaAlertaId.current = ultima.id
       if (notifActiva) {
         mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
-          body: ultima.mensaje,
+          body: saludar(ultima.mensaje),
           icon: '/logo-mibaradero.png',
         })
       }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { Bus, Calendar, History as HistoryIcon, Loader2, LogOut, Recycle, Trash2, Users } from 'lucide-react'
+import { Bus, Calendar, History as HistoryIcon, Loader2, LogOut, Recycle, Trash2, Users, UserCheck } from 'lucide-react'
 import { auth } from '../firebase'
 import { useTrabajador } from '../hooks/useTrabajador'
 import { registrarHistorial } from '../utils/historial'
@@ -12,6 +12,7 @@ import CombiEnVivo from '../components/panel/CombiEnVivo'
 import CalendarioResiduos from '../components/panel/CalendarioResiduos'
 import AgregarTrabajador from '../components/panel/AgregarTrabajador'
 import Historial from '../components/panel/Historial'
+import Vecinos from '../components/panel/Vecinos'
 import {
   camposEventos,
   camposHorariosCombi,
@@ -27,6 +28,7 @@ const TODAS_LAS_TABS = [
   { id: 'residuos', label: 'Residuos', icon: Trash2 },
   { id: 'puntosVerdes', label: 'Puntos Verdes', icon: Recycle },
   { id: 'usuarios', label: 'Usuarios', icon: Users, soloAdmin: true },
+  { id: 'vecinos', label: 'Vecinos', icon: UserCheck, soloAdmin: true },
   { id: 'historial', label: 'Historial', icon: HistoryIcon, soloAdmin: true },
 ]
 
@@ -187,6 +189,7 @@ export default function PanelTrabajadores() {
         )}
 
         {tab === 'usuarios' && esAdmin && <AgregarTrabajador />}
+        {tab === 'vecinos' && esAdmin && <Vecinos />}
         {tab === 'historial' && esAdmin && <Historial />}
       </div>
     </div>

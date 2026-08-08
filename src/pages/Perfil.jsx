@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3 } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
+import { db } from '../firebase'
+import { idVecino } from '../utils/perfilLocal'
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -43,6 +46,28 @@ export default function Perfil() {
       await pedirPermisoNotificacion()
     }
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
+
+    // Le mandamos al municipio únicamente el nombre y qué notificaciones
+    // tenés activas — nunca tu teléfono, dirección, email ni zona. Así
+    // el administrador puede ver cuántos vecinos usan la app sin acceder
+    // a tus datos de contacto.
+    if (perfil.nombre?.trim()) {
+      try {
+        const ref = doc(db, 'vecinos', idVecino())
+        const existe = (await getDoc(ref)).exists()
+        await setDoc(ref, {
+          nombre: perfil.nombre.trim(),
+          apellido: perfil.apellido?.trim() || '',
+          notif: perfil.notif,
+          actualizadoEn: serverTimestamp(),
+          ...(existe ? {} : { creadoEn: serverTimestamp() }),
+        }, { merge: true })
+      } catch {
+        // Si falla (sin conexión, etc.) el perfil ya quedó guardado
+        // localmente igual — no interrumpimos la experiencia del vecino.
+      }
+    }
+
     setGuardado(true)
     setEditando(false)
     setTimeout(() => setGuardado(false), 3000)
@@ -58,6 +83,8 @@ export default function Perfil() {
   const limpiar = () => {
     if (confirm('¿Querés borrar todos tus datos de perfil?')) {
       localStorage.removeItem('mibaradero_perfil')
+      deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+      localStorage.removeItem('mibaradero_vecino_id')
       setPerfil(defaultPerfil)
     }
   }

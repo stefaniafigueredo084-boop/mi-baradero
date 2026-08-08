@@ -59,6 +59,18 @@ service cloud.firestore {
     match /config/calendarioResiduos { allow read: if true; allow write: if puedeEditar('residuos'); }
     match /config/combiEnVivo        { allow read: if true; allow write: if puedeEditar('combi'); }
 
+    // Perfiles de vecinos: cualquiera puede crear/actualizar el suyo (no
+    // están logueados, son visitantes anónimos identificados solo por un
+    // id aleatorio que guarda su propio navegador) pero SOLO puede mandar
+    // nombre/apellido/notif — nunca telefono, direccion, email ni zona,
+    // que quedan exclusivamente en el localStorage de cada vecino. Leer
+    // la lista completa es solo para el administrador.
+    match /vecinos/{doc} {
+      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'creadoEn', 'actualizadoEn']);
+      allow delete: if true;
+      allow read: if esAdmin();
+    }
+
     // Historial de actividad: cualquier trabajador logueado puede agregar
     // una entrada (login/logout/acciones), pero es de solo lectura para el
     // admin, e inmutable para todos (no se edita ni se borra).

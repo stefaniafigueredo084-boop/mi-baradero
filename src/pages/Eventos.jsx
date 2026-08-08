@@ -3,7 +3,7 @@ import { Calendar, MapPin, Clock, Filter, Star, Bell, BellOff, CheckCircle, Plus
 import { eventos as eventosFijos, categorias as categoriasBase } from '../data/eventosData'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
-import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
+import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-verde/10 text-verde',
@@ -34,11 +34,11 @@ export default function Eventos() {
 
   const avisoEventos = useAviso('avisoEventos', notifActiva, aviso => ({
     title: '🎉 Mi Baradero — Eventos',
-    body: aviso.mensaje,
+    body: saludar(aviso.mensaje),
   }))
   const avisoNuevosEventos = useAviso('avisoEventos', notifNuevos, () => ({
     title: '📅 Mi Baradero — Nuevos eventos',
-    body: 'Se agregó un nuevo evento a la agenda.',
+    body: saludar('Se agregó un nuevo evento a la agenda.'),
   }))
 
   const activarNotif = async () => {
@@ -50,7 +50,7 @@ export default function Eventos() {
     if (permiso === 'granted') {
       setNotifActiva(true)
       mostrarNotificacion('🎉 Mi Baradero — Eventos', {
-        body: 'Te avisaremos cuando se acerque un evento en Baradero.',
+        body: saludar('Te avisaremos cuando se acerque un evento en Baradero.'),
         icon: '/logo-mibaradero.png',
       })
     }
@@ -65,7 +65,7 @@ export default function Eventos() {
     if (permiso === 'granted') {
       setNotifNuevos(true)
       mostrarNotificacion('📅 Mi Baradero — Nuevos eventos', {
-        body: 'Te avisaremos cuando se agregue un nuevo evento a la agenda.',
+        body: saludar('Te avisaremos cuando se agregue un nuevo evento a la agenda.'),
         icon: '/logo-mibaradero.png',
       })
     }

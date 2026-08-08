@@ -9,6 +9,8 @@
 // contra eso: en esos navegadores simplemente no hay notificaciones,
 // pero todo lo demás (guardar datos, etc.) sigue funcionando.
 
+import { nombreVecino } from './perfilLocal'
+
 export const soportaNotificaciones = () => typeof window !== 'undefined' && 'Notification' in window
 
 export async function pedirPermisoNotificacion() {
@@ -35,4 +37,11 @@ export function mostrarNotificacion(titulo, opciones) {
     // Algunos navegadores móviles exponen el permiso pero no soportan
     // instanciar Notification directamente (piden Service Worker).
   }
+}
+
+// Antepone un saludo con el nombre guardado en el perfil del vecino
+// (si cargó uno), para personalizar el cuerpo de las notificaciones.
+export function saludar(mensaje) {
+  const nombre = nombreVecino()
+  return nombre ? `¡Hola ${nombre}! ${mensaje}` : mensaje
 }
