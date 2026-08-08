@@ -100,14 +100,14 @@ export default function Residuos() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero amarillo */}
-      <div className="bg-gradient-to-br from-amarillo to-yellow-500 text-gray-900 py-10 sm:py-12 px-4">
+      <div className="bg-gradient-to-br from-amarillo to-yellow-500 text-gray-900 dark:text-white py-10 sm:py-12 px-4">
         <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black/10 flex items-center justify-center shrink-0">
             <Trash2 className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Recolección de Residuos</h1>
-            <p className="text-gray-700 text-sm sm:text-base">Calendario, alertas y seguimiento GPS del camión</p>
+            <p className="text-gray-700 dark:text-white/80 text-sm sm:text-base">Calendario, alertas y seguimiento GPS del camión</p>
           </div>
         </div>
       </div>
