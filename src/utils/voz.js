@@ -46,33 +46,58 @@ async function elegirVozCalida() {
   return preferida
 }
 
-// Arma (sin hablar todavía) una frase configurada con una voz cálida y
-// un tono/velocidad más suaves que el default robótico del navegador.
-export async function crearVoz(texto) {
-  const utterance = new SpeechSynthesisUtterance(texto)
-  utterance.lang = 'es-AR'
-  utterance.rate = 0.95 // un poco más lenta, se entiende mejor y suena más calma
-  utterance.pitch = 1.08 // un poco más aguda, suaviza el tono
-  utterance.volume = 1
-  const voz = await elegirVozCalida()
-  if (voz) utterance.voice = voz
-  return utterance
+// Corta el texto en oraciones (por ".", "!", "?" o "…") para poder
+// hablarlas una por una con una pausa real entre medio — el navegador
+// no soporta pausas tipo SSML dentro de una sola frase, así que la
+// forma de lograr un ritmo pausado es literalmente hablar de a partes.
+function dividirEnFrases(texto) {
+  return texto
+    .split(/(?<=[.!?…])\s+/)
+    .map(f => f.trim())
+    .filter(Boolean)
 }
 
-// Dice un texto en voz alta y resuelve cuando termina de hablar.
-export async function hablar(texto) {
-  if (!soportaSintesisVoz()) return
-  const synth = window.speechSynthesis
-  synth.cancel()
-  const utterance = await crearVoz(texto)
+function esperar(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function hablarFrase(frase, voz) {
   return new Promise(resolve => {
+    const utterance = new SpeechSynthesisUtterance(frase)
+    utterance.lang = 'es-AR'
+    utterance.rate = 0.9 // pausada, sin apurarse
+    utterance.pitch = 1.02 // casi natural, apenas suavizada (evita sonar "artificial")
+    utterance.volume = 1
+    if (voz) utterance.voice = voz
     utterance.onend = resolve
     utterance.onerror = resolve
-    synth.speak(utterance)
+    window.speechSynthesis.speak(utterance)
   })
 }
 
+// Se usa para poder cortar una lectura larga a la mitad (botón "detener")
+// sin que el resto de las frases pendientes se sigan escuchando.
+let generacionActual = 0
+
+// Dice un texto en voz alta, de a una oración por vez con una pequeña
+// pausa entre cada una, y resuelve cuando termina (o cuando se cancela).
+export async function hablar(texto) {
+  if (!soportaSintesisVoz()) return
+  const miGeneracion = ++generacionActual
+  window.speechSynthesis.cancel()
+  const voz = await elegirVozCalida()
+  const frases = dividirEnFrases(texto)
+
+  for (let i = 0; i < frases.length; i++) {
+    if (miGeneracion !== generacionActual) return // se canceló o se pidió hablar otra cosa
+    await hablarFrase(frases[i], voz)
+    if (miGeneracion !== generacionActual) return
+    if (i < frases.length - 1) await esperar(180) // pausa breve entre oraciones
+  }
+}
+
 export function detenerVoz() {
+  generacionActual++
   window.speechSynthesis?.cancel()
 }
 

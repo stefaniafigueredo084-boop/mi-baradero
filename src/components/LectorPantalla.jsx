@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Mic, Volume2, VolumeX } from 'lucide-react'
 import { useAccesibilidad } from '../context/AccesibilidadContext'
-import { soportaReconocimientoVoz, crearVoz } from '../utils/voz'
+import { soportaReconocimientoVoz, hablar, detenerVoz } from '../utils/voz'
 import AsistenteVoz from './AsistenteVoz'
 
 const PALABRAS_ACTIVACION = ['asistente', 'mi baradero']
@@ -30,7 +30,7 @@ export default function LectorPantalla() {
 
   // Escucha continua de la palabra de activación.
   useEffect(() => {
-    if (!lector || asistenteAbierto || !soportaReconocimientoVoz()) {
+    if (!lector || asistenteAbierto || leyendo || !soportaReconocimientoVoz()) {
       setEscuchandoActivacion(false)
       return
     }
@@ -86,7 +86,7 @@ export default function LectorPantalla() {
       setEscuchandoActivacion(false)
       try { reconocimiento.stop() } catch { /* ya detenido */ }
     }
-  }, [lector, asistenteAbierto])
+  }, [lector, asistenteAbierto, leyendo])
 
   if (!lector) return null
 
@@ -94,19 +94,15 @@ export default function LectorPantalla() {
 
   const alternarLectura = async () => {
     if (!soportado) return
-    const synth = window.speechSynthesis
     if (leyendo) {
-      synth.cancel()
+      detenerVoz()
       setLeyendo(false)
       return
     }
     const contenido = document.querySelector('main')?.innerText || document.body.innerText
-    const utterance = await crearVoz(contenido)
-    utterance.onend = () => setLeyendo(false)
-    utterance.onerror = () => setLeyendo(false)
-    synth.cancel()
-    synth.speak(utterance)
     setLeyendo(true)
+    await hablar(contenido)
+    setLeyendo(false)
   }
 
   return (
