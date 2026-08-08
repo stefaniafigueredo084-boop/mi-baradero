@@ -40,11 +40,11 @@ export default function Eventos() {
   const avisoEventos = useAviso('avisoEventos', notifActiva, aviso => ({
     title: '🎉 Mi Baradero — Eventos',
     body: saludar(aviso.mensaje),
-  }))
+  }), 'eventos')
   const avisoNuevosEventos = useAviso('avisoEventos', notifNuevos, () => ({
     title: '📅 Mi Baradero — Nuevos eventos',
     body: saludar('Se agregó un nuevo evento a la agenda.'),
-  }))
+  }), 'nuevosEventos')
 
   const activarNotif = async () => {
     if (notifActiva) {
@@ -57,7 +57,7 @@ export default function Eventos() {
       mostrarNotificacion('🎉 Mi Baradero — Eventos', {
         body: saludar('Te avisaremos cuando se acerque un evento en Baradero.'),
         icon: '/logo-mibaradero.png',
-      })
+      }, 'eventos')
     }
   }
 
@@ -72,7 +72,7 @@ export default function Eventos() {
       mostrarNotificacion('📅 Mi Baradero — Nuevos eventos', {
         body: saludar('Te avisaremos cuando se agregue un nuevo evento a la agenda.'),
         icon: '/logo-mibaradero.png',
-      })
+      }, 'nuevosEventos')
     }
   }
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Mic, Volume2, VolumeX } from 'lucide-react'
 import { useAccesibilidad } from '../context/AccesibilidadContext'
-import { soportaReconocimientoVoz } from '../utils/voz'
+import { soportaReconocimientoVoz, crearVoz } from '../utils/voz'
 import AsistenteVoz from './AsistenteVoz'
 
 const PALABRAS_ACTIVACION = ['asistente', 'mi baradero']
@@ -92,7 +92,7 @@ export default function LectorPantalla() {
 
   const soportado = typeof window !== 'undefined' && 'speechSynthesis' in window
 
-  const alternarLectura = () => {
+  const alternarLectura = async () => {
     if (!soportado) return
     const synth = window.speechSynthesis
     if (leyendo) {
@@ -101,8 +101,7 @@ export default function LectorPantalla() {
       return
     }
     const contenido = document.querySelector('main')?.innerText || document.body.innerText
-    const utterance = new SpeechSynthesisUtterance(contenido)
-    utterance.lang = 'es-AR'
+    const utterance = await crearVoz(contenido)
     utterance.onend = () => setLeyendo(false)
     utterance.onerror = () => setLeyendo(false)
     synth.cancel()

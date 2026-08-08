@@ -7,7 +7,7 @@ import { mostrarNotificacion } from '../utils/notificaciones'
 // publica avisos puntuales (EnviarAviso). Devuelve el último aviso, y si
 // "activo" es true dispara una notificación del navegador cada vez que
 // llega uno nuevo (comparando por su timestamp "enviadoEn").
-export function useAviso(nombreDoc, activo, formatear) {
+export function useAviso(nombreDoc, activo, formatear, sector) {
   const [aviso, setAviso] = useState(null)
   const activoRef = useRef(activo)
   activoRef.current = activo
@@ -25,7 +25,7 @@ export function useAviso(nombreDoc, activo, formatear) {
         ultimoEnviadoEn.current = datos.enviadoEn
         if (activoRef.current) {
           const { title, body } = formatear(datos)
-          mostrarNotificacion(title, { body, icon: '/logo-mibaradero.png' })
+          mostrarNotificacion(title, { body, icon: '/logo-mibaradero.png' }, sector)
         }
       }
     })

@@ -26,7 +26,7 @@ function useGpsCamion(activo) {
           mostrarNotificacion('🚛 Mi Baradero — Camión cerca', {
             body: saludar('El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!'),
             icon: '/logo-mibaradero.png',
-          })
+          }, 'basura')
           setNotifEnviada(true)
         }
         return nueva <= 0 ? 0 : nueva
@@ -80,7 +80,7 @@ export default function Residuos() {
   const avisoResiduos = useAviso('avisoResiduos', notifActiva, aviso => ({
     title: '🚛 Mi Baradero — Recolección de Residuos',
     body: saludar(aviso.mensaje),
-  }))
+  }), 'basura')
 
   const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long' })
   const hoyCapitalizado = hoy.charAt(0).toUpperCase() + hoy.slice(1)

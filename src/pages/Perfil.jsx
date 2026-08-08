@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
 import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2 } from 'lucide-react'
-import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play } from 'lucide-react'
+import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
+import { hablar } from '../utils/voz'
+import { NOTIF_SECTORES } from '../data/notifSectores'
+
+const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, nuevosEventos: Bell, puntosVerdes: Recycle }
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -17,6 +21,14 @@ const defaultPerfil = {
   zona: '',
   avatar: '',
   notif: {
+    basura: false,
+    eventos: false,
+    puntosVerdes: false,
+    nuevosEventos: false,
+  },
+  // Además de la notificación visual, ¿este sector te lo tengo que leer
+  // en voz alta? Solo tiene efecto si "Lector de pantalla" está activado.
+  notifVoz: {
     basura: false,
     eventos: false,
     puntosVerdes: false,
@@ -39,6 +51,7 @@ export default function Perfil() {
 
   const set = (campo, valor) => setPerfil(p => ({ ...p, [campo]: valor }))
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
+  const setNotifVoz = (campo, valor) => setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } }))
 
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
@@ -95,12 +108,7 @@ export default function Perfil() {
     ? `${perfil.nombre?.[0] || ''}${perfil.apellido?.[0] || ''}`.toUpperCase()
     : '?'
 
-  const notifItems = [
-    { key: 'basura', icon: Trash2, label: 'Recolección de Basura', desc: 'Avisame cuando el camión esté cerca de mi casa', color: 'amarillo' },
-    { key: 'eventos', icon: Calendar, label: 'Eventos próximos', desc: 'Notificación antes de que empiece un evento', color: 'verde' },
-    { key: 'nuevosEventos', icon: Bell, label: 'Nuevos eventos', desc: 'Cuando se agregue un evento nuevo a la agenda', color: 'azul' },
-    { key: 'puntosVerdes', icon: Recycle, label: 'Puntos Verdes', desc: 'Avisos sobre los puntos de reciclaje cercanos', color: 'verde' },
-  ]
+  const escucharEjemplo = ejemplo => hablar(saludar(ejemplo))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -301,47 +309,86 @@ export default function Perfil() {
             Elegí qué avisos querés recibir. Te llegará una notificación al dispositivo y al teléfono si lo cargaste.
           </p>
           <div className="space-y-3">
-            {notifItems.map(({ key, icon: Icon, label, desc, color }) => (
-              <div
-                key={key}
-                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
-                  perfil.notif[key]
-                    ? color === 'amarillo' ? 'border-amarillo/40 bg-amarillo/5'
-                    : color === 'azul' ? 'border-azul/30 bg-azul/5'
-                    : 'border-verde/30 bg-verde/5'
-                    : 'border-gray-100 bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+            {NOTIF_SECTORES.map(({ key, label, desc, color, ejemplo }) => {
+              const Icon = ICONOS_NOTIF[key]
+              return (
+                <div
+                  key={key}
+                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                     perfil.notif[key]
-                      ? color === 'amarillo' ? 'bg-amarillo/20' : color === 'azul' ? 'bg-azul/15' : 'bg-verde/15'
-                      : 'bg-gray-200'
-                  }`}>
-                    <Icon className={`w-5 h-5 ${
-                      perfil.notif[key]
-                        ? color === 'amarillo' ? 'text-yellow-600' : color === 'azul' ? 'text-azul' : 'text-verde'
-                        : 'text-gray-400'
-                    }`} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800 text-sm">{label}</p>
-                    <p className="text-xs text-gray-500">{desc}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setNotif(key, !perfil.notif[key])}
-                  className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
-                    perfil.notif[key] ? 'bg-verde' : 'bg-gray-300'
+                      ? color === 'amarillo' ? 'border-amarillo/40 bg-amarillo/5'
+                      : color === 'azul' ? 'border-azul/30 bg-azul/5'
+                      : 'border-verde/30 bg-verde/5'
+                      : 'border-gray-100 bg-gray-50'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${
-                    perfil.notif[key] ? 'left-6' : 'left-0.5'
-                  }`} />
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        perfil.notif[key]
+                          ? color === 'amarillo' ? 'bg-amarillo/20' : color === 'azul' ? 'bg-azul/15' : 'bg-verde/15'
+                          : 'bg-gray-200'
+                      }`}>
+                        <Icon className={`w-5 h-5 ${
+                          perfil.notif[key]
+                            ? color === 'amarillo' ? 'text-yellow-600' : color === 'azul' ? 'text-azul' : 'text-verde'
+                            : 'text-gray-400'
+                        }`} />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800 text-sm">{label}</p>
+                        <p className="text-xs text-gray-500">{desc}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setNotif(key, !perfil.notif[key])}
+                      className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
+                        perfil.notif[key] ? 'bg-verde' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${
+                        perfil.notif[key] ? 'left-6' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+
+                  {/* Si está activada, ofrecemos que también llegue hablada */}
+                  {perfil.notif[key] && (
+                    <div className="mt-3 pt-3 border-t border-gray-200/70 flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Volume2 className={`w-4 h-4 shrink-0 ${perfil.notifVoz[key] ? 'text-verde' : 'text-gray-400'}`} />
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-700">Recibir también con voz</p>
+                          <button
+                            type="button"
+                            onClick={() => escucharEjemplo(ejemplo)}
+                            className="flex items-center gap-1 text-xs text-azul hover:text-azul-oscuro font-medium mt-0.5"
+                          >
+                            <Play className="w-3 h-3" /> Escuchar ejemplo
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setNotifVoz(key, !perfil.notifVoz[key])}
+                        className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
+                          perfil.notifVoz[key] ? 'bg-verde' : 'bg-gray-300'
+                        }`}
+                      >
+                        <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${
+                          perfil.notifVoz[key] ? 'left-6' : 'left-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
+          {lector === false && (
+            <p className="text-xs text-gray-400 mt-3">
+              💡 Para que las notificaciones se lean en voz alta necesitás activar "Lector de pantalla" más arriba.
+            </p>
+          )}
         </div>
 
         {/* Botones */}

@@ -14,15 +14,58 @@ export function soportaSintesisVoz() {
   return typeof window !== 'undefined' && 'speechSynthesis' in window
 }
 
-// Dice un texto en voz alta y resuelve cuando termina de hablar.
-export function hablar(texto) {
+// El navegador tarda en cargar la lista de voces instaladas (a veces es
+// asincrónico, vía el evento "voiceschanged"). La cacheamos una sola vez.
+let vocesCache = null
+
+function obtenerVoces() {
   return new Promise(resolve => {
-    if (!soportaSintesisVoz()) return resolve()
-    const synth = window.speechSynthesis
-    synth.cancel()
-    const utterance = new SpeechSynthesisUtterance(texto)
-    utterance.lang = 'es-AR'
-    utterance.rate = 1
+    if (!soportaSintesisVoz()) return resolve([])
+    const voces = window.speechSynthesis.getVoices()
+    if (voces.length > 0) return resolve(voces)
+    window.speechSynthesis.onvoiceschanged = () => resolve(window.speechSynthesis.getVoices())
+    // Si el navegador nunca dispara el evento, no nos quedamos esperando.
+    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 500)
+  })
+}
+
+// Entre las voces en español disponibles, prioriza las que suelen sonar
+// más naturales/cálidas (voces "Google" en Chrome, o nombres de voces
+// femeninas que suelen tener una entonación más suave), en vez de la
+// primera voz robótica que encuentre el navegador.
+async function elegirVozCalida() {
+  if (vocesCache !== null) return vocesCache
+  const voces = await obtenerVoces()
+  const esEspanol = voces.filter(v => v.lang?.toLowerCase().startsWith('es'))
+  const preferida =
+    esEspanol.find(v => /google/i.test(v.name)) ||
+    esEspanol.find(v => /(mujer|female|paulina|mónica|monica|helena|elvira|sabina|lucia|luciana|camila|valentina)/i.test(v.name)) ||
+    esEspanol[0] ||
+    null
+  vocesCache = preferida
+  return preferida
+}
+
+// Arma (sin hablar todavía) una frase configurada con una voz cálida y
+// un tono/velocidad más suaves que el default robótico del navegador.
+export async function crearVoz(texto) {
+  const utterance = new SpeechSynthesisUtterance(texto)
+  utterance.lang = 'es-AR'
+  utterance.rate = 0.95 // un poco más lenta, se entiende mejor y suena más calma
+  utterance.pitch = 1.08 // un poco más aguda, suaviza el tono
+  utterance.volume = 1
+  const voz = await elegirVozCalida()
+  if (voz) utterance.voice = voz
+  return utterance
+}
+
+// Dice un texto en voz alta y resuelve cuando termina de hablar.
+export async function hablar(texto) {
+  if (!soportaSintesisVoz()) return
+  const synth = window.speechSynthesis
+  synth.cancel()
+  const utterance = await crearVoz(texto)
+  return new Promise(resolve => {
     utterance.onend = resolve
     utterance.onerror = resolve
     synth.speak(utterance)

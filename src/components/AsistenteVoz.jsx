@@ -4,13 +4,14 @@ import { Mic, MicOff, X } from 'lucide-react'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado } from '../utils/perfilLocal'
 import { hablar, escuchar, esAfirmativo, esNegativo, detenerVoz, soportaReconocimientoVoz } from '../utils/voz'
+import { NOTIF_SECTORES } from '../data/notifSectores'
 
-const SECTORES_VOZ = [
-  { key: 'basura', pregunta: '¿Querés activar notificaciones de recolección de residuos? Decí sí o no.' },
-  { key: 'eventos', pregunta: '¿Querés activar notificaciones de eventos próximos? Decí sí o no.' },
-  { key: 'nuevosEventos', pregunta: '¿Querés que te avise cuando se agreguen eventos nuevos a la agenda? Decí sí o no.' },
-  { key: 'puntosVerdes', pregunta: '¿Querés activar notificaciones de puntos verdes? Decí sí o no.' },
-]
+const PREGUNTAS_SECTOR = {
+  basura: '¿Querés activar notificaciones de recolección de residuos?',
+  eventos: '¿Querés activar notificaciones de eventos próximos?',
+  nuevosEventos: '¿Querés que te avise cuando se agreguen eventos nuevos a la agenda?',
+  puntosVerdes: '¿Querés activar notificaciones de puntos verdes?',
+}
 
 // Asistente conversacional por voz para registrarse sin usar el
 // formulario: pregunta y confirma cada dato hablado, y al final guarda
@@ -102,9 +103,15 @@ export default function AsistenteVoz({ onClose }) {
     throw new Error('sin-respuesta')
   }
 
-  const guardarPerfilPorVoz = async ({ nombre, apellido, notif }) => {
+  const guardarPerfilPorVoz = async ({ nombre, apellido, notif, notifVoz }) => {
     const previo = JSON.parse(localStorage.getItem('mibaradero_perfil') || 'null') || {}
-    const perfil = { ...previo, nombre, apellido, notif: { ...previo.notif, ...notif } }
+    const perfil = {
+      ...previo,
+      nombre,
+      apellido,
+      notif: { ...previo.notif, ...notif },
+      notifVoz: { ...previo.notifVoz, ...notifVoz },
+    }
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
 
     const esNuevo = esPrimerGuardadoVecino()
@@ -131,11 +138,19 @@ export default function AsistenteVoz({ onClose }) {
       const apellido = await preguntarTexto('Ahora decime tu apellido.')
 
       const notif = {}
-      for (const sector of SECTORES_VOZ) {
-        notif[sector.key] = await preguntarSiNo(sector.pregunta)
+      const notifVoz = {}
+      for (const sector of NOTIF_SECTORES) {
+        const quiereNotif = await preguntarSiNo(`${PREGUNTAS_SECTOR[sector.key]} Decí sí o no.`)
+        notif[sector.key] = quiereNotif
+        if (quiereNotif) {
+          await decir(`Te doy un ejemplo de cómo te llegaría: "${sector.ejemplo}"`)
+          notifVoz[sector.key] = await preguntarSiNo('¿Querés que estas notificaciones también te lleguen habladas, como recién? Decí sí o no.')
+        } else {
+          notifVoz[sector.key] = false
+        }
       }
 
-      await guardarPerfilPorVoz({ nombre, apellido, notif })
+      await guardarPerfilPorVoz({ nombre, apellido, notif, notifVoz })
       await decir(`Listo ${nombre}, guardé tu perfil y tus preferencias de notificación. ¡Gracias por usar Mi Baradero!`)
     } catch {
       if (!canceladoRef.current) {

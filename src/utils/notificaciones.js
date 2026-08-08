@@ -10,6 +10,7 @@
 // pero todo lo demás (guardar datos, etc.) sigue funcionando.
 
 import { nombreVecino } from './perfilLocal'
+import { hablar } from './voz'
 
 export const soportaNotificaciones = () => typeof window !== 'undefined' && 'Notification' in window
 
@@ -29,13 +30,38 @@ export function permisoConcedido() {
   return soportaNotificaciones() && Notification.permission === 'granted'
 }
 
-export function mostrarNotificacion(titulo, opciones) {
-  if (!permisoConcedido()) return
+function lectorActivo() {
   try {
-    new Notification(titulo, opciones)
+    return JSON.parse(localStorage.getItem('mibaradero_accesibilidad') || 'null')?.lector === true
   } catch {
-    // Algunos navegadores móviles exponen el permiso pero no soportan
-    // instanciar Notification directamente (piden Service Worker).
+    return false
+  }
+}
+
+function notifVozActiva(sector) {
+  if (!sector) return false
+  try {
+    const perfil = JSON.parse(localStorage.getItem('mibaradero_perfil') || 'null')
+    return perfil?.notifVoz?.[sector] === true
+  } catch {
+    return false
+  }
+}
+
+// Además de la notificación visual del navegador, si la persona tiene
+// activado el lector de pantalla Y eligió que este sector le llegue
+// hablado, lee el mensaje en voz alta.
+export function mostrarNotificacion(titulo, opciones, sector) {
+  if (permisoConcedido()) {
+    try {
+      new Notification(titulo, opciones)
+    } catch {
+      // Algunos navegadores móviles exponen el permiso pero no soportan
+      // instanciar Notification directamente (piden Service Worker).
+    }
+  }
+  if (opciones?.body && lectorActivo() && notifVozActiva(sector)) {
+    hablar(opciones.body)
   }
 }
 
