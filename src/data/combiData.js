@@ -62,3 +62,10 @@ export const alertasCombi = [
     hora: '12:10',
   },
 ]
+
+export const datosPago = {
+  alias: 'Mi.baradero.no.es.un.alias.verdadero',
+  titular: 'Mi Baradero APP',
+  telefono: '5493329383105',
+  telefonoVisible: '+54 9 3329 38-3105',
+}

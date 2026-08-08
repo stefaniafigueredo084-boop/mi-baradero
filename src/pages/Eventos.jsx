@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Calendar, MapPin, Clock, Filter, Star, Bell, BellOff, CheckCircle, Plus } from 'lucide-react'
-import { eventos, categorias } from '../data/eventosData'
+import { eventos as eventosFijos, categorias as categoriasBase } from '../data/eventosData'
+import { useColeccion } from '../hooks/useColeccion'
+import { useAviso } from '../hooks/useAviso'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-verde/10 text-verde',
@@ -14,43 +16,29 @@ const categoriaBadgeColor = {
   'Salud': 'bg-red-100 text-red-700',
 }
 
-function GaleriaCard({ evento }) {
-  return (
-    <div className="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer h-52">
-      {evento.imagen ? (
-        <img
-          src={evento.imagen}
-          alt={evento.titulo}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      ) : (
-        <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(135deg, ${evento.color1}, ${evento.color2})` }}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      <div className="absolute top-3 left-3">
-        <span className="bg-white/20 backdrop-blur-sm border border-white/25 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-          {evento.tag}
-        </span>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <p className="text-white/65 text-xs mb-0.5">{evento.categoria}</p>
-        <h3 className="text-white font-bold font-poppins text-sm leading-tight mb-1">{evento.titulo}</h3>
-        <div className="flex items-center justify-between text-white/65 text-xs">
-          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{evento.ubicacion}</span>
-          <span>{evento.fecha}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function Eventos() {
   const [catActiva, setCatActiva] = useState('Todos')
   const [notifActiva, setNotifActiva] = useState(false)
   const [notifNuevos, setNotifNuevos] = useState(false)
+
+  // Eventos cargados desde el panel de trabajadores (Firestore), seguidos
+  // de los eventos fijos del sitio como respaldo.
+  const { items: eventosLive } = useColeccion('eventos')
+  const eventos = useMemo(() => [...eventosLive, ...eventosFijos], [eventosLive])
+
+  const categorias = useMemo(() => {
+    const nuevas = [...new Set(eventos.map(e => e.categoria).filter(Boolean))].filter(c => !categoriasBase.includes(c))
+    return [...categoriasBase, ...nuevas]
+  }, [eventos])
+
+  const avisoEventos = useAviso('avisoEventos', notifActiva, aviso => ({
+    title: '🎉 Mi Baradero — Eventos',
+    body: aviso.mensaje,
+  }))
+  const avisoNuevosEventos = useAviso('avisoEventos', notifNuevos, () => ({
+    title: '📅 Mi Baradero — Nuevos eventos',
+    body: 'Se agregó un nuevo evento a la agenda.',
+  }))
 
   const activarNotif = async () => {
     if (notifActiva) {
@@ -108,8 +96,8 @@ export default function Eventos() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 mt-6">
             {[
-              { label: 'Eventos este mes', value: '6' },
-              { label: 'Categorías', value: '8' },
+              { label: 'Eventos este mes', value: String(eventos.length) },
+              { label: 'Categorías', value: String(categorias.length - 1) },
             ].map(s => (
               <div key={s.label} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold font-poppins text-amarillo">{s.value}</p>
@@ -172,6 +160,12 @@ export default function Eventos() {
                 <p className="text-xs text-verde-oscuro">Te avisaremos antes de cada evento de Baradero.</p>
               </div>
             )}
+            {avisoEventos?.mensaje && (
+              <div className="mt-3 flex items-center gap-2 bg-amarillo/10 border border-amarillo/30 rounded-xl p-3">
+                <Bell className="w-4 h-4 text-yellow-700 shrink-0" />
+                <p className="text-xs text-yellow-800">{avisoEventos.mensaje}</p>
+              </div>
+            )}
           </div>
 
           <div className="card p-5">
@@ -232,9 +226,9 @@ export default function Eventos() {
             {eventosFiltrados.map(evento => (
               <div key={evento.id} className="card overflow-hidden group">
                 <div className="h-48 relative overflow-hidden">
-                  {evento.imagen ? (
+                  {evento.imagenData || evento.imagen ? (
                     <img
-                      src={evento.imagen}
+                      src={evento.imagenData || evento.imagen}
                       alt={evento.titulo}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

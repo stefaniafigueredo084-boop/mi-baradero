@@ -1,15 +1,86 @@
-import { useState } from 'react'
-import { Bus, MapPin, Clock, Users, CheckCircle, AlertCircle, Navigation, Bell, AlertTriangle, Info } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Bus, MapPin, Clock, Users, CheckCircle, AlertCircle, Navigation, Bell, BellOff, AlertTriangle, Info, Landmark, MessageCircle } from 'lucide-react'
 import { useCombiSimulation } from '../hooks/useCombiSimulation'
-import { paradas, horarios, destinos, alertasCombi } from '../data/combiData'
+import { useCombiEnVivo } from '../hooks/useCombiEnVivo'
+import { useColeccion } from '../hooks/useColeccion'
+import { paradas, horarios as horariosFijos, alertasCombi as alertasFijas, destinos, datosPago } from '../data/combiData'
 import QRModal from '../components/QRModal'
+import CopiarCampo from '../components/CopiarCampo'
 
 export default function CombiMunicipal() {
-  const { estadoActual, posicion, progreso } = useCombiSimulation()
+  const simulacion = useCombiSimulation()
+  const enVivo = useCombiEnVivo()
+  const { estadoActual, posicion, progreso } = enVivo || simulacion
+
   const [form, setForm] = useState({ nombre: '', dni: '', destino: '', fecha: '', horario: '' })
   const [qrDatos, setQrDatos] = useState(null)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [paso, setPaso] = useState('formulario') // 'formulario' | 'pago'
+  const [notifActiva, setNotifActiva] = useState(false)
+
+  // Notificación cuando un trabajador mueve la combi de posición.
+  const ultimaParadaId = useRef(enVivo?.paradaId)
+  useEffect(() => {
+    if (!enVivo) return
+    if (ultimaParadaId.current === undefined) {
+      ultimaParadaId.current = enVivo.paradaId
+      return
+    }
+    if (enVivo.paradaId !== ultimaParadaId.current) {
+      ultimaParadaId.current = enVivo.paradaId
+      if (notifActiva && Notification.permission === 'granted') {
+        new Notification('🚌 Mi Baradero — Combi Municipal', {
+          body: `${enVivo.estadoActual}. ¡Prepará tu pasaje!`,
+          icon: '/logo-mibaradero.png',
+        })
+      }
+    }
+  }, [enVivo, notifActiva])
+
+  const activarNotif = async () => {
+    if (notifActiva) {
+      setNotifActiva(false)
+      return
+    }
+    let permiso = Notification.permission
+    if (permiso === 'default') {
+      permiso = await Notification.requestPermission()
+    }
+    if (permiso === 'granted') {
+      setNotifActiva(true)
+      new Notification('🚌 Mi Baradero — Combi Municipal', {
+        body: 'Te avisaremos cuando la combi cambie de posición.',
+        icon: '/logo-mibaradero.png',
+      })
+    }
+  }
+
+  // Horarios y alertas cargados desde el panel de trabajadores, combinados
+  // con los datos fijos del sitio.
+  const { items: horariosLive } = useColeccion('horariosCombi')
+  const { items: alertasLive } = useColeccion('alertasCombi')
+  const horarios = useMemo(() => [...horariosFijos, ...horariosLive], [horariosLive])
+  const alertasCombi = useMemo(() => [...alertasLive, ...alertasFijas], [alertasLive])
+
+  // Notificación cuando se publica una alerta nueva.
+  const ultimaAlertaId = useRef(undefined)
+  useEffect(() => {
+    const ultima = alertasLive[0]
+    if (ultimaAlertaId.current === undefined) {
+      ultimaAlertaId.current = ultima?.id ?? null
+      return
+    }
+    if (ultima && ultima.id !== ultimaAlertaId.current) {
+      ultimaAlertaId.current = ultima.id
+      if (notifActiva && Notification.permission === 'granted') {
+        new Notification('🚌 Mi Baradero — Combi Municipal', {
+          body: ultima.mensaje,
+          icon: '/logo-mibaradero.png',
+        })
+      }
+    }
+  }, [alertasLive, notifActiva])
 
   const validate = () => {
     const e = {}
@@ -21,19 +92,36 @@ export default function CombiMunicipal() {
     return e
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault()
     const e2 = validate()
     if (Object.keys(e2).length > 0) { setErrors(e2); return }
     setErrors({})
-    const horarioSeleccionado = horarios.find(h => h.id === parseInt(form.horario))
-    setQrDatos({ ...form, horario: horarioSeleccionado?.salida || form.horario })
-    setSubmitted(true)
+    setPaso('pago')
   }
 
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }))
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }))
+  }
+
+  const confirmarPago = () => {
+    const horarioSeleccionado = horarios.find(h => h.id === parseInt(form.horario))
+    const texto = [
+      '*Comprobante de pago - Pasaje Combi Municipal*',
+      `Nombre: ${form.nombre}`,
+      `DNI: ${form.dni}`,
+      `Destino: ${form.destino}`,
+      `Fecha: ${form.fecha}`,
+      `Horario: ${horarioSeleccionado?.salida || form.horario}`,
+      '',
+      'Adjunto el comprobante de la transferencia.',
+    ].join('\n')
+    const url = `https://wa.me/${datosPago.telefono}?text=${encodeURIComponent(texto)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    setQrDatos({ ...form, horario: horarioSeleccionado?.salida || form.horario })
+    setSubmitted(true)
+    setPaso('formulario')
   }
 
   return (
@@ -55,13 +143,22 @@ export default function CombiMunicipal() {
 
         {/* Estado en tiempo real */}
         <div className="card p-6">
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-5 flex-wrap">
             <Navigation className="w-6 h-6 text-verde" />
             <h2 className="text-xl font-bold font-poppins">Seguimiento en Tiempo Real</h2>
-            <span className="badge bg-verde/10 text-verde ml-auto">
+            <span className="badge bg-verde/10 text-verde">
               <span className="w-2 h-2 rounded-full bg-verde animate-pulse inline-block mr-1" />
               En vivo
             </span>
+            <button
+              onClick={activarNotif}
+              className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                notifActiva ? 'bg-verde/10 text-verde border border-verde/30' : 'bg-verde text-white hover:bg-verde-oscuro shadow-sm'
+              }`}
+            >
+              {notifActiva ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+              {notifActiva ? 'Notificaciones activadas' : 'Avisame cuando se mueva'}
+            </button>
           </div>
 
           {/* Mapa simulado */}
@@ -117,7 +214,9 @@ export default function CombiMunicipal() {
             </div>
             <div>
               <p className="font-semibold text-verde-oscuro">{estadoActual}</p>
-              <p className="text-sm text-gray-500">Actualización automática cada 2.5 segundos</p>
+              <p className="text-sm text-gray-500">
+                {enVivo ? 'Posición confirmada por el municipio' : 'Actualización automática cada 2.5 segundos'}
+              </p>
             </div>
             <div className="ml-auto text-right">
               <p className="text-xs text-gray-400">Recorrido</p>
@@ -231,81 +330,118 @@ export default function CombiMunicipal() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {paso === 'pago' ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nombre completo *</label>
-              <input
-                type="text"
-                className={`input-field ${errors.nombre ? 'border-red-400 ring-1 ring-red-400' : ''}`}
-                placeholder="Juan García"
-                value={form.nombre}
-                onChange={e => handleChange('nombre', e.target.value)}
-              />
-              {errors.nombre && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.nombre}</p>}
-            </div>
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-sm text-gray-600 space-y-1">
+                <p><span className="font-semibold text-gray-800">{form.nombre}</span> · DNI {form.dni}</p>
+                <p>{form.destino} · {form.fecha}</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">DNI *</label>
-              <input
-                type="text"
-                className={`input-field ${errors.dni ? 'border-red-400 ring-1 ring-red-400' : ''}`}
-                placeholder="30123456"
-                value={form.dni}
-                onChange={e => handleChange('dni', e.target.value.replace(/\D/g, ''))}
-                maxLength={8}
-              />
-              {errors.dni && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.dni}</p>}
-            </div>
+              <div className="flex items-center gap-2 mb-4">
+                <Landmark className="w-5 h-5 text-verde" />
+                <h3 className="font-bold font-poppins text-gray-800">Datos para transferir</h3>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Destino *</label>
-              <select
-                className={`select-field ${errors.destino ? 'border-red-400 ring-1 ring-red-400' : ''}`}
-                value={form.destino}
-                onChange={e => handleChange('destino', e.target.value)}
-              >
-                <option value="">Seleccioná destino</option>
-                {destinos.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-              {errors.destino && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.destino}</p>}
-            </div>
+              <div className="space-y-3 mb-6">
+                <CopiarCampo label="Alias" valor={datosPago.alias} />
+                <CopiarCampo label="Titular" valor={datosPago.titular} />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Fecha *</label>
-              <input
-                type="date"
-                className={`input-field ${errors.fecha ? 'border-red-400 ring-1 ring-red-400' : ''}`}
-                value={form.fecha}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={e => handleChange('fecha', e.target.value)}
-              />
-              {errors.fecha && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.fecha}</p>}
-            </div>
+              <div className="bg-azul/5 border border-azul/20 rounded-xl p-4 mb-6 flex items-start gap-3">
+                <MessageCircle className="w-5 h-5 text-azul shrink-0 mt-0.5" />
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  Una vez que hagas la transferencia, envianos el comprobante por WhatsApp al{' '}
+                  <span className="font-semibold text-azul-oscuro">{datosPago.telefonoVisible}</span> para confirmar tu pasaje.
+                </p>
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Horario *</label>
-              <select
-                className={`select-field ${errors.horario ? 'border-red-400 ring-1 ring-red-400' : ''}`}
-                value={form.horario}
-                onChange={e => handleChange('horario', e.target.value)}
-              >
-                <option value="">Seleccioná horario</option>
-                {horarios.filter(h => h.disponibles > 0).map(h => (
-                  <option key={h.id} value={h.id}>
-                    {h.salida} - {h.origen} → {h.destino} ({h.disponibles} lugares)
-                  </option>
-                ))}
-              </select>
-              {errors.horario && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.horario}</p>}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button type="button" onClick={() => setPaso('formulario')} className="btn-secondary sm:w-40">
+                  Volver
+                </button>
+                <button type="button" onClick={confirmarPago} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Enviar comprobante por WhatsApp
+                </button>
+              </div>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nombre completo *</label>
+                <input
+                  type="text"
+                  className={`input-field ${errors.nombre ? 'border-red-400 ring-1 ring-red-400' : ''}`}
+                  placeholder="Juan García"
+                  value={form.nombre}
+                  onChange={e => handleChange('nombre', e.target.value)}
+                />
+                {errors.nombre && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.nombre}</p>}
+              </div>
 
-            <div className="sm:col-span-2">
-              <button type="submit" className="btn-primary w-full text-base py-4 flex items-center justify-center gap-2">
-                <Bus className="w-5 h-5" />
-                Comprar Pasaje
-              </button>
-            </div>
-          </form>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">DNI *</label>
+                <input
+                  type="text"
+                  className={`input-field ${errors.dni ? 'border-red-400 ring-1 ring-red-400' : ''}`}
+                  placeholder="30123456"
+                  value={form.dni}
+                  onChange={e => handleChange('dni', e.target.value.replace(/\D/g, ''))}
+                  maxLength={8}
+                />
+                {errors.dni && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.dni}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Destino *</label>
+                <select
+                  className={`select-field ${errors.destino ? 'border-red-400 ring-1 ring-red-400' : ''}`}
+                  value={form.destino}
+                  onChange={e => handleChange('destino', e.target.value)}
+                >
+                  <option value="">Seleccioná destino</option>
+                  {destinos.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                {errors.destino && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.destino}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Fecha *</label>
+                <input
+                  type="date"
+                  className={`input-field ${errors.fecha ? 'border-red-400 ring-1 ring-red-400' : ''}`}
+                  value={form.fecha}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={e => handleChange('fecha', e.target.value)}
+                />
+                {errors.fecha && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.fecha}</p>}
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Horario *</label>
+                <select
+                  className={`select-field ${errors.horario ? 'border-red-400 ring-1 ring-red-400' : ''}`}
+                  value={form.horario}
+                  onChange={e => handleChange('horario', e.target.value)}
+                >
+                  <option value="">Seleccioná horario</option>
+                  {horarios.filter(h => h.disponibles > 0).map(h => (
+                    <option key={h.id} value={h.id}>
+                      {h.salida} - {h.origen} → {h.destino} ({h.disponibles} lugares)
+                    </option>
+                  ))}
+                </select>
+                {errors.horario && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.horario}</p>}
+              </div>
+
+              <div className="sm:col-span-2">
+                <button type="submit" className="btn-primary w-full text-base py-4 flex items-center justify-center gap-2">
+                  <Bus className="w-5 h-5" />
+                  Comprar Pasaje
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
 

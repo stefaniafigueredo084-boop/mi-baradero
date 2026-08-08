@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3 } from 'lucide-react'
-import { puntosVerdes, materialesInfo } from '../data/puntosVerdesData'
+import { puntosVerdes as puntosFijos, materialesInfo } from '../data/puntosVerdesData'
+import { useColeccion } from '../hooks/useColeccion'
+import { posicionDesdeId } from '../utils/posicionHash'
 
 const instrucciones = [
   {
@@ -43,6 +45,14 @@ const instrucciones = [
 
 export default function PuntosVerdes() {
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null)
+
+  // Puntos cargados desde el panel de trabajadores, con una posición en
+  // el mapa calculada a partir de su id (el formulario no la pide).
+  const { items: puntosLive } = useColeccion('puntosVerdesExtra')
+  const puntosVerdes = useMemo(
+    () => [...puntosFijos, ...puntosLive.map(p => ({ ...posicionDesdeId(p.id), ...p }))],
+    [puntosLive]
+  )
 
   return (
     <div className="min-h-screen bg-gray-50">

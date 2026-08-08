@@ -1,6 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation } from 'lucide-react'
-import { calendario, zonas, estadosCamion, consejos } from '../data/residuosData'
+import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, consejos as consejosFijos } from '../data/residuosData'
+import { db } from '../firebase'
+import { useColeccion } from '../hooks/useColeccion'
+import { useAviso } from '../hooks/useAviso'
 
 function useGpsCamion(activo) {
   const [distancia, setDistancia] = useState(2400)
@@ -35,6 +39,18 @@ function useGpsCamion(activo) {
   return distancia
 }
 
+// Estado del camión y calendario, publicados por el panel de trabajadores
+// en documentos config/estadoCamion y config/calendarioResiduos.
+function useDocConfig(nombreDoc, valorInicial, extraer) {
+  const [valor, setValor] = useState(valorInicial)
+  useEffect(() => {
+    return onSnapshot(doc(db, 'config', nombreDoc), snap => {
+      if (snap.exists()) setValor(extraer(snap.data()))
+    })
+  }, [nombreDoc])
+  return valor
+}
+
 const colorMap = {
   verde: { bg: 'bg-verde/10', border: 'border-verde/30', text: 'text-verde', icon: 'bg-verde' },
   azul: { bg: 'bg-azul/10', border: 'border-azul/30', text: 'text-azul', icon: 'bg-azul' },
@@ -45,8 +61,21 @@ export default function Residuos() {
   const [notifActiva, setNotifActiva] = useState(false)
   const [gpsActivo, setGpsActivo] = useState(false)
   const [zonaSeleccionada, setZonaSeleccionada] = useState(null)
-  const [estadoCamion] = useState('EN_SERVICIO')
   const distancia = useGpsCamion(gpsActivo)
+
+  const estadoCamion = useDocConfig('estadoCamion', 'EN_SERVICIO', d => d.valor)
+  const calendario = useDocConfig('calendarioResiduos', calendarioFijo, d => d.dias)
+
+  const { items: zonasLive } = useColeccion('zonasResiduos')
+  const zonas = useMemo(() => [...zonasFijas, ...zonasLive], [zonasLive])
+
+  const { items: consejosLive } = useColeccion('consejosResiduos')
+  const consejos = useMemo(() => [...consejosFijos, ...consejosLive], [consejosLive])
+
+  const avisoResiduos = useAviso('avisoResiduos', notifActiva, aviso => ({
+    title: '🚛 Mi Baradero — Recolección de Residuos',
+    body: aviso.mensaje,
+  }))
 
   const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long' })
   const hoyCapitalizado = hoy.charAt(0).toUpperCase() + hoy.slice(1)
@@ -130,6 +159,12 @@ export default function Residuos() {
               <div className="mt-3 bg-verde/5 border border-verde/20 rounded-xl p-3 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-verde shrink-0" />
                 <p className="text-sm text-verde-oscuro">Notificaciones activadas. Te avisaremos 30 minutos antes de la recolección.</p>
+              </div>
+            )}
+            {avisoResiduos?.mensaje && (
+              <div className="mt-3 bg-amarillo/10 border border-amarillo/30 rounded-xl p-3 flex items-center gap-2">
+                <Truck className="w-4 h-4 text-yellow-700 shrink-0" />
+                <p className="text-sm text-yellow-800">{avisoResiduos.mensaje}</p>
               </div>
             )}
           </div>

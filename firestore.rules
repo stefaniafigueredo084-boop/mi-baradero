@@ -1,0 +1,71 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para "Mi Baradero".
+//
+// IMPORTANTE: esto NO se aplica solo (copiar el archivo al repo no alcanza).
+// Hay que pegarlo en Firebase Console → Firestore Database → Reglas → Publicar,
+// o desplegarlo con `firebase deploy --only firestore:rules` si tenés el
+// proyecto vinculado con firebase-tools.
+//
+// Sin esto, la separación por sectores del panel de trabajadores es solo
+// una restricción visual (de la interfaz): cualquiera con las credenciales
+// de un trabajador podría, en teoría, escribir en Firestore directamente
+// sin pasar por la UI. Estas reglas son las que hacen cumplir el permiso
+// del lado del servidor.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaLogueado() {
+      return request.auth != null;
+    }
+
+    function trabajador() {
+      return get(/databases/$(database)/documents/trabajadores/$(request.auth.uid)).data;
+    }
+
+    function esAdmin() {
+      return estaLogueado() && trabajador().rol == 'admin';
+    }
+
+    function esDelSector(seccion) {
+      return estaLogueado() && trabajador().rol == 'sector' && trabajador().sector == seccion;
+    }
+
+    function puedeEditar(seccion) {
+      return esAdmin() || esDelSector(seccion);
+    }
+
+    // trabajadores/{uid}: cada uno lee su propio doc (para saber su rol);
+    // el admin puede leer todos. Solo el admin puede crear/editar cuentas.
+    match /trabajadores/{uid} {
+      allow read: if estaLogueado() && (request.auth.uid == uid || esAdmin());
+      allow write: if esAdmin();
+    }
+
+    // Contenido editable desde el panel: lectura pública (lo consume el
+    // sitio para todos los vecinos), escritura solo del sector dueño o admin.
+    match /eventos/{doc}          { allow read: if true; allow write: if puedeEditar('eventos'); }
+    match /horariosCombi/{doc}    { allow read: if true; allow write: if puedeEditar('combi'); }
+    match /alertasCombi/{doc}     { allow read: if true; allow write: if puedeEditar('combi'); }
+    match /zonasResiduos/{doc}    { allow read: if true; allow write: if puedeEditar('residuos'); }
+    match /consejosResiduos/{doc} { allow read: if true; allow write: if puedeEditar('residuos'); }
+    match /puntosVerdesExtra/{doc}{ allow read: if true; allow write: if puedeEditar('puntosVerdes'); }
+
+    // Documentos de estado/avisos puntuales.
+    match /config/avisoEventos       { allow read: if true; allow write: if puedeEditar('eventos'); }
+    match /config/avisoResiduos      { allow read: if true; allow write: if puedeEditar('residuos'); }
+    match /config/estadoCamion       { allow read: if true; allow write: if puedeEditar('residuos'); }
+    match /config/calendarioResiduos { allow read: if true; allow write: if puedeEditar('residuos'); }
+    match /config/combiEnVivo        { allow read: if true; allow write: if puedeEditar('combi'); }
+
+    // Historial de actividad: cualquier trabajador logueado puede agregar
+    // una entrada (login/logout/acciones), pero es de solo lectura para el
+    // admin, e inmutable para todos (no se edita ni se borra).
+    match /historial/{doc} {
+      allow create: if estaLogueado();
+      allow read: if esAdmin();
+      allow update, delete: if false;
+    }
+  }
+}
