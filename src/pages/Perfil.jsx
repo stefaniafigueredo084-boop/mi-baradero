@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3 } from 'lucide-react'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2 } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion } from '../utils/notificaciones'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
+import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -24,6 +25,7 @@ const defaultPerfil = {
 }
 
 export default function Perfil() {
+  const { tema, setTema, tamanoFuente, setTamanoFuente, lector, setLector } = useAccesibilidad()
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
@@ -212,6 +214,80 @@ export default function Perfil() {
                 <option value="">Seleccioná tu zona</option>
                 {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
               </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Accesibilidad */}
+        <div className="card p-6">
+          <h2 className="text-lg font-bold font-poppins flex items-center gap-2 mb-5">
+            <Sun className="w-5 h-5 text-amarillo" /> Accesibilidad
+          </h2>
+
+          <div className="space-y-6">
+            {/* Tema claro/oscuro */}
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Apariencia</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setTema('claro')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
+                    tema === 'claro' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                  }`}
+                >
+                  <Sun className="w-4 h-4" /> Claro
+                </button>
+                <button
+                  onClick={() => setTema('oscuro')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
+                    tema === 'oscuro' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                  }`}
+                >
+                  <Moon className="w-4 h-4" /> Oscuro
+                </button>
+              </div>
+            </div>
+
+            {/* Tamaño de letra */}
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                <Type className="w-4 h-4" /> Tamaño de letra
+              </p>
+              <div className="grid grid-cols-4 gap-2">
+                {TAMANOS_FUENTE.map((t, i) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTamanoFuente(t.id)}
+                    title={t.descripcion}
+                    className={`py-3 rounded-xl font-bold border-2 transition-all ${
+                      tamanoFuente === t.id ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                    }`}
+                    style={{ fontSize: `${0.8 + i * 0.15}rem` }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-1.5">Cambia el tamaño de todo el texto del sitio.</p>
+            </div>
+
+            {/* Lector de pantalla */}
+            <div className="flex items-center justify-between gap-3 p-4 rounded-xl border-2 border-gray-100 bg-gray-50">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${lector ? 'bg-verde/15' : 'bg-gray-200'}`}>
+                  <Volume2 className={`w-5 h-5 ${lector ? 'text-verde' : 'text-gray-400'}`} />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 text-sm">Lector de pantalla</p>
+                  <p className="text-xs text-gray-500">Muestra un botón para escuchar el contenido de cada página en voz alta.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setLector(!lector)}
+                className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${lector ? 'bg-verde' : 'bg-gray-300'}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${lector ? 'left-6' : 'left-0.5'}`} />
+              </button>
             </div>
           </div>
         </div>

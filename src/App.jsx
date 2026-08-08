@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import LectorPantalla from './components/LectorPantalla'
 import Home from './pages/Home'
 import CombiMunicipal from './pages/CombiMunicipal'
 import Residuos from './pages/Residuos'
@@ -29,6 +30,7 @@ function Layout() {
         </Routes>
       </main>
       {!esPanelTrabajadores && <Footer />}
+      <LectorPantalla />
     </div>
   )
 }

@@ -127,3 +127,54 @@
 .marker-pulse {
   animation: markerPulse 2s ease-in-out infinite;
 }
+
+/* ────────────────────────────────────────────────────────────────
+   Modo oscuro
+   Se activa agregando la clase "dark" a <html> (ver
+   AccesibilidadContext). En vez de agregar "dark:" a cada className
+   de cada página (cientos de lugares), se sobreescriben acá mismo
+   las clases de color grises/blancas más usadas en todo el sitio.
+   Estas reglas están fuera de cualquier @layer de Tailwind, así que
+   siempre ganan sobre los estilos generados por Tailwind, sin
+   importar el orden ni la especificidad.
+   ──────────────────────────────────────────────────────────────── */
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark .bg-white   { background-color: #1e293b; }
+.dark .bg-gray-50 { background-color: #0f172a; }
+.dark .bg-gray-100{ background-color: #334155; }
+.dark .bg-gray-200{ background-color: #475569; }
+
+.dark .text-gray-900{ color: #f1f5f9; }
+.dark .text-gray-800{ color: #f1f5f9; }
+.dark .text-gray-700{ color: #e2e8f0; }
+.dark .text-gray-600{ color: #cbd5e1; }
+.dark .text-gray-500{ color: #94a3b8; }
+.dark .text-gray-400{ color: #64748b; }
+
+.dark .border-gray-100{ border-color: #334155; }
+.dark .border-gray-200{ border-color: #334155; }
+.dark .border-gray-50 { border-color: #1e293b; }
+
+.dark .input-field,
+.dark .select-field {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark .card {
+  background-color: #1e293b;
+}
+
+.dark .bg-pattern {
+  background-image: radial-gradient(circle at 20% 50%, rgba(27, 142, 62, 0.12) 0%, transparent 50%),
+                     radial-gradient(circle at 80% 20%, rgba(29, 143, 225, 0.12) 0%, transparent 50%);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
