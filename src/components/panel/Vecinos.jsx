@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
-import { Bell, Trash2, Calendar, Recycle, Users } from 'lucide-react'
+import { Bus, Trash2, Calendar, Recycle, Users } from 'lucide-react'
 import { useColeccion } from '../../hooks/useColeccion'
 
 const NOTIF_INFO = {
   basura: { label: 'Residuos', icon: Trash2, color: 'text-amarillo bg-amarillo/10' },
   eventos: { label: 'Eventos', icon: Calendar, color: 'text-verde bg-verde/10' },
-  nuevosEventos: { label: 'Nuevos eventos', icon: Bell, color: 'text-azul bg-azul/10' },
   puntosVerdes: { label: 'Puntos Verdes', icon: Recycle, color: 'text-verde bg-verde/10' },
+  combi: { label: 'Combi Municipal', icon: Bus, color: 'text-azul bg-azul/10' },
 }
 
 export default function Vecinos() {
@@ -43,7 +43,10 @@ export default function Vecinos() {
         <div className="space-y-2">
           {items.map(v => (
             <div key={v.id} className="card p-4 flex items-center justify-between gap-3 flex-wrap">
-              <p className="font-semibold text-gray-800">{v.nombre} {v.apellido}</p>
+              <div>
+                <p className="font-semibold text-gray-800">{v.nombre} {v.apellido}</p>
+                {v.usuario && <p className="text-xs text-gray-400 font-mono">@{v.usuario}</p>}
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(NOTIF_INFO).map(([key, { label, icon: Icon, color }]) => v.notif?.[key] && (
                   <span key={key} className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${color}`}>

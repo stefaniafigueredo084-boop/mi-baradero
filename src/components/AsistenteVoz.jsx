@@ -3,14 +3,15 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Mic, MicOff, X } from 'lucide-react'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado } from '../utils/perfilLocal'
+import { usuarioVecino } from '../utils/usuario'
 import { hablar, escuchar, esAfirmativo, esNegativo, detenerVoz, soportaReconocimientoVoz } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 
 const PREGUNTAS_SECTOR = {
   basura: '¿Querés activar notificaciones de recolección de residuos?',
-  eventos: '¿Querés activar notificaciones de eventos próximos?',
-  nuevosEventos: '¿Querés que te avise cuando se agreguen eventos nuevos a la agenda?',
+  eventos: '¿Querés activar notificaciones de eventos: cuando estén por empezar y cuando se agreguen nuevos a la agenda?',
   puntosVerdes: '¿Querés activar notificaciones de puntos verdes?',
+  combi: '¿Querés activar notificaciones de demoras y cambios de parada de la combi municipal?',
 }
 
 // Asistente conversacional por voz para registrarse sin usar el
@@ -115,14 +116,17 @@ export default function AsistenteVoz({ onClose }) {
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
 
     const esNuevo = esPrimerGuardadoVecino()
+    const usuario = await usuarioVecino(nombre, apellido)
     await setDoc(doc(db, 'vecinos', idVecino()), {
       nombre,
       apellido,
       notif: perfil.notif,
+      usuario,
       actualizadoEn: serverTimestamp(),
       ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
     }, { merge: true })
     if (esNuevo) marcarVecinoGuardado()
+    return usuario
   }
 
   const ejecutarConversacion = async () => {
