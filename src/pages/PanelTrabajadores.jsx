@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { Bus, Calendar, History as HistoryIcon, Loader2, LogOut, Recycle, Trash2, Users, UserCheck } from 'lucide-react'
+import { Bus, Calendar, Car, History as HistoryIcon, Loader2, LogOut, Recycle, ShieldOff, Trash2, Users, UserCheck } from 'lucide-react'
 import { auth } from '../firebase'
 import { useTrabajador } from '../hooks/useTrabajador'
 import { registrarHistorial } from '../utils/historial'
@@ -11,9 +11,13 @@ import EstadoCamion from '../components/panel/EstadoCamion'
 import CombiEnVivo from '../components/panel/CombiEnVivo'
 import CalendarioResiduos from '../components/panel/CalendarioResiduos'
 import AgregarTrabajador from '../components/panel/AgregarTrabajador'
+import GestionarTrabajadores from '../components/panel/GestionarTrabajadores'
 import Historial from '../components/panel/Historial'
 import Vecinos from '../components/panel/Vecinos'
 import ImportarDatosFijos from '../components/panel/ImportarDatosFijos'
+import SolicitudesCategoria from '../components/panel/SolicitudesCategoria'
+import ConfirmarPago from '../components/panel/ConfirmarPago'
+import EmbarqueScanner from '../components/panel/EmbarqueScanner'
 import {
   camposEventos,
   camposHorariosCombi,
@@ -30,6 +34,7 @@ import { puntosVerdes as puntosFijos } from '../data/puntosVerdesData'
 const TODAS_LAS_TABS = [
   { id: 'eventos', label: 'Eventos', icon: Calendar },
   { id: 'combi', label: 'Combi Municipal', icon: Bus },
+  { id: 'choferes', label: 'Choferes', icon: Car },
   { id: 'residuos', label: 'Residuos', icon: Trash2 },
   { id: 'puntosVerdes', label: 'Puntos Verdes', icon: Recycle },
   { id: 'usuarios', label: 'Usuarios', icon: Users, soloAdmin: true },
@@ -72,6 +77,21 @@ export default function PanelTrabajadores() {
   }
 
   if (!usuario) return <LoginTrabajadores />
+
+  if (trabajador?.activo === false || trabajador?.rol === 'eliminado') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="card p-8 max-w-sm text-center">
+          <ShieldOff className="w-10 h-10 text-red-400 mx-auto mb-3" />
+          <h1 className="font-bold font-poppins text-lg text-gray-800 mb-1">Tu cuenta está desactivada</h1>
+          <p className="text-sm text-gray-500 mb-5">Ya no tenés acceso al panel. Si te parece que es un error, hablá con un administrador.</p>
+          <button onClick={cerrarSesion} className="btn-secondary w-full flex items-center justify-center gap-2">
+            <LogOut className="w-4 h-4" /> Cerrar sesión
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,8 +160,15 @@ export default function PanelTrabajadores() {
           </div>
         )}
 
+        {tab === 'choferes' && (
+          <EmbarqueScanner soloHorarios={trabajador?.horariosAsignados} />
+        )}
+
         {tab === 'combi' && (
           <div>
+            <ConfirmarPago />
+            <div className="my-10 border-t border-gray-200" />
+            <SolicitudesCategoria />
             <CombiEnVivo />
             <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Horarios de la combi</h3>
             <ImportarDatosFijos
@@ -247,7 +274,12 @@ export default function PanelTrabajadores() {
           </div>
         )}
 
-        {tab === 'usuarios' && esAdmin && <AgregarTrabajador />}
+        {tab === 'usuarios' && esAdmin && (
+          <div>
+            <GestionarTrabajadores />
+            <AgregarTrabajador />
+          </div>
+        )}
         {tab === 'vecinos' && esAdmin && <Vecinos />}
         {tab === 'historial' && esAdmin && <Historial />}
       </div>

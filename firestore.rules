@@ -24,16 +24,36 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/trabajadores/$(request.auth.uid)).data;
     }
 
+    // Si "activo" no está (cuentas de antes de que existiera este campo)
+    // se considera activa por defecto — solo queda desactivada si un
+    // admin la puso explícitamente en false. OJO: hay que leerlo con
+    // .get(campo, default) — acceder con ".activo" directo a un campo
+    // que no existe en el documento no da "vacío", tira error, y ese
+    // error termina tratando a la cuenta como si no cumpliera la regla
+    // (o sea, como inactiva). Así es como se rompió el acceso de admin
+    // apenas se desplegó esto la primera vez.
+    function estaActivo() {
+      return trabajador().get('activo', true) != false;
+    }
+
     function esAdmin() {
-      return estaLogueado() && trabajador().rol == 'admin';
+      return estaLogueado() && estaActivo() && trabajador().rol == 'admin';
     }
 
     function esDelSector(seccion) {
-      return estaLogueado() && trabajador().rol == 'sector' && trabajador().sector == seccion;
+      return estaLogueado() && estaActivo() && trabajador().rol == 'sector' && trabajador().sector == seccion;
     }
 
     function puedeEditar(seccion) {
       return esAdmin() || esDelSector(seccion);
+    }
+
+    // Choferes: sector aparte de "combi" — puede escanear pasajes al
+    // embarcar (viajes/embarques/marcar un pasaje como usado), pero NO
+    // puede tocar horarios, alertas, aprobar pagos ni revisar
+    // certificados de categoría (eso sigue siendo solo de "combi"/admin).
+    function esChofer() {
+      return esAdmin() || esDelSector('choferes');
     }
 
     // trabajadores/{uid}: cada uno lee su propio doc (para saber su rol);
@@ -59,25 +79,140 @@ service cloud.firestore {
     match /config/calendarioResiduos { allow read: if true; allow write: if puedeEditar('residuos'); }
     match /config/combiEnVivo        { allow read: if true; allow write: if puedeEditar('combi'); }
 
+    // Usuarios: reserva de nombre de usuario legible (ej:
+    // "stefania.figueredo"), un documento por usuario tomado (el id del
+    // documento ES el usuario). Solo existe para garantizar que dos
+    // vecinos con el mismo nombre nunca terminen con el mismo usuario:
+    // "get" público para poder chequear si ya está tomado antes de
+    // reservarlo; "list" bloqueado para que no se pueda armar un padrón
+    // completo de usuarios recorriendo la colección.
+    match /usuarios/{usuario} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.keys().hasOnly(['id', 'creadoEn']);
+      allow update, delete: if false;
+    }
+
     // Perfiles de vecinos: cualquiera puede crear/actualizar el suyo (no
     // están logueados, son visitantes anónimos identificados solo por un
     // id aleatorio que guarda su propio navegador) pero SOLO puede mandar
-    // nombre/apellido/notif — nunca telefono, direccion, email ni zona,
-    // que quedan exclusivamente en el localStorage de cada vecino. Leer
-    // la lista completa es solo para el administrador.
+    // nombre/apellido/notif/usuario — nunca telefono, direccion, email ni
+    // zona, que quedan exclusivamente en el localStorage de cada vecino.
+    // Leer la lista completa es solo para el administrador.
     match /vecinos/{doc} {
-      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'creadoEn', 'actualizadoEn']);
+      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'usuario', 'creadoEn', 'actualizadoEn']);
       allow delete: if true;
       allow read: if esAdmin();
     }
 
-    // Historial de actividad: cualquier trabajador logueado puede agregar
-    // una entrada (login/logout/acciones), pero es de solo lectura para el
-    // admin, e inmutable para todos (no se edita ni se borra).
+    // Historial de actividad: cualquier trabajador logueado y activo puede
+    // agregar una entrada (login/logout/acciones), pero es de solo lectura
+    // para el admin, e inmutable para todos (no se edita ni se borra).
     match /historial/{doc} {
-      allow create: if estaLogueado();
+      allow create: if estaLogueado() && estaActivo();
       allow read: if esAdmin();
       allow update, delete: if false;
+    }
+
+    // Pasajeros: categoría verificada (estudiante/jubilado/discapacidad)
+    // y pase QR de la combi. El "id" del documento es el mismo id
+    // anónimo por dispositivo que ya usa "vecinos" (no hay login en la
+    // app). Por eso "get" — consultar UN documento cuyo id ya conocés,
+    // que es exactamente lo que hace el propio dueño del pase para ver
+    // su estado y renovar el token del QR — es público, con el mismo
+    // nivel de confianza que ya usa el resto de la app para ese id.
+    // "list" (recorrer todos los pasajeros, incluidas las fotos de
+    // documentos) queda restringido al sector combi/admin, para que
+    // nadie pueda scrapear el padrón completo.
+    function esAutoServicioPasajero() {
+      let cambios = request.resource.data.diff(resource.data).affectedKeys();
+      // El chequeo de estadoVerificacion solo aplica SI ese campo es uno
+      // de los que está cambiando — si no se toca (ej: solo se rota el
+      // token del QR), no importa qué valor tenga hoy (podría estar
+      // "aprobada", que es exactamente el caso más común al renovar el
+      // pase).
+      return cambios.hasOnly(['nombre', 'usuario', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'actualizadoEn'])
+             && (!cambios.hasAny(['estadoVerificacion']) || request.resource.data.estadoVerificacion in ['sin_solicitud', 'pendiente']);
+    }
+
+    match /pasajeros/{id} {
+      allow get: if true;
+      allow list: if puedeEditar('combi');
+      allow create: if request.resource.data.keys()
+                       .hasOnly(['nombre', 'usuario', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'creadoEn', 'actualizadoEn'])
+                     && request.resource.data.estadoVerificacion in ['sin_solicitud', 'pendiente'];
+      // El propio pasajero solo puede mandar una solicitud nueva o rotar
+      // el token de su QR — nunca puede aprobarse o rechazarse a sí
+      // mismo. Aprobar/rechazar (tocar estadoVerificacion a esos valores,
+      // o motivoRechazo) es solo del empleado del sector combi/admin.
+      allow update: if puedeEditar('combi') || esAutoServicioPasajero();
+    }
+
+    // Viajes: instancia de un horario de combi para un día puntual
+    // (id = "{horarioId}_{fecha}"), con el cupo de asientos y los
+    // contadores de embarque de ESE día. Lectura pública para que
+    // cualquiera vea cuántos lugares quedan antes de salir de casa;
+    // escritura de combi/admin (arma los horarios) o de un chofer (lo
+    // crea/actualiza al escanear un pasaje).
+    match /viajes/{id} {
+      allow read: if true;
+      allow write: if puedeEditar('combi') || esChofer();
+
+      // Embarques confirmados de ese viaje: un documento por pasajero
+      // (id = pasajeroId) garantiza que el mismo pase nunca cuenta dos
+      // veces en el mismo viaje. Es un registro, no se edita ni se borra.
+      match /embarques/{pasajeroId} {
+        allow read: if puedeEditar('combi') || esChofer();
+        allow create: if puedeEditar('combi') || esChofer();
+        allow update, delete: if false;
+      }
+    }
+
+    // Pasajes: un ticket puntual para un viaje específico (no un abono
+    // general) — id = "{pasajeroId}_{horarioId}_{fecha}", así nadie
+    // termina con dos pasajes pendientes para el mismo viaje. Nace
+    // "pendiente" (sin QR), un empleado confirma el pago y ahí pasa a
+    // "confirmado" (con QR); el conductor lo marca "usado" al embarcar.
+    //
+    // Igual que con pasajeros: el propio pasajero solo puede tocar su
+    // pasaje mientras sigue "pendiente" y sin usar (antes de que un
+    // empleado lo confirme) — después queda congelado para él.
+    function categoriaEstaAprobada(pasajeroId, categoria) {
+      let p = get(/databases/$(database)/documents/pasajeros/$(pasajeroId)).data;
+      return p.estadoVerificacion == 'aprobada' && p.categoriaSolicitada == categoria;
+    }
+    // "comun" nunca necesita leer pasajeros/{pasajeroId} (puede no
+    // existir todavía si alguien compra sin haber verificado nunca una
+    // categoría) — por eso ese caso va primero y corta antes del get().
+    function categoriaValidaParaComprar(pasajeroId, categoria) {
+      return categoria == 'comun' || categoriaEstaAprobada(pasajeroId, categoria);
+    }
+    function datosPasajeValidos() {
+      return request.resource.data.keys().hasOnly([
+               'pasajeroId', 'nombre', 'usuario', 'categoria', 'horarioId', 'fecha',
+               'salida', 'origen', 'destino', 'importe', 'estado', 'usado', 'creadoEn', 'actualizadoEn'
+             ])
+             && request.resource.data.estado == 'pendiente'
+             && request.resource.data.usado == false
+             && categoriaValidaParaComprar(request.resource.data.pasajeroId, request.resource.data.categoria);
+    }
+
+    match /pasajes/{id} {
+      allow get: if true;
+      // "list" con filtros (ej: buscar por código para un horario) lo
+      // necesita tanto ventas (revisar pendientes de pago) como un
+      // chofer (buscar el pasaje que le dictaron).
+      allow list: if puedeEditar('combi') || esChofer();
+      allow create: if datosPasajeValidos();
+      // El chofer solo puede marcar un pasaje como "usado" al embarcar
+      // (eso lo hace la transacción de embarque) — nunca puede
+      // confirmar un pago ni tocar cualquier otro campo.
+      allow update: if puedeEditar('combi')
+                    || (esChofer() && resource.data.estado == 'confirmado'
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['usado', 'usadoEn', 'conductorUid', 'conductorEmail'])
+                        && request.resource.data.usado == true)
+                    || (resource.data.estado == 'pendiente' && resource.data.usado == false && datosPasajeValidos());
     }
   }
 }
