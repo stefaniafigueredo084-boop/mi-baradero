@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
+import { usuarioVecino, usuarioVecinoLocal } from '../utils/usuario'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 
-const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, nuevosEventos: Bell, puntosVerdes: Recycle }
+const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, puntosVerdes: Recycle, combi: Bus }
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -24,15 +26,15 @@ const defaultPerfil = {
     basura: false,
     eventos: false,
     puntosVerdes: false,
-    nuevosEventos: false,
+    combi: false,
   },
   // Además de la notificación visual, ¿este sector te lo tengo que leer
-  // en voz alta? Solo tiene efecto si "Lector de pantalla" está activado.
+  // en voz alta?
   notifVoz: {
     basura: false,
     eventos: false,
     puntosVerdes: false,
-    nuevosEventos: false,
+    combi: false,
   },
 }
 
@@ -41,13 +43,27 @@ export default function Perfil() {
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
-      return guardado ? { ...defaultPerfil, ...JSON.parse(guardado) } : defaultPerfil
+      if (!guardado) return defaultPerfil
+      const datos = JSON.parse(guardado)
+      // Migración: "Eventos próximos" y "Nuevos eventos" eran dos sectores
+      // separados y ahora son uno solo ("eventos"). Si alguien ya tenía
+      // activado cualquiera de los dos viejos, el sector combinado queda
+      // activado (no perdemos la preferencia que ya habían elegido).
+      if (datos.notif?.nuevosEventos) datos.notif.eventos = true
+      if (datos.notifVoz?.nuevosEventos) datos.notifVoz.eventos = true
+      return {
+        ...defaultPerfil,
+        ...datos,
+        notif: { ...defaultPerfil.notif, ...datos.notif },
+        notifVoz: { ...defaultPerfil.notifVoz, ...datos.notifVoz },
+      }
     } catch {
       return defaultPerfil
     }
   })
   const [guardado, setGuardado] = useState(false)
   const [editando, setEditando] = useState(false)
+  const [usuario, setUsuario] = useState(usuarioVecinoLocal)
 
   const set = (campo, valor) => setPerfil(p => ({ ...p, [campo]: valor }))
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
@@ -69,10 +85,13 @@ export default function Perfil() {
     if (perfil.nombre?.trim()) {
       try {
         const esNuevo = esPrimerGuardadoVecino()
+        const usuarioAsignado = await usuarioVecino(perfil.nombre, perfil.apellido)
+        setUsuario(usuarioAsignado)
         await setDoc(doc(db, 'vecinos', idVecino()), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
+          usuario: usuarioAsignado,
           actualizadoEn: serverTimestamp(),
           ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
         }, { merge: true })
@@ -122,6 +141,9 @@ export default function Perfil() {
             <h1 className="text-3xl font-bold font-poppins">
               {perfil.nombre ? `${perfil.nombre} ${perfil.apellido}` : 'Mi Perfil'}
             </h1>
+            {usuario && (
+              <p className="text-green-200/80 text-sm font-mono mt-0.5">@{usuario}</p>
+            )}
             <p className="text-green-200 mt-1">
               {perfil.direccion ? perfil.direccion : 'Completá tu perfil para recibir notificaciones personalizadas'}
             </p>
@@ -135,6 +157,21 @@ export default function Perfil() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
+
+        {/* Mi Pase (vive dentro de la página de la Combi) */}
+        <Link
+          to="/combi"
+          className="card p-5 flex items-center gap-4 hover:border-verde hover:border-2 transition-all group"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-verde/10 flex items-center justify-center shrink-0">
+            <Ticket className="w-6 h-6 text-verde" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold font-poppins text-gray-800">Mi Pase de la combi</p>
+            <p className="text-sm text-gray-500">Pedí tu categoría (estudiante, jubilado, discapacidad) y generá tu QR para viajar.</p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-verde transition-colors shrink-0" />
+        </Link>
 
         {/* Datos personales */}
         <div className="card p-6">
@@ -384,11 +421,6 @@ export default function Perfil() {
               )
             })}
           </div>
-          {lector === false && (
-            <p className="text-xs text-gray-400 mt-3">
-              💡 Para que las notificaciones se lean en voz alta necesitás activar "Lector de pantalla" más arriba.
-            </p>
-          )}
         </div>
 
         {/* Botones */}
