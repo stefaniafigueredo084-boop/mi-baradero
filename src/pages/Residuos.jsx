@@ -100,7 +100,7 @@ export default function Residuos() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero amarillo */}
-      <div className="bg-gradient-to-br from-amarillo to-yellow-500 text-gray-900 dark:text-white py-10 sm:py-12 px-4">
+      <div className="bg-amarillo text-gray-900 dark:text-white py-10 sm:py-12 px-4">
         <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black/10 flex items-center justify-center shrink-0">
             <Trash2 className="w-7 h-7 sm:w-8 sm:h-8" />

@@ -119,29 +119,31 @@ export default function MiPaseSection() {
         </form>
       ) : (
         <>
-          <div className="mb-5 max-w-xs">
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Fecha del viaje</label>
-            <input
-              type="date"
-              className="input-field"
-              min={fechaHoy()}
-              value={fecha}
-              onChange={e => { setFecha(e.target.value); setHorarioId('') }}
-            />
-          </div>
+          <div id="mipase-horario" className="scroll-mt-32">
+            <div className="mb-5 max-w-xs">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Fecha del viaje</label>
+              <input
+                type="date"
+                className="input-field"
+                min={fechaHoy()}
+                value={fecha}
+                onChange={e => { setFecha(e.target.value); setHorarioId('') }}
+              />
+            </div>
 
-          <div className="mb-5 max-w-md">
-            <p className="text-sm font-semibold text-gray-700 mb-2">Horario</p>
-            <div className="space-y-2">
-              {horarios.map(h => (
-                <HorarioOption
-                  key={h.id}
-                  horario={h}
-                  fecha={fecha}
-                  seleccionado={String(horarioId) === String(h.id)}
-                  onSeleccionar={setHorarioId}
-                />
-              ))}
+            <div className="mb-5 max-w-md">
+              <p className="text-sm font-semibold text-gray-700 mb-2">Horario</p>
+              <div className="space-y-2">
+                {horarios.map(h => (
+                  <HorarioOption
+                    key={h.id}
+                    horario={h}
+                    fecha={fecha}
+                    seleccionado={String(horarioId) === String(h.id)}
+                    onSeleccionar={setHorarioId}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -152,7 +154,7 @@ export default function MiPaseSection() {
           )}
 
           {horario && !cargandoPasaje && !pasaje && (
-            <div className="max-w-md">
+            <div id="mipase-categoria" className="max-w-md scroll-mt-32">
               <p className="text-sm font-semibold text-gray-700 mb-3">Tipo de pasaje</p>
               <div className="space-y-3 mb-5">
                 {CATEGORIAS.map(cat => {

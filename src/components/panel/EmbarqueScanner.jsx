@@ -118,7 +118,9 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         return
       }
       await confirmarYRegistrar(snap.docs[0].id, codigo)
-    } catch {
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error al procesar código de embarque:', err)
       setResultado({ ok: false, mensaje: MOTIVO_RECHAZO.error })
     } finally {
       setProcesando(false)
@@ -140,11 +142,21 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
       scannerRef.current = scanner
       await scanner.start(
         { facingMode: 'environment' },
-        // Sin "qrbox": escanea el cuadro completo de la cámara en vez de
-        // un recorte chico en el centro — un recorte mal calculado
-        // (según el tamaño real del contenedor en cada celular) puede
-        // terminar sin detectar nada aunque la cámara se vea bien.
-        { fps: 10 },
+        {
+          fps: 10,
+          // "qrbox" como función (no un número fijo): recorta al centro
+          // un cuadrado proporcional al tamaño REAL de la cámara en ese
+          // celular puntual. Sin esto pasaron los dos problemas
+          // opuestos: un número fijo (ej 220) podía ser más grande que
+          // la cámara real y romper la detección; escanear el cuadro
+          // completo (sin recorte) baja tanto el detalle relativo del
+          // QR que tampoco llega a detectarlo. Con la función, el
+          // recorte siempre entra y siempre deja bastante detalle.
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const lado = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75)
+            return { width: lado, height: lado }
+          },
+        },
         texto => {
           // Un escaneo por vez: pausamos mientras se procesa/muestra el resultado.
           scanner.pause(true)
@@ -154,7 +166,9 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         },
         () => {} // errores de "no se detectó nada todavía" — se ignoran, son constantes
       )
-    } catch {
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error al iniciar la cámara:', err)
       setEscaneando(false)
       setErrorCamara('No se pudo acceder a la cámara. Podés pegar el código manualmente más abajo.')
     }

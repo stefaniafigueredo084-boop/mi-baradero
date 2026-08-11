@@ -1,13 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Volume2, VolumeX } from 'lucide-react'
+import { Mic } from 'lucide-react'
 import { useAccesibilidad } from '../context/AccesibilidadContext'
-import { soportaReconocimientoVoz, hablar, detenerVoz } from '../utils/voz'
+import { soportaReconocimientoVoz } from '../utils/voz'
 import AsistenteVoz from './AsistenteVoz'
 
 const PALABRAS_ACTIVACION = ['asistente', 'mi baradero']
 
-// Botones flotantes de accesibilidad: lector de página (voz → texto de
-// la pantalla) y asistente de registro por voz (texto/voz → perfil).
+// Botón flotante de accesibilidad: asistente de registro por voz
+// (texto/voz → perfil).
+//
+// Antes también había un botón para "leer la página en voz alta", pero
+// leía el texto tal cual estaba en pantalla (document.body.innerText),
+// sin ninguna estructura — mezclaba menú, botones y contenido en un
+// choclo de texto ininteligible. Se sacó por no servir; si se vuelve a
+// necesitar un lector de página de verdad, hace falta generar un texto
+// narrado a mano por sección, no leer el HTML crudo.
 //
 // Para que un vecino no vidente no tenga que estar tocando la pantalla
 // cada vez, mientras "Lector de pantalla" está activo el sitio queda
@@ -18,19 +25,14 @@ const PALABRAS_ACTIVACION = ['asistente', 'mi baradero']
 // evitar en ningún sitio web.
 export default function LectorPantalla() {
   const { lector } = useAccesibilidad()
-  const [leyendo, setLeyendo] = useState(false)
   const [asistenteAbierto, setAsistenteAbierto] = useState(false)
   const [escuchandoActivacion, setEscuchandoActivacion] = useState(false)
   const asistenteAbiertoRef = useRef(asistenteAbierto)
   asistenteAbiertoRef.current = asistenteAbierto
 
-  useEffect(() => {
-    return () => window.speechSynthesis?.cancel()
-  }, [])
-
   // Escucha continua de la palabra de activación.
   useEffect(() => {
-    if (!lector || asistenteAbierto || leyendo || !soportaReconocimientoVoz()) {
+    if (!lector || asistenteAbierto || !soportaReconocimientoVoz()) {
       setEscuchandoActivacion(false)
       return
     }
@@ -86,24 +88,9 @@ export default function LectorPantalla() {
       setEscuchandoActivacion(false)
       try { reconocimiento.stop() } catch { /* ya detenido */ }
     }
-  }, [lector, asistenteAbierto, leyendo])
+  }, [lector, asistenteAbierto])
 
   if (!lector) return null
-
-  const soportado = typeof window !== 'undefined' && 'speechSynthesis' in window
-
-  const alternarLectura = async () => {
-    if (!soportado) return
-    if (leyendo) {
-      detenerVoz()
-      setLeyendo(false)
-      return
-    }
-    const contenido = document.querySelector('main')?.innerText || document.body.innerText
-    setLeyendo(true)
-    await hablar(contenido)
-    setLeyendo(false)
-  }
 
   return (
     <>
@@ -118,17 +105,6 @@ export default function LectorPantalla() {
           {escuchandoActivacion && (
             <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-verde border-2 border-white animate-pulse" />
           )}
-        </button>
-        <button
-          onClick={alternarLectura}
-          disabled={!soportado}
-          aria-label={leyendo ? 'Detener lectura de la página' : 'Leer esta página en voz alta'}
-          title={soportado ? (leyendo ? 'Detener lectura' : 'Leer esta página en voz alta') : 'Tu navegador no soporta lectura de voz'}
-          className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 disabled:opacity-40 disabled:hover:scale-100 ${
-            leyendo ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-700 text-gray-300'
-          }`}
-        >
-          {leyendo ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
         </button>
       </div>
 

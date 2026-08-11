@@ -195,7 +195,7 @@ export default function Home() {
               icon={Trash2}
               title="Recolección de Residuos"
               description="Consultá el calendario de recolección y recibí alertas para tu zona."
-              gradient="bg-gradient-to-br from-amarillo to-yellow-500"
+              gradient="bg-amarillo"
             />
             <ServiceCard
               to="/eventos"

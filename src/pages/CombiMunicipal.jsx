@@ -93,10 +93,35 @@ export default function CombiMunicipal() {
         </div>
       </div>
 
+      {/* Barra para saltar directo a una sección — la página tiene
+          bastante contenido para leer de una sola vez, esto es solo
+          para orientarse rápido, no para esconder nada (a diferencia
+          del acordeón del panel de empleados, esto lo lee un vecino de
+          punta a punta). */}
+      <nav className="sticky top-[68px] z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center gap-2.5 overflow-x-auto">
+          {[
+            { href: '#en-vivo', label: 'En vivo' },
+            { href: '#alertas', label: 'Alertas' },
+            { href: '#paradas', label: 'Paradas' },
+            { href: '#horarios', label: 'Horarios' },
+            { href: '#mi-pase', label: 'Mi Pase' },
+          ].map(s => (
+            <a
+              key={s.href}
+              href={s.href}
+              className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-verde/10 hover:text-verde transition-colors"
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
 
         {/* Estado en tiempo real */}
-        <div className="card p-6">
+        <div id="en-vivo" className="card p-6 scroll-mt-32">
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             <Navigation className="w-6 h-6 text-verde" />
             <h2 className="text-xl font-bold font-poppins">Seguimiento en Tiempo Real</h2>
@@ -188,7 +213,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Alertas */}
-        <div>
+        <div id="alertas" className="scroll-mt-32">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold font-poppins flex items-center gap-2">
               <Bell className="w-5 h-5 text-orange-500" /> Alertas y Demoras
@@ -225,7 +250,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Paradas */}
-        <div>
+        <div id="paradas" className="scroll-mt-32">
           <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
             <MapPin className="w-5 h-5 text-verde" /> Paradas Disponibles
           </h2>
@@ -241,7 +266,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Horarios */}
-        <div>
+        <div id="horarios" className="scroll-mt-32">
           <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-azul" /> Horarios del Día
           </h2>
@@ -273,7 +298,9 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Mi Pase (QR) */}
-        <MiPaseSection />
+        <div id="mi-pase" className="scroll-mt-32">
+          <MiPaseSection />
+        </div>
 
       </div>
     </div>
