@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth'
-import { AlertCircle, LogIn, LogOut, Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react'
+import { AlertCircle, LogIn, LogOut, Loader2, ShieldCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 
 const googleProvider = new GoogleAuthProvider()
@@ -89,12 +89,9 @@ export default function CuentaVecino({ usuario }) {
   }
 
   return (
-    <div className="pb-6 mb-6 border-b border-gray-100">
-      <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-1">
-        <Mail className="w-4 h-4 text-verde" /> ¿Ya tenés cuenta?
-      </p>
+    <div>
       <p className="text-sm text-gray-500 mb-4">
-        Iniciá sesión para guardar tus datos en la nube y recuperarlos desde otro dispositivo. Es opcional: podés seguir usando el sitio sin loguearte.
+        Iniciá sesión para completar tus datos y guardarlos en la nube — así los recuperás desde cualquier dispositivo.
       </p>
 
       <button
