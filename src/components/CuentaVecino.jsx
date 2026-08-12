@@ -21,11 +21,13 @@ const MENSAJES_ERROR = {
   'auth/popup-closed-by-user': '',
 }
 
-// Tarjeta de "Mi cuenta" para la web pública: iniciar sesión con Google
-// o con email/contraseña, o crear una cuenta nueva. Es opcional — el
-// sitio funciona sin loguearse, pero al iniciar sesión el perfil y las
-// notificaciones quedan guardados en la cuenta (se pueden recuperar
-// desde cualquier dispositivo) en vez de solo en este navegador.
+// Sección de cuenta (Google o email/contraseña) para la web pública.
+// Va dentro de la misma tarjeta que "Datos Personales" en vez de tener
+// tarjeta propia, para que no se vean como dos bloques repetidos. Es
+// opcional — el sitio funciona sin loguearse, pero al iniciar sesión
+// el perfil y las notificaciones quedan guardados en la cuenta (se
+// pueden recuperar desde cualquier dispositivo) en vez de solo en
+// este navegador.
 export default function CuentaVecino({ usuario }) {
   const [modo, setModo] = useState('ingresar') // 'ingresar' | 'registro'
   const [email, setEmail] = useState('')
@@ -66,7 +68,7 @@ export default function CuentaVecino({ usuario }) {
 
   if (usuario) {
     return (
-      <div className="card p-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-4 flex-wrap pb-6 mb-6 border-b border-gray-100">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 rounded-xl bg-verde/15 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5 text-verde" />
@@ -87,12 +89,12 @@ export default function CuentaVecino({ usuario }) {
   }
 
   return (
-    <div className="card p-6">
-      <h2 className="text-lg font-bold font-poppins flex items-center gap-2 mb-1">
-        <Mail className="w-5 h-5 text-verde" /> Mi cuenta
-      </h2>
+    <div className="pb-6 mb-6 border-b border-gray-100">
+      <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-1">
+        <Mail className="w-4 h-4 text-verde" /> ¿Ya tenés cuenta?
+      </p>
       <p className="text-sm text-gray-500 mb-4">
-        Iniciá sesión para guardar tu perfil y notificaciones en tu cuenta. Es opcional: podés seguir usando el sitio sin loguearte.
+        Iniciá sesión para guardar tus datos en la nube y recuperarlos desde otro dispositivo. Es opcional: podés seguir usando el sitio sin loguearte.
       </p>
 
       <button

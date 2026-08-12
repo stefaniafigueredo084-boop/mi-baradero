@@ -168,14 +168,12 @@ export default function Perfil() {
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-        {/* Mi cuenta (Google o email/contraseña, opcional) */}
-        <CuentaVecino usuario={usuario} />
-
-        {/* Datos personales */}
+        {/* Datos personales (incluye, arriba, la cuenta Google o
+            email/contraseña opcional — todo junto en una sola tarjeta) */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold font-poppins flex items-center gap-2">
-              <User className="w-5 h-5 text-verde" /> Datos Personales
+              <User className="w-5 h-5 text-verde" /> Mis Datos
             </h2>
             <button
               onClick={() => setEditando(!editando)}
@@ -185,6 +183,8 @@ export default function Perfil() {
               {editando ? 'Cancelar' : 'Editar'}
             </button>
           </div>
+
+          <CuentaVecino usuario={usuario} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
