@@ -72,6 +72,14 @@ export default function Perfil() {
     }).catch(() => {})
   }, [usuario])
 
+  // El email de "Datos Personales" no debe pedirse dos veces: si hay
+  // sesión iniciada, usamos directamente el email de la cuenta (Google
+  // o email/contraseña) en vez de un campo aparte para completar a mano.
+  useEffect(() => {
+    if (!usuario?.email) return
+    setPerfil(p => (p.email === usuario.email ? p : { ...p, email: usuario.email }))
+  }, [usuario])
+
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
     // navegador no soporta notificaciones, esto no interrumpe el guardado)
@@ -220,10 +228,13 @@ export default function Perfil() {
                 type="email"
                 value={perfil.email}
                 onChange={e => set('email', e.target.value)}
-                disabled={!editando}
+                disabled={!editando || !!usuario}
                 placeholder="tu@email.com"
                 className="input-field disabled:bg-gray-50 disabled:text-gray-600"
               />
+              {usuario && (
+                <p className="text-xs text-gray-400 mt-1">Es el email de tu cuenta. Para cambiarlo, cerrá sesión e ingresá con otro.</p>
+              )}
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block flex items-center gap-1">
