@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
+import { useAuth } from '../context/AuthContext'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
+import CuentaVecino from '../components/CuentaVecino'
 
 const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, nuevosEventos: Bell, puntosVerdes: Recycle }
 
@@ -38,6 +40,7 @@ const defaultPerfil = {
 
 export default function Perfil() {
   const { tema, setTema, tamanoFuente, setTamanoFuente, lector, setLector } = useAccesibilidad()
+  const { usuario } = useAuth()
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
@@ -53,6 +56,22 @@ export default function Perfil() {
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
   const setNotifVoz = (campo, valor) => setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } }))
 
+  // Al iniciar sesión, si esa cuenta ya tenía un perfil guardado (por
+  // ejemplo, desde otro dispositivo) lo traemos para no perderlo.
+  useEffect(() => {
+    if (!usuario) return
+    getDoc(doc(db, 'vecinos', usuario.uid)).then(snap => {
+      if (!snap.exists()) return
+      const d = snap.data()
+      setPerfil(p => ({
+        ...p,
+        nombre: d.nombre || p.nombre,
+        apellido: d.apellido || p.apellido,
+        notif: d.notif || p.notif,
+      }))
+    }).catch(() => {})
+  }, [usuario])
+
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
     // navegador no soporta notificaciones, esto no interrumpe el guardado)
@@ -66,10 +85,15 @@ export default function Perfil() {
     // tenés activas — nunca tu teléfono, dirección, email ni zona. Así
     // el administrador puede ver cuántos vecinos usan la app sin acceder
     // a tus datos de contacto.
+    //
+    // Si hay sesión iniciada, el documento queda ligado a la cuenta
+    // (usuario.uid) en vez de al id anónimo del dispositivo — así el
+    // perfil se puede recuperar desde cualquier otro dispositivo.
     if (perfil.nombre?.trim()) {
       try {
-        const esNuevo = esPrimerGuardadoVecino()
-        await setDoc(doc(db, 'vecinos', idVecino()), {
+        const idDoc = usuario ? usuario.uid : idVecino()
+        const esNuevo = !usuario && esPrimerGuardadoVecino()
+        await setDoc(doc(db, 'vecinos', idDoc), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
@@ -98,7 +122,7 @@ export default function Perfil() {
   const limpiar = () => {
     if (confirm('¿Querés borrar todos tus datos de perfil?')) {
       localStorage.removeItem('mibaradero_perfil')
-      deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+      deleteDoc(doc(db, 'vecinos', usuario ? usuario.uid : idVecino())).catch(() => {})
       olvidarVecino()
       setPerfil(defaultPerfil)
     }
@@ -135,6 +159,9 @@ export default function Perfil() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
+
+        {/* Mi cuenta (Google o email/contraseña, opcional) */}
+        <CuentaVecino usuario={usuario} />
 
         {/* Datos personales */}
         <div className="card p-6">
