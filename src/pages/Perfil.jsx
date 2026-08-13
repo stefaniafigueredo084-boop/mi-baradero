@@ -72,21 +72,6 @@ export default function Perfil() {
     }).catch(() => {})
   }, [usuario])
 
-  // El email de "Datos Personales" no debe pedirse dos veces: si hay
-  // sesión iniciada, usamos directamente el email de la cuenta (Google
-  // o email/contraseña) en vez de un campo aparte para completar a mano.
-  useEffect(() => {
-    if (!usuario?.email) return
-    setPerfil(p => (p.email === usuario.email ? p : { ...p, email: usuario.email }))
-  }, [usuario])
-
-  // Los campos de "Datos Personales" están ocultos hasta iniciar
-  // sesión. Apenas se loguea, los dejamos habilitados directamente
-  // para completar, sin un paso extra de tocar "Editar".
-  useEffect(() => {
-    if (usuario) setEditando(true)
-  }, [usuario])
-
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
     // navegador no soporta notificaciones, esto no interrumpe el guardado)
@@ -175,28 +160,24 @@ export default function Perfil() {
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-        {/* Cuenta (Google o email/contraseña) y, recién cuando hay sesión
-            iniciada, los datos personales para completar — todo en una
-            sola tarjeta */}
+        {/* Mi cuenta (Google o email/contraseña, opcional) */}
+        <CuentaVecino usuario={usuario} />
+
+        {/* Datos personales */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold font-poppins flex items-center gap-2">
-              <User className="w-5 h-5 text-verde" /> {usuario ? 'Mis Datos' : 'Mi cuenta'}
+              <User className="w-5 h-5 text-verde" /> Datos Personales
             </h2>
-            {usuario && (
-              <button
-                onClick={() => setEditando(!editando)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-verde hover:text-verde-oscuro transition-colors"
-              >
-                <Edit3 className="w-4 h-4" />
-                {editando ? 'Cancelar' : 'Editar'}
-              </button>
-            )}
+            <button
+              onClick={() => setEditando(!editando)}
+              className="flex items-center gap-1.5 text-sm font-semibold text-verde hover:text-verde-oscuro transition-colors"
+            >
+              <Edit3 className="w-4 h-4" />
+              {editando ? 'Cancelar' : 'Editar'}
+            </button>
           </div>
 
-          <CuentaVecino usuario={usuario} />
-
-          {usuario && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Nombre</label>
@@ -239,13 +220,10 @@ export default function Perfil() {
                 type="email"
                 value={perfil.email}
                 onChange={e => set('email', e.target.value)}
-                disabled={!editando || !!usuario}
+                disabled={!editando}
                 placeholder="tu@email.com"
                 className="input-field disabled:bg-gray-50 disabled:text-gray-600"
               />
-              {usuario && (
-                <p className="text-xs text-gray-400 mt-1">Es el email de tu cuenta. Para cambiarlo, cerrá sesión e ingresá con otro.</p>
-              )}
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block flex items-center gap-1">
@@ -273,7 +251,6 @@ export default function Perfil() {
               </select>
             </div>
           </div>
-          )}
         </div>
 
         {/* Accesibilidad */}
