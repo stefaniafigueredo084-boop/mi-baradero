@@ -197,6 +197,15 @@
 .dark .bg-orange-100  { background-color: #6b3a12; }
 .dark .text-orange-600{ color: #fdba74; }
 
+/* Amber (avisos de pago pendiente/efectivo, categoría jubilado, etc.)
+   — sin esto, el texto quedaba oscuro sobre una tarjeta que también
+   se oscurecía, casi ilegible. */
+.dark .bg-amber-50    { background-color: #4d3300; }
+.dark .bg-amber-100   { background-color: #5c3d00; }
+.dark .border-amber-200{ border-color: #7a5200; }
+.dark .text-amber-600 { color: #fbbf24; }
+.dark .text-amber-700 { color: #fbbf24; }
+
 .dark .bg-purple-100  { background-color: #4c1d6b; }
 .dark .text-purple-700{ color: #d8b4fe; }
 

@@ -8,7 +8,7 @@ import { usePasajero } from '../../hooks/usePasajero'
 import { usePasaje } from '../../hooks/usePasaje'
 import { useViaje } from '../../hooks/useViaje'
 import { useHorariosCombi } from '../../hooks/useHorariosCombi'
-import { aMilisegundos, CATEGORIAS, categoriaPorId, categoriaVerificada, calcularImporte, fechaHoy, idPasaje, MINUTOS_CORTE_VENTA, salidaTimestamp } from '../../utils/pase'
+import { aMilisegundos, CATEGORIAS, categoriaPorId, categoriaVerificada, calcularImporte, fechaHoy, idPasaje, MINUTOS_CORTE_VENTA, puntosPagoParaRuta, salidaTimestamp } from '../../utils/pase'
 import { datosPago, puntosPagoEfectivo } from '../../data/combiData'
 import ImagenInput from '../panel/ImagenInput'
 import CopiarCampo from '../CopiarCampo'
@@ -240,7 +240,8 @@ export default function MiPaseSection() {
                   </div>
                   {formaPago === 'efectivo' && (
                     <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 leading-relaxed">
-                      Se paga en persona en un punto de venta oficial, {puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
+                      Se paga en persona en {puntosPagoParaRuta(horario.origen, horario.destino).map(p => p.nombre).join(' o ')},
+                      {' '}{puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
                       Tenés que pagarlo antes de que salga tu combi ({horario.salida} hs) — si no, la reserva vence y vas a tener que generarla de nuevo.
                     </p>
                   )}
@@ -470,7 +471,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
             <Banknote className="w-3.5 h-3.5" /> Pagá en efectivo, en persona:
           </p>
           <ul className="text-sm text-gray-700 space-y-0.5">
-            {puntosPagoEfectivo.puntos.map(p => (
+            {puntosPagoParaRuta(pasaje.origen, pasaje.destino).map(p => (
               <li key={p.nombre}>• {p.nombre}{p.direccion ? ` — ${p.direccion}` : ''}</li>
             ))}
           </ul>

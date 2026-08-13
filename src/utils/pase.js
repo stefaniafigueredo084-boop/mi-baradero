@@ -1,3 +1,5 @@
+import { puntosPagoEfectivo } from '../data/combiData'
+
 // Reglas de negocio del módulo de pasajes de la combi, compartidas
 // entre la pantalla del pasajero (Mi Pase / lugares disponibles) y el
 // panel del conductor (escáner de embarque) — para no duplicar la
@@ -137,6 +139,14 @@ export function salidaTimestamp(fecha, horaSalida) {
   const [h, m] = (horaSalida || '00:00').split(':').map(Number)
   const [y, mo, d] = fecha.split('-').map(Number)
   return new Date(y, (mo || 1) - 1, d || 1, h || 0, m || 0, 0, 0)
+}
+
+// Punto de pago en efectivo relevante para ESTE viaje puntual: el
+// general de Baradero (toda ruta pasa por ahí) más la delegación de la
+// otra punta del recorrido — a alguien que viaja Portela → Baradero le
+// mostramos la Delegación de Portela, no la de Alsina.
+export function puntosPagoParaRuta(origen, destino) {
+  return puntosPagoEfectivo.puntos.filter(p => !p.localidad || p.localidad === origen || p.localidad === destino)
 }
 
 // Un campo de fecha/hora guardado en Firestore puede volver como
