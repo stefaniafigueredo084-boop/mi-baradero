@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
@@ -7,8 +7,10 @@ import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { usuarioVecino, usuarioVecinoLocal } from '../utils/usuario'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
+import { useAuth } from '../context/AuthContext'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
+import CuentaVecino from '../components/CuentaVecino'
 
 const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, puntosVerdes: Recycle, combi: Bus }
 
@@ -40,6 +42,7 @@ const defaultPerfil = {
 
 export default function Perfil() {
   const { tema, setTema, tamanoFuente, setTamanoFuente, lector, setLector } = useAccesibilidad()
+  const { usuario: cuenta } = useAuth()
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
@@ -69,6 +72,22 @@ export default function Perfil() {
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
   const setNotifVoz = (campo, valor) => setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } }))
 
+  // Al iniciar sesión, si esa cuenta ya tenía un perfil guardado (por
+  // ejemplo, desde otro dispositivo) lo traemos para no perderlo.
+  useEffect(() => {
+    if (!cuenta) return
+    getDoc(doc(db, 'vecinos', cuenta.uid)).then(snap => {
+      if (!snap.exists()) return
+      const d = snap.data()
+      setPerfil(p => ({
+        ...p,
+        nombre: d.nombre || p.nombre,
+        apellido: d.apellido || p.apellido,
+        notif: d.notif || p.notif,
+      }))
+    }).catch(() => {})
+  }, [cuenta])
+
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
     // navegador no soporta notificaciones, esto no interrumpe el guardado)
@@ -82,12 +101,17 @@ export default function Perfil() {
     // tenés activas — nunca tu teléfono, dirección, email ni zona. Así
     // el administrador puede ver cuántos vecinos usan la app sin acceder
     // a tus datos de contacto.
+    //
+    // Si hay sesión iniciada, el documento queda ligado a la cuenta
+    // (usuario.uid) en vez de al id anónimo del dispositivo — así el
+    // perfil se puede recuperar desde cualquier otro dispositivo.
     if (perfil.nombre?.trim()) {
       try {
-        const esNuevo = esPrimerGuardadoVecino()
+        const esNuevo = !cuenta && esPrimerGuardadoVecino()
         const usuarioAsignado = await usuarioVecino(perfil.nombre, perfil.apellido)
         setUsuario(usuarioAsignado)
-        await setDoc(doc(db, 'vecinos', idVecino()), {
+        const idDoc = cuenta ? cuenta.uid : idVecino()
+        await setDoc(doc(db, 'vecinos', idDoc), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
@@ -117,7 +141,7 @@ export default function Perfil() {
   const limpiar = () => {
     if (confirm('¿Querés borrar todos tus datos de perfil?')) {
       localStorage.removeItem('mibaradero_perfil')
-      deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+      deleteDoc(doc(db, 'vecinos', cuenta ? cuenta.uid : idVecino())).catch(() => {})
       olvidarVecino()
       setPerfil(defaultPerfil)
     }
@@ -172,6 +196,9 @@ export default function Perfil() {
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-verde transition-colors shrink-0" />
         </Link>
+
+        {/* Mi cuenta (Google o email/contraseña, opcional) */}
+        <CuentaVecino usuario={cuenta} />
 
         {/* Datos personales */}
         <div className="card p-6">

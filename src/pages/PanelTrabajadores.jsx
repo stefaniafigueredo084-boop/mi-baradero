@@ -136,7 +136,10 @@ export default function PanelTrabajadores() {
           </div>
         )}
 
-        {tabsVisibles.length === 0 && (
+        {tabsVisibles.length === 0 && trabajador === null && (
+          <p className="text-gray-500">Esta cuenta no tiene acceso al panel de trabajadores.</p>
+        )}
+        {tabsVisibles.length === 0 && trabajador !== null && (
           <p className="text-gray-500">Tu cuenta no tiene un sector asignado. Pedile a un administrador que te lo asigne.</p>
         )}
 

@@ -93,16 +93,23 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Perfiles de vecinos: cualquiera puede crear/actualizar el suyo (no
-    // están logueados, son visitantes anónimos identificados solo por un
-    // id aleatorio que guarda su propio navegador) pero SOLO puede mandar
-    // nombre/apellido/notif/usuario — nunca telefono, direccion, email ni
-    // zona, que quedan exclusivamente en el localStorage de cada vecino.
-    // Leer la lista completa es solo para el administrador.
+    // Perfiles de vecinos: se puede guardar sin estar logueado (visitante
+    // anónimo identificado solo por un id aleatorio que guarda su propio
+    // navegador) o con sesión iniciada (Google o email/contraseña), en
+    // cuyo caso el id del documento es el uid de la cuenta. En ambos
+    // casos SOLO se puede mandar nombre/apellido/notif/usuario — nunca
+    // telefono, direccion, email ni zona, que quedan exclusivamente en el
+    // localStorage de cada vecino.
+    //
+    // Leer la lista completa es solo para el administrador. Una cuenta
+    // logueada además puede leer/borrar únicamente SU PROPIO documento
+    // (id == su uid), para poder recuperar su perfil desde otro
+    // dispositivo o borrar sus datos.
     match /vecinos/{doc} {
-      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'usuario', 'creadoEn', 'actualizadoEn']);
-      allow delete: if true;
-      allow read: if esAdmin();
+      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'usuario', 'creadoEn', 'actualizadoEn'])
+                             && (request.auth == null || request.auth.uid == doc);
+      allow delete: if request.auth == null || request.auth.uid == doc;
+      allow read: if esAdmin() || (estaLogueado() && request.auth.uid == doc);
     }
 
     // Historial de actividad: cualquier trabajador logueado y activo puede
