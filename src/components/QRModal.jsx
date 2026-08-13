@@ -1,13 +1,23 @@
+import { useMemo } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { X, Download, Share2 } from 'lucide-react'
 
 export default function QRModal({ datos, onClose }) {
+  const numeroPasaje = useMemo(
+    () => `MB-${Math.floor(Math.random() * 90000) + 10000}`,
+    [datos]
+  )
+
   if (!datos) return null
 
-  const qrCells = Array.from({ length: 25 }, (_, i) => {
-    const row = Math.floor(i / 5)
-    const col = i % 5
-    const isCorner = (row < 2 && col < 2) || (row < 2 && col > 2) || (row > 2 && col < 2)
-    return { isCorner, filled: isCorner || Math.random() > 0.4 }
+  // Contenido real codificado en el QR: se puede validar/escanear con cualquier lector
+  const qrValue = JSON.stringify({
+    pasaje: numeroPasaje,
+    nombre: datos.nombre,
+    dni: datos.dni,
+    destino: datos.destino,
+    fecha: datos.fecha,
+    horario: datos.horario,
   })
 
   return (
@@ -20,24 +30,9 @@ export default function QRModal({ datos, onClose }) {
           </button>
         </div>
 
-        {/* QR simulado */}
+        {/* QR real, escaneable */}
         <div className="bg-white border-4 border-verde rounded-2xl p-4 mx-auto w-fit mb-4 relative overflow-hidden">
-          <div className="grid grid-cols-7 gap-1 w-36 h-36">
-            {Array.from({ length: 49 }, (_, i) => {
-              const row = Math.floor(i / 7)
-              const col = i % 7
-              const isTopLeft = row < 3 && col < 3
-              const isTopRight = row < 3 && col > 3
-              const isBottomLeft = row > 3 && col < 3
-              const filled = isTopLeft || isTopRight || isBottomLeft || (Math.sin(i * 1.3) > 0)
-              return (
-                <div
-                  key={i}
-                  className={`rounded-sm ${filled ? 'bg-gray-900' : 'bg-white'}`}
-                />
-              )
-            })}
-          </div>
+          <QRCodeSVG value={qrValue} size={144} level="M" />
           {/* Línea de escaneo */}
           <div className="absolute left-4 right-4 h-0.5 bg-verde/60 qr-scan-line" style={{ top: 0 }} />
         </div>
@@ -65,7 +60,7 @@ export default function QRModal({ datos, onClose }) {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">N° Pasaje</span>
-            <span className="font-semibold text-azul">#MB-{Math.floor(Math.random() * 90000) + 10000}</span>
+            <span className="font-semibold text-azul">#{numeroPasaje}</span>
           </div>
         </div>
 

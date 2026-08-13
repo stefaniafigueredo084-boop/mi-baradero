@@ -148,6 +148,11 @@
 .dark .bg-gray-100{ background-color: #334155; }
 .dark .bg-gray-200{ background-color: #475569; }
 
+/* Chips translucidos sobre mapas (nombres de parada, "Mapa simulado", etc.):
+   sin esto quedan con texto claro sobre fondo blanco casi sin contraste. */
+.dark .bg-white\/80 { background-color: rgba(30, 41, 59, 0.85); }
+.dark .bg-white\/90 { background-color: rgba(30, 41, 59, 0.9); }
+
 .dark .text-gray-900{ color: #f1f5f9; }
 .dark .text-gray-800{ color: #f1f5f9; }
 .dark .text-gray-700{ color: #e2e8f0; }
