@@ -92,7 +92,7 @@ export default function CuentaVecino({ usuario }) {
         <Mail className="w-5 h-5 text-verde" /> Mi cuenta
       </h2>
       <p className="text-sm text-gray-500 mb-4">
-        Iniciá sesión para guardar tu perfil y notificaciones en tu cuenta. Es opcional: podés seguir usando el sitio sin loguearte.
+        Iniciá sesión para completar tu perfil y notificaciones — quedan guardados en tu cuenta y los podés recuperar desde cualquier dispositivo.
       </p>
 
       <button

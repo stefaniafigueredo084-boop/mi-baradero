@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight } from 'lucide-react'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
@@ -76,6 +76,9 @@ export default function Perfil() {
   // ejemplo, desde otro dispositivo) lo traemos para no perderlo.
   useEffect(() => {
     if (!cuenta) return
+    // Precarga el email de la cuenta (Google o el que usó para
+    // registrarse) — es un dato que ya dio, no hace falta pedírselo de nuevo.
+    setPerfil(p => ({ ...p, email: p.email || cuenta.email || '' }))
     getDoc(doc(db, 'vecinos', cuenta.uid)).then(snap => {
       if (!snap.exists()) return
       const d = snap.data()
@@ -182,23 +185,39 @@ export default function Perfil() {
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-        {/* Mi Pase (vive dentro de la página de la Combi) */}
-        <Link
-          to="/combi"
-          className="card p-5 flex items-center gap-4 hover:border-verde hover:border-2 transition-all group"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-verde/10 flex items-center justify-center shrink-0">
-            <Ticket className="w-6 h-6 text-verde" />
+        {/* Mientras se confirma si hay sesión iniciada, no mostramos nada
+            todavía — evita el parpadeo de "iniciá sesión" seguido de
+            inmediato por el perfil ya logueado. */}
+        {cuenta === undefined && (
+          <div className="card p-10 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 text-verde animate-spin" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold font-poppins text-gray-800">Mi Pase de la combi</p>
-            <p className="text-sm text-gray-500">Pedí tu categoría (estudiante, jubilado, discapacidad) y generá tu QR para viajar.</p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-verde transition-colors shrink-0" />
-        </Link>
+        )}
 
-        {/* Mi cuenta (Google o email/contraseña, opcional) */}
-        <CuentaVecino usuario={cuenta} />
+        {/* Sin sesión: solo se ve la tarjeta de "Mi cuenta". El resto del
+            perfil (datos, accesibilidad, notificaciones) aparece recién
+            después de loguearse, más abajo. */}
+        {cuenta === null && <CuentaVecino usuario={cuenta} />}
+
+        {cuenta && (
+          <>
+            {/* Mi cuenta (resumen: sesión iniciada + cerrar sesión) */}
+            <CuentaVecino usuario={cuenta} />
+
+            {/* Mi Pase (vive dentro de la página de la Combi) */}
+            <Link
+              to="/combi"
+              className="card p-5 flex items-center gap-4 hover:border-verde hover:border-2 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-verde/10 flex items-center justify-center shrink-0">
+                <Ticket className="w-6 h-6 text-verde" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold font-poppins text-gray-800">Mi Pase de la combi</p>
+                <p className="text-sm text-gray-500">Pedí tu categoría (estudiante, jubilado, discapacidad) y generá tu QR para viajar.</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-verde transition-colors shrink-0" />
+            </Link>
 
         {/* Datos personales */}
         <div className="card p-6">
@@ -473,6 +492,8 @@ export default function Perfil() {
             <CheckCircle className="w-5 h-5 text-verde shrink-0" />
             <p className="text-verde-oscuro font-semibold text-sm">¡Perfil guardado correctamente!</p>
           </div>
+        )}
+          </>
         )}
 
       </div>
