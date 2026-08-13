@@ -138,14 +138,11 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
     setEscaneando(true)
     try {
       const { Html5Qrcode } = await import('html5-qrcode')
-      // "useBarCodeDetectorIfSupported" va acá, en el constructor — no
-      // en las opciones de start() (ese es un config distinto, que no
-      // tiene este campo; ponerlo ahí no rompe nada pero tampoco hace
-      // nada). Cuando el celular lo soporta (Chrome/Android, la mayoría
-      // de los navegadores modernos), usa el lector de QR nativo en vez
-      // del que trae la librería por JavaScript — mucho más rápido y
-      // confiable para detectar el código apuntando la cámara. Sin esto
-      // es común que la cámara se vea perfecta pero nunca "enganche" el QR.
+      // "useBarCodeDetectorIfSupported" va acá, en el constructor (no en
+      // las opciones de start(), que es un config distinto sin este
+      // campo). Ya es el default de la librería, pero lo dejamos
+      // explícito: usa el lector de QR nativo del celular cuando está
+      // disponible (Chrome/Android) en vez del propio en JavaScript.
       const scanner = new Html5Qrcode('lector-qr-embarque', {
         experimentalFeatures: { useBarCodeDetectorIfSupported: true },
         verbose: false,
@@ -153,21 +150,14 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
       scannerRef.current = scanner
       await scanner.start(
         { facingMode: 'environment' },
-        {
-          fps: 10,
-          // "qrbox" como función (no un número fijo): recorta al centro
-          // un cuadrado proporcional al tamaño REAL de la cámara en ese
-          // celular puntual. Sin esto pasaron los dos problemas
-          // opuestos: un número fijo (ej 220) podía ser más grande que
-          // la cámara real y romper la detección; escanear el cuadro
-          // completo (sin recorte) baja tanto el detalle relativo del
-          // QR que tampoco llega a detectarlo. Con la función, el
-          // recorte siempre entra y siempre deja bastante detalle.
-          qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const lado = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75)
-            return { width: lado, height: lado }
-          },
-        },
+        // Sin "qrbox": versiones anteriores recortaban el centro de la
+        // imagen calculando el tamaño a partir del viewfinder, pero eso
+        // nunca llegó a detectar nada en la práctica (probable
+        // desalineación entre ese recorte y lo que la cámara entrega
+        // de verdad en el celular). Sin recorte, se analiza el cuadro
+        // completo de la cámara — más simple y es el modo que la
+        // propia librería recomienda como default más confiable.
+        { fps: 10 },
         texto => {
           // Un escaneo por vez: pausamos mientras se procesa/muestra el resultado.
           scanner.pause(true)
