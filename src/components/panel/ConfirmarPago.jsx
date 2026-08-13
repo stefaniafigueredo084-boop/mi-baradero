@@ -4,7 +4,7 @@ import { AlertTriangle, Banknote, CheckCircle, CreditCard, Loader2 } from 'lucid
 import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
-import { aMilisegundos, categoriaPorId, generarCodigo } from '../../utils/pase'
+import { aMilisegundos, categoriaPorId, generarCodigo, puntosPagoParaRuta } from '../../utils/pase'
 
 const formatoPesos = n => `$${Number(n || 0).toLocaleString('es-AR')}`
 const formatearFecha = fecha => {
@@ -69,7 +69,9 @@ export default function ConfirmarPago() {
                   </p>
                   <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-600' : 'text-azul'}`}>
                     {esEfectivo ? <Banknote className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
-                    {esEfectivo ? 'Paga en efectivo' : 'Paga por transferencia'}
+                    {esEfectivo
+                      ? `Paga en efectivo — ${puntosPagoParaRuta(item.origen, item.destino).map(p => p.nombre).join(' o ')}`
+                      : 'Paga por transferencia'}
                   </p>
                   {vencido && (
                     <p className="text-xs font-bold text-red-500 mt-1 flex items-center gap-1.5">
