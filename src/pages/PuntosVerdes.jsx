@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3 } from 'lucide-react'
+import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3, Navigation } from 'lucide-react'
 import { puntosVerdes as puntosFijos, materialesInfo } from '../data/puntosVerdesData'
 import { useColeccion } from '../hooks/useColeccion'
 import { posicionDesdeId } from '../utils/posicionHash'
@@ -42,6 +42,17 @@ const instrucciones = [
     color: '#0B6A2E',
   },
 ]
+
+// Arma el link de Google Maps para llegar al punto: si en algún momento
+// se cargan coordenadas (lat/lng) usa eso, que es exacto; si no, busca
+// por dirección + "Baradero" para no confundirse con una calle del mismo
+// nombre en otra ciudad.
+function linkComoLlegar(punto) {
+  const destino = punto.lat && punto.lng
+    ? `${punto.lat},${punto.lng}`
+    : `${punto.direccion}, Baradero, Buenos Aires`
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}`
+}
 
 export default function PuntosVerdes() {
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null)
@@ -243,9 +254,19 @@ export default function PuntosVerdes() {
                   <span className="text-gray-500 text-sm">{puntoSeleccionado.direccion}</span>
                 </div>
               </div>
-              <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-verde/10 text-verde' : 'bg-red-100 text-red-500'}`}>
-                {puntoSeleccionado.activo ? '● Activo' : '● Inactivo'}
-              </span>
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-verde/10 text-verde' : 'bg-red-100 text-red-500'}`}>
+                  {puntoSeleccionado.activo ? '● Activo' : '● Inactivo'}
+                </span>
+                <a
+                  href={linkComoLlegar(puntoSeleccionado)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 bg-azul text-white text-sm font-semibold px-3.5 py-2 rounded-xl hover:bg-azul-oscuro transition-colors shrink-0"
+                >
+                  <Navigation className="w-4 h-4" /> Cómo llegar
+                </a>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
