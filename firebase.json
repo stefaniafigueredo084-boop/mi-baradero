@@ -3,7 +3,6 @@
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
-      { "source": "/mp-webhook", "function": { "functionId": "webhookMercadoPago", "region": "us-central1" } },
       { "source": "**", "destination": "/index.html" }
     ],
     "headers": [
@@ -23,8 +22,5 @@
   },
   "firestore": {
     "rules": "firestore.rules"
-  },
-  "functions": {
-    "source": "functions"
   }
 }

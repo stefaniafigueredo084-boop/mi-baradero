@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { httpsCallable } from 'firebase/functions'
-import { BadgeCheck, Banknote, CheckCircle2, Clock, Contact, CreditCard, ExternalLink, Lock, Loader2, MessageCircle, RefreshCw, ShieldCheck, Ticket, Wallet } from 'lucide-react'
-import { db, functions } from '../../firebase'
+import { BadgeCheck, Banknote, CheckCircle2, Clock, Contact, CreditCard, Lock, Loader2, MessageCircle, RefreshCw, ShieldCheck, Ticket } from 'lucide-react'
+import { db } from '../../firebase'
 import { idVecino, leerPerfilLocal } from '../../utils/perfilLocal'
 import { usuarioVecino, usuarioVecinoLocal } from '../../utils/usuario'
 import { usePasajero } from '../../hooks/usePasajero'
@@ -27,17 +26,6 @@ const formatearFecha = fecha => {
   return d && m && y ? `${d}/${m}/${y}` : fecha
 }
 
-// Le pide al backend el link de pago de Mercado Pago para este pasaje
-// puntual y manda ahí mismo al navegador. La confirmación vuelve sola
-// (webhook del lado del servidor) — al volver de Mercado Pago, este
-// mismo pasaje ya va a figurar "confirmado" sin que nadie tenga que
-// tocar nada acá.
-async function irAMercadoPago(pasajeId) {
-  const crearPreferencia = httpsCallable(functions, 'crearPreferenciaMercadoPago')
-  const { data } = await crearPreferencia({ pasajeId })
-  window.location.href = data.initPoint
-}
-
 // Sección embebida en la página de la Combi. Cada pasaje es un ticket
 // puntual para un viaje específico (fecha + horario) — se paga, un
 // empleado confirma el pago, y recién ahí aparece el QR. La categoría
@@ -56,7 +44,7 @@ export default function MiPaseSection() {
   const [fecha, setFecha] = useState(fechaHoy())
   const [horarioId, setHorarioId] = useState('')
   const [categoriaId, setCategoriaId] = useState('comun')
-  const [formaPago, setFormaPago] = useState('mercadopago')
+  const [formaPago, setFormaPago] = useState('transferencia')
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
 
@@ -94,8 +82,7 @@ export default function MiPaseSection() {
       // arranque el cartel de "pagá en efectivo" a alguien que no tiene
       // que pagar nada.
       const formaPagoFinal = importe === 0 ? 'transferencia' : formaPago
-      const pasajeId = idPasaje(idVecino(), horario.id, fecha)
-      await setDoc(doc(db, 'pasajes', pasajeId), {
+      await setDoc(doc(db, 'pasajes', idPasaje(idVecino(), horario.id, fecha)), {
         pasajeroId: idVecino(),
         nombre: nombreCompleto,
         usuario,
@@ -117,14 +104,6 @@ export default function MiPaseSection() {
         creadoEn: serverTimestamp(),
         actualizadoEn: serverTimestamp(),
       })
-      // Mercado Pago: en vez de mostrar el pasaje "pendiente" acá,
-      // mandamos directo al checkout — el pasaje se confirma solo
-      // (webhook) apenas se acredite, sin que nadie tenga que volver a
-      // esta pantalla a avisar nada.
-      if (formaPagoFinal === 'mercadopago') {
-        await irAMercadoPago(pasajeId)
-        return
-      }
     } catch {
       setError('No se pudo generar el pedido. Revisá tu conexión e intentá de nuevo.')
     } finally {
@@ -239,20 +218,11 @@ export default function MiPaseSection() {
               {calcularImporte(categoriaId, horario.origen, horario.destino) > 0 && (
                 <div className="mb-5">
                   <p className="text-sm font-semibold text-gray-700 mb-2">Forma de pago</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormaPago('mercadopago')}
-                      className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl font-semibold text-xs sm:text-sm border-2 transition-all ${
-                        formaPago === 'mercadopago' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4" /> Mercado Pago
-                    </button>
+                  <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setFormaPago('transferencia')}
-                      className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl font-semibold text-xs sm:text-sm border-2 transition-all ${
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
                         formaPago === 'transferencia' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
                       }`}
                     >
@@ -261,18 +231,13 @@ export default function MiPaseSection() {
                     <button
                       type="button"
                       onClick={() => setFormaPago('efectivo')}
-                      className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl font-semibold text-xs sm:text-sm border-2 transition-all ${
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
                         formaPago === 'efectivo' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
                       }`}
                     >
                       <Banknote className="w-4 h-4" /> Efectivo
                     </button>
                   </div>
-                  {formaPago === 'mercadopago' && (
-                    <p className="text-xs text-azul bg-azul/5 border border-azul/20 rounded-xl p-3 mt-2 leading-relaxed">
-                      Te vamos a redirigir a Mercado Pago para pagar. Apenas se acredite, el pasaje se confirma solo — no hace falta esperar a que nadie lo revise.
-                    </p>
-                  )}
                   {formaPago === 'efectivo' && (
                     <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 leading-relaxed">
                       Se paga en persona en {puntosPagoParaRuta(horario.origen, horario.destino).map(p => p.nombre).join(' o ')},
@@ -290,8 +255,8 @@ export default function MiPaseSection() {
                 disabled={enviando || horarioYaNoDisponible || categoriaBloqueada(categoriaPorId(categoriaId))}
                 className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {enviando ? <Loader2 className="w-4 h-4 animate-spin" /> : formaPago === 'mercadopago' ? <ExternalLink className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
-                {formaPago === 'mercadopago' ? 'Pagar con Mercado Pago' : 'Generar pasaje'} — {formatoPesos(calcularImporte(categoriaId, horario.origen, horario.destino))}
+                {enviando ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                Generar pasaje — {formatoPesos(calcularImporte(categoriaId, horario.origen, horario.destino))}
               </button>
             </div>
           )}
@@ -442,14 +407,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
     )
   }
 
-  // Pendiente de pago. Mercado Pago es distinto de los otros dos: no
-  // hay nada para "mostrar" acá más que esperar — la confirmación
-  // llega sola (webhook) apenas se acredite. Solo hace falta un botón
-  // por si cerró la ventana de pago antes de terminar.
-  if (pasaje.formaPago === 'mercadopago') {
-    return <EsperandoMercadoPago pasaje={pasaje} cat={cat} />
-  }
-
+  // Pendiente de pago.
   const esEfectivo = pasaje.formaPago === 'efectivo'
   const venceMs = esEfectivo ? aMilisegundos(pasaje.vencePagoEn) : null
   const vencido = venceMs != null && Date.now() > venceMs
@@ -540,49 +498,6 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
           </p>
         </div>
       )}
-    </div>
-  )
-}
-
-function EsperandoMercadoPago({ pasaje, cat }) {
-  const [yendo, setYendo] = useState(false)
-  const [error, setError] = useState('')
-
-  const volver = async () => {
-    setError('')
-    setYendo(true)
-    try {
-      await irAMercadoPago(pasaje.id)
-    } catch {
-      setError('No se pudo abrir Mercado Pago. Probá de nuevo.')
-      setYendo(false)
-    }
-  }
-
-  return (
-    <div className="max-w-sm bg-azul/5 border border-azul/20 rounded-xl p-5">
-      <p className="text-xs font-bold text-azul-oscuro flex items-center gap-1.5 mb-3">
-        <Wallet className="w-3.5 h-3.5" /> Esperando el pago
-      </p>
-      <div className="text-sm text-gray-700 space-y-1 mb-4">
-        <p><span className="text-gray-500">Tipo de pasaje:</span> {cat.label}</p>
-        <p><span className="text-gray-500">Recorrido:</span> {pasaje.origen} → {pasaje.destino}</p>
-        <p><span className="text-gray-500">Fecha:</span> {formatearFecha(pasaje.fecha)}</p>
-        <p><span className="text-gray-500">Horario:</span> {pasaje.salida} hs</p>
-        <p className="font-bold text-gray-800">Total a pagar: {formatoPesos(pasaje.importe)}</p>
-      </div>
-      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-        Si cerraste la ventana de Mercado Pago antes de terminar, volvé a intentar acá abajo. Apenas se acredite el pago, el QR va a aparecer solo — no hace falta que hagas nada más.
-      </p>
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-      <button
-        onClick={volver}
-        disabled={yendo}
-        className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
-      >
-        {yendo ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
-        Volver a Mercado Pago
-      </button>
     </div>
   )
 }
