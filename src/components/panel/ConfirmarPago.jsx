@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
-import { Banknote, CheckCircle, Loader2 } from 'lucide-react'
+import { AlertTriangle, Banknote, CheckCircle, CreditCard, Loader2 } from 'lucide-react'
 import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
-import { categoriaPorId, generarCodigo } from '../../utils/pase'
+import { aMilisegundos, categoriaPorId, generarCodigo } from '../../utils/pase'
 
 const formatoPesos = n => `$${Number(n || 0).toLocaleString('es-AR')}`
 const formatearFecha = fecha => {
@@ -55,28 +55,42 @@ export default function ConfirmarPago() {
         <p className="text-gray-400 text-sm">No hay pasajes esperando confirmación de pago.</p>
       ) : (
         <div className="space-y-3">
-          {pendientes.map(item => (
-            <div key={item.id} className="card p-4 flex items-center justify-between gap-4 flex-wrap">
-              <div className="min-w-0">
-                <p className="font-bold text-gray-800">{item.nombre}</p>
-                {item.usuario && <p className="text-xs text-gray-400 font-mono">@{item.usuario}</p>}
-                <p className="text-sm text-gray-600 mt-1">
-                  {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
-                </p>
+          {pendientes.map(item => {
+            const esEfectivo = item.formaPago === 'efectivo'
+            const venceMs = esEfectivo ? aMilisegundos(item.vencePagoEn) : null
+            const vencido = venceMs != null && Date.now() > venceMs
+            return (
+              <div key={item.id} className={`card p-4 flex items-center justify-between gap-4 flex-wrap ${vencido ? 'border-2 border-red-200' : ''}`}>
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-800">{item.nombre}</p>
+                  {item.usuario && <p className="text-xs text-gray-400 font-mono">@{item.usuario}</p>}
+                  <p className="text-sm text-gray-600 mt-1">
+                    {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
+                  </p>
+                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-600' : 'text-azul'}`}>
+                    {esEfectivo ? <Banknote className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
+                    {esEfectivo ? 'Paga en efectivo' : 'Paga por transferencia'}
+                  </p>
+                  {vencido && (
+                    <p className="text-xs font-bold text-red-500 mt-1 flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5" /> Venció el plazo para pagar — confirmá solo si realmente recibiste el efectivo.
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="font-bold text-verde-oscuro text-lg">{formatoPesos(item.importe)}</span>
+                  <button
+                    onClick={() => confirmar(item)}
+                    disabled={procesando === item.id}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-verde text-white hover:bg-verde-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
+                  >
+                    {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Confirmar pago
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="font-bold text-verde-oscuro text-lg">{formatoPesos(item.importe)}</span>
-                <button
-                  onClick={() => confirmar(item)}
-                  disabled={procesando === item.id}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-verde text-white hover:bg-verde-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
-                >
-                  {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  Confirmar pago
-                </button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

@@ -197,7 +197,8 @@ service cloud.firestore {
     function datosPasajeValidos() {
       return request.resource.data.keys().hasOnly([
                'pasajeroId', 'nombre', 'usuario', 'categoria', 'horarioId', 'fecha',
-               'salida', 'origen', 'destino', 'importe', 'estado', 'usado', 'creadoEn', 'actualizadoEn'
+               'salida', 'origen', 'destino', 'importe', 'estado', 'usado', 'creadoEn', 'actualizadoEn',
+               'formaPago', 'vencePagoEn'
              ])
              && request.resource.data.estado == 'pendiente'
              && request.resource.data.usado == false

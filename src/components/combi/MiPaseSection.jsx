@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { BadgeCheck, CheckCircle2, Clock, Contact, Lock, Loader2, MessageCircle, ShieldCheck, Ticket } from 'lucide-react'
+import { BadgeCheck, Banknote, CheckCircle2, Clock, Contact, CreditCard, Lock, Loader2, MessageCircle, RefreshCw, ShieldCheck, Ticket } from 'lucide-react'
 import { db } from '../../firebase'
 import { idVecino, leerPerfilLocal } from '../../utils/perfilLocal'
 import { usuarioVecino, usuarioVecinoLocal } from '../../utils/usuario'
@@ -8,8 +8,8 @@ import { usePasajero } from '../../hooks/usePasajero'
 import { usePasaje } from '../../hooks/usePasaje'
 import { useViaje } from '../../hooks/useViaje'
 import { useHorariosCombi } from '../../hooks/useHorariosCombi'
-import { CATEGORIAS, categoriaPorId, categoriaVerificada, calcularImporte, fechaHoy, idPasaje, MINUTOS_CORTE_VENTA, salidaTimestamp } from '../../utils/pase'
-import { datosPago } from '../../data/combiData'
+import { aMilisegundos, CATEGORIAS, categoriaPorId, categoriaVerificada, calcularImporte, fechaHoy, idPasaje, MINUTOS_CORTE_VENTA, salidaTimestamp } from '../../utils/pase'
+import { datosPago, puntosPagoEfectivo } from '../../data/combiData'
 import ImagenInput from '../panel/ImagenInput'
 import CopiarCampo from '../CopiarCampo'
 import PaseQR from '../pase/PaseQR'
@@ -44,6 +44,7 @@ export default function MiPaseSection() {
   const [fecha, setFecha] = useState(fechaHoy())
   const [horarioId, setHorarioId] = useState('')
   const [categoriaId, setCategoriaId] = useState('comun')
+  const [formaPago, setFormaPago] = useState('transferencia')
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
 
@@ -75,6 +76,12 @@ export default function MiPaseSection() {
     try {
       const nombreCompleto = `${perfilLocal.nombre} ${perfilLocal.apellido || ''}`.trim()
       const usuario = usuarioVecinoLocal() || await usuarioVecino(perfilLocal.nombre, perfilLocal.apellido)
+      const importe = calcularImporte(categoriaId, horario.origen, horario.destino)
+      // Sin nada que pagar (categoría discapacidad), la forma de pago no
+      // aplica — se guarda como transferencia para no mostrarle de
+      // arranque el cartel de "pagá en efectivo" a alguien que no tiene
+      // que pagar nada.
+      const formaPagoFinal = importe === 0 ? 'transferencia' : formaPago
       await setDoc(doc(db, 'pasajes', idPasaje(idVecino(), horario.id, fecha)), {
         pasajeroId: idVecino(),
         nombre: nombreCompleto,
@@ -85,9 +92,15 @@ export default function MiPaseSection() {
         salida: horario.salida || '',
         origen: horario.origen || '',
         destino: horario.destino || '',
-        importe: calcularImporte(categoriaId, horario.origen, horario.destino),
+        importe,
         estado: 'pendiente',
         usado: false,
+        formaPago: formaPagoFinal,
+        // El efectivo se paga en persona, en horario de atención — no
+        // tiene sentido más allá de que salga la combi: si no se pagó
+        // para entonces, la reserva queda vencida (se puede volver a
+        // generar el pasaje, pero ya no es "esta" reserva).
+        ...(formaPagoFinal === 'efectivo' ? { vencePagoEn: salidaTimestamp(fecha, horario.salida) } : {}),
         creadoEn: serverTimestamp(),
         actualizadoEn: serverTimestamp(),
       })
@@ -202,6 +215,38 @@ export default function MiPaseSection() {
                 })}
               </div>
 
+              {calcularImporte(categoriaId, horario.origen, horario.destino) > 0 && (
+                <div className="mb-5">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Forma de pago</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormaPago('transferencia')}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
+                        formaPago === 'transferencia' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4" /> Transferencia
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormaPago('efectivo')}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
+                        formaPago === 'efectivo' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                      }`}
+                    >
+                      <Banknote className="w-4 h-4" /> Efectivo
+                    </button>
+                  </div>
+                  {formaPago === 'efectivo' && (
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 leading-relaxed">
+                      Se paga en persona en un punto de venta oficial, {puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
+                      Tenés que pagarlo antes de que salga tu combi ({horario.salida} hs) — si no, la reserva vence y vas a tener que generarla de nuevo.
+                    </p>
+                  )}
+                </div>
+              )}
+
               {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
               <button
@@ -215,7 +260,7 @@ export default function MiPaseSection() {
             </div>
           )}
 
-          {horario && !cargandoPasaje && pasaje && <EstadoPasaje pasaje={pasaje} />}
+          {horario && !cargandoPasaje && pasaje && <EstadoPasaje pasaje={pasaje} onReintentar={comprar} reintentando={enviando} />}
         </>
       )}
     </div>
@@ -329,7 +374,7 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
   )
 }
 
-function EstadoPasaje({ pasaje }) {
+function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
   const cat = categoriaPorId(pasaje.categoria)
 
   if (pasaje.usado) {
@@ -362,6 +407,37 @@ function EstadoPasaje({ pasaje }) {
   }
 
   // Pendiente de pago.
+  const esEfectivo = pasaje.formaPago === 'efectivo'
+  const venceMs = esEfectivo ? aMilisegundos(pasaje.vencePagoEn) : null
+  const vencido = venceMs != null && Date.now() > venceMs
+
+  if (vencido) {
+    return (
+      <div className="max-w-sm bg-red-50 border border-red-200 rounded-xl p-5">
+        <p className="text-xs font-bold text-red-600 flex items-center gap-1.5 mb-3">
+          <Clock className="w-3.5 h-3.5" /> Reserva vencida
+        </p>
+        <div className="text-sm text-gray-700 space-y-1 mb-4">
+          <p><span className="text-gray-500">Tipo de pasaje:</span> {cat.label}</p>
+          <p><span className="text-gray-500">Recorrido:</span> {pasaje.origen} → {pasaje.destino}</p>
+          <p><span className="text-gray-500">Fecha:</span> {formatearFecha(pasaje.fecha)}</p>
+          <p><span className="text-gray-500">Horario:</span> {pasaje.salida} hs</p>
+        </div>
+        <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+          No se pagó en efectivo antes de la salida de la combi, así que la reserva venció. Si todavía querés viajar, generá el pasaje de nuevo.
+        </p>
+        <button
+          onClick={onReintentar}
+          disabled={reintentando}
+          className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
+        >
+          {reintentando ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Reservar de nuevo
+        </button>
+      </div>
+    )
+  }
+
   const mensaje = [
     '*Comprobante de pago - Pasaje Combi Municipal*',
     `Pasajero: ${pasaje.nombre}`,
@@ -388,22 +464,39 @@ function EstadoPasaje({ pasaje }) {
         <p className="font-bold text-gray-800">Total a pagar: {formatoPesos(pasaje.importe)}</p>
       </div>
 
-      <div className="pt-3 border-t border-amber-200 space-y-2">
-        <p className="text-xs font-semibold text-gray-600">Pagá por transferencia:</p>
-        <CopiarCampo label="Alias" valor={datosPago.alias} />
-        <CopiarCampo label="Titular" valor={datosPago.titular} />
-        <a
-          href={linkWhatsApp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
-        >
-          <MessageCircle className="w-4 h-4" /> Enviar comprobante por WhatsApp
-        </a>
-        <p className="text-xs text-amber-600 pt-1">
-          Apenas se confirme el pago, tu QR va a aparecer acá — no hace falta que hagas nada más.
-        </p>
-      </div>
+      {esEfectivo ? (
+        <div className="pt-3 border-t border-amber-200 space-y-2">
+          <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+            <Banknote className="w-3.5 h-3.5" /> Pagá en efectivo, en persona:
+          </p>
+          <ul className="text-sm text-gray-700 space-y-0.5">
+            {puntosPagoEfectivo.puntos.map(p => (
+              <li key={p.nombre}>• {p.nombre}{p.direccion ? ` — ${p.direccion}` : ''}</li>
+            ))}
+          </ul>
+          <p className="text-xs text-gray-500">{puntosPagoEfectivo.horarioAtencion}.</p>
+          <p className="text-xs font-bold text-amber-700 pt-1">
+            Pagalo antes de las {pasaje.salida} hs del {formatearFecha(pasaje.fecha)} (cuando sale tu combi) o la reserva vence.
+          </p>
+        </div>
+      ) : (
+        <div className="pt-3 border-t border-amber-200 space-y-2">
+          <p className="text-xs font-semibold text-gray-600">Pagá por transferencia:</p>
+          <CopiarCampo label="Alias" valor={datosPago.alias} />
+          <CopiarCampo label="Titular" valor={datosPago.titular} />
+          <a
+            href={linkWhatsApp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
+          >
+            <MessageCircle className="w-4 h-4" /> Enviar comprobante por WhatsApp
+          </a>
+          <p className="text-xs text-amber-600 pt-1">
+            Apenas se confirme el pago, tu QR va a aparecer acá — no hace falta que hagas nada más.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

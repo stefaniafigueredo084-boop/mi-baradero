@@ -69,3 +69,15 @@ export const datosPago = {
   telefono: '5493329383105',
   telefonoVisible: '+54 9 3329 38-3105',
 }
+
+// Únicos puntos de venta oficiales donde se puede pagar el pasaje en
+// efectivo — no es en la combi ni con el conductor, es en persona en
+// alguno de estos 3 lugares, y solo en este horario de atención.
+export const puntosPagoEfectivo = {
+  horarioAtencion: 'Lunes a Viernes de 8 a 13 horas',
+  puntos: [
+    { nombre: 'Centro Operativo Baradero I', direccion: 'Av. San Martín 2106' },
+    { nombre: 'Delegación de Alsina' },
+    { nombre: 'Delegación de Portela' },
+  ],
+}

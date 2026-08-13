@@ -139,6 +139,15 @@ export function salidaTimestamp(fecha, horaSalida) {
   return new Date(y, (mo || 1) - 1, d || 1, h || 0, m || 0, 0, 0)
 }
 
+// Un campo de fecha/hora guardado en Firestore puede volver como
+// Timestamp (leído recién de un doc existente), Date o milisegundos
+// (recién calculado en el momento) — normaliza los tres casos a
+// milisegundos para poder compararlos.
+export function aMilisegundos(valor) {
+  if (!valor) return null
+  return typeof valor.toMillis === 'function' ? valor.toMillis() : new Date(valor).getTime()
+}
+
 // Plantilla por defecto para un horario que todavía no tiene los campos
 // nuevos cargados (horarios ya existentes en Firestore, o los fijos de
 // combiData.js).
