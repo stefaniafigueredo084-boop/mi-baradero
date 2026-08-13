@@ -32,7 +32,7 @@ const formatearFecha = fecha => {
 // se pide una sola vez y desbloquea el precio con descuento para
 // cualquier pasaje futuro de esa categoría.
 export default function MiPaseSection() {
-  const perfilLocal = leerPerfilLocal()
+  const [perfilLocal, setPerfilLocal] = useState(() => leerPerfilLocal())
   const [nombreForm, setNombreForm] = useState(perfilLocal?.nombre || '')
   const [apellidoForm, setApellidoForm] = useState(perfilLocal?.apellido || '')
   const tieneNombre = !!(perfilLocal?.nombre?.trim())
@@ -59,8 +59,9 @@ export default function MiPaseSection() {
     e.preventDefault()
     if (!nombreForm.trim()) return
     const previo = JSON.parse(localStorage.getItem('mibaradero_perfil') || 'null') || {}
-    localStorage.setItem('mibaradero_perfil', JSON.stringify({ ...previo, nombre: nombreForm.trim(), apellido: apellidoForm.trim() }))
-    window.location.reload()
+    const actualizado = { ...previo, nombre: nombreForm.trim(), apellido: apellidoForm.trim() }
+    localStorage.setItem('mibaradero_perfil', JSON.stringify(actualizado))
+    setPerfilLocal(actualizado)
   }
 
   const categoriaBloqueada = cat => cat.requiereDocumento && !categoriaVerificada(pasajero, cat.id)

@@ -164,7 +164,14 @@ export default function CombiMunicipal() {
                 <div className="w-8 h-8 rounded-full bg-white border-2 border-verde shadow-md flex items-center justify-center text-sm">
                   {p.icono}
                 </div>
-                <span className="absolute top-9 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-700 whitespace-nowrap bg-white/80 px-1.5 py-0.5 rounded-md">
+                {/* max-w + truncate (en vez de whitespace-nowrap sin límite):
+                    las paradas están a 20% de distancia entre sí en el mapa, así
+                    que un nombre largo sin tope ("Centro de Camioneros") se comía
+                    el espacio de la parada vecina en pantallas angostas. Con esto
+                    nunca ocupa más ancho que el que tiene disponible, sea cual sea
+                    el tamaño de pantalla; el nombre completo sigue apareciendo en
+                    la tarjeta de "Paradas Disponibles" más abajo. */}
+                <span className="absolute top-9 left-1/2 -translate-x-1/2 max-w-[64px] sm:max-w-[100px] truncate text-center text-[10px] sm:text-xs font-medium text-gray-700 bg-white/80 px-1.5 py-0.5 rounded-md">
                   {p.nombre}
                 </span>
               </div>
