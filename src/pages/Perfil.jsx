@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { deleteUser } from 'firebase/auth'
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
-import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
+import { pedirPermisoNotificacion, saludar } from '../utils/notificaciones'
 import { auth, db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
@@ -67,10 +67,14 @@ export default function Perfil() {
   })
   const [guardado, setGuardado] = useState(false)
   const [editando, setEditando] = useState(false)
+  // Solo autoguarda cambios que hizo la persona tocando un campo — no
+  // el precargado inicial (localStorage o el doc de la cuenta al
+  // loguearse), que no es algo "nuevo" que haya que reescribir.
+  const tocado = useRef(false)
 
-  const set = (campo, valor) => setPerfil(p => ({ ...p, [campo]: valor }))
-  const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
-  const setNotifVoz = (campo, valor) => setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } }))
+  const set = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, [campo]: valor })) }
+  const setNotif = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } })) }
+  const setNotifVoz = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } })) }
 
   // Al iniciar sesión, si esa cuenta ya tenía un perfil guardado (por
   // ejemplo, desde otro dispositivo) lo traemos para no perderlo.
@@ -91,6 +95,17 @@ export default function Perfil() {
       }))
     }).catch(() => {})
   }, [cuenta])
+
+  // Con sesión iniciada, cualquier cambio se guarda solo (con una
+  // pequeña espera, para no escribir en Firestore en cada tecla) — no
+  // hace falta un botón "Guardar" aparte, la cuenta ya identifica de
+  // quién es el perfil.
+  useEffect(() => {
+    if (!cuenta || !tocado.current || !perfil.nombre?.trim()) return
+    const id = setTimeout(() => { guardar() }, 900)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perfil, cuenta])
 
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
@@ -129,15 +144,7 @@ export default function Perfil() {
     }
 
     setGuardado(true)
-    setEditando(false)
     setTimeout(() => setGuardado(false), 3000)
-
-    if (hayNotif) {
-      mostrarNotificacion('✅ Mi Baradero — Perfil guardado', {
-        body: `Hola ${perfil.nombre || 'vecino'}, tus notificaciones están activas.`,
-        icon: '/logo-mibaradero.png',
-      })
-    }
   }
 
   const [borrandoCuenta, setBorrandoCuenta] = useState(false)
@@ -491,15 +498,8 @@ export default function Perfil() {
           </div>
         </div>
 
-        {/* Botones */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={guardar}
-            className="flex-1 flex items-center justify-center gap-2 bg-verde text-white font-bold py-3.5 rounded-2xl hover:bg-verde-oscuro transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-          >
-            <Save className="w-5 h-5" />
-            Guardar perfil
-          </button>
+        {/* Botón */}
+        <div className="flex">
           <button
             onClick={borrarCuenta}
             disabled={borrandoCuenta}
