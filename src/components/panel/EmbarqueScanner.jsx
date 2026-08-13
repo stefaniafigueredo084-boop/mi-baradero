@@ -66,8 +66,13 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
   const [resultado, setResultado] = useState(null) // { ok, mensaje, detalle }
   const [procesando, setProcesando] = useState(false)
   const [contador, setContador] = useState(() => leerContador(auth.currentUser?.uid))
+  // Diagnóstico visible en pantalla: mientras no logremos que escanee
+  // en un celular real, esto muestra qué está pasando de verdad adentro
+  // (antes fallaba en silencio, sin ninguna pista de qué probar).
+  const [debug, setDebug] = useState(null)
 
   const scannerRef = useRef(null)
+  const intentosRef = useRef(0)
 
   // Punto común: confirma el embarque de un pasaje puntual (ya
   // identificado, sea por cámara o por código dictado) y actualiza
@@ -130,6 +135,20 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
   const iniciarCamara = async () => {
     setErrorCamara('')
     setResultado(null)
+    intentosRef.current = 0
+    // Chequeo manual (no de la librería) de si este navegador tiene
+    // lector de QR nativo — para saber, con certeza, qué motor de
+    // lectura se está usando en este celular puntual.
+    let nativo = false
+    try {
+      if ('BarcodeDetector' in window) {
+        const formatos = await window.BarcodeDetector.getSupportedFormats?.()
+        nativo = !formatos || formatos.includes('qr_code')
+      }
+    } catch {
+      nativo = false
+    }
+    setDebug({ nativo, intentos: 0, ultimoError: '', videoListo: false })
     // Mostramos el contenedor ANTES de arrancar la cámara: html5-qrcode
     // necesita que el div ya tenga tamaño real en pantalla para poder
     // calcular y dibujar el video adentro — con el contenedor todavía
@@ -165,8 +184,18 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
             setTimeout(() => scannerRef.current?.resume(), 1500)
           })
         },
-        () => {} // errores de "no se detectó nada todavía" — se ignoran, son constantes
+        errorMsg => {
+          // Antes se ignoraban del todo (son constantes, una por
+          // frame sin detectar nada) — ahora se cuentan y se muestra
+          // la última, para saber si el lector está siquiera
+          // intentando algo o si quedó completamente trabado.
+          intentosRef.current += 1
+          if (intentosRef.current % 10 === 0) {
+            setDebug(d => d && { ...d, intentos: intentosRef.current, ultimoError: String(errorMsg) })
+          }
+        }
       )
+      setDebug(d => d && { ...d, videoListo: true })
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error al iniciar la cámara:', err)
@@ -184,6 +213,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
     }
     scannerRef.current = null
     setEscaneando(false)
+    setDebug(null)
   }
 
   useEffect(() => () => { scannerRef.current?.stop().catch(() => {}) }, [])
@@ -269,6 +299,20 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           </button>
         )}
         {errorCamara && <p className="text-red-500 text-sm mt-2">{errorCamara}</p>}
+
+        {/* Diagnóstico temporal: mientras no confirmemos que escanea
+            bien en un celular real, esto muestra qué está pasando
+            adentro en vez de fallar en silencio. Sacarlo una vez que
+            ande. */}
+        {debug && (
+          <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-600 space-y-0.5 font-mono">
+            <p>Lector nativo del celular: <strong>{debug.nativo ? 'sí' : 'no'}</strong></p>
+            <p>Video de la cámara arrancó: <strong>{debug.videoListo ? 'sí' : 'todavía no'}</strong></p>
+            <p>Cuadros analizados sin detectar nada: <strong>{debug.intentos}</strong></p>
+            {debug.ultimoError && <p className="truncate">Último aviso: {debug.ultimoError}</p>}
+          </div>
+        )}
+
         <div className={escaneando ? 'relative mt-4' : 'hidden'}>
           <div id="lector-qr-embarque" className="rounded-xl overflow-hidden min-h-[240px]" />
           {/* Cartel superpuesto a la cámara con el resultado del último
