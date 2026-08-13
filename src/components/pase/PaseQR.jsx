@@ -8,8 +8,11 @@ import { QRCodeSVG } from 'qrcode.react'
 export default function PaseQR({ codigo }) {
   return (
     <div>
-      <div className="bg-white border-4 border-verde rounded-2xl p-4 mx-auto w-fit">
-        <QRCodeSVG value={codigo || ''} size={180} level="M" />
+      {/* Grande a propósito: se suele escanear desde OTRO celular, no
+          desde una hoja impresa — más chico, la pantalla del celular
+          (brillo, reflejo, refresco) hace que cueste mucho más leerlo. */}
+      <div className="bg-white border-4 border-verde rounded-2xl p-5 mx-auto w-fit">
+        <QRCodeSVG value={codigo || ''} size={260} level="M" />
       </div>
 
       {/* Mismo código que codifica el QR, bien grande — para dictarle
