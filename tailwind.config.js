@@ -13,6 +13,7 @@ export default {
         azul: '#1D8FE1',
         'azul-oscuro': '#0057B8',
         amarillo: '#F5C400',
+        'amarillo-oscuro': '#C9A400',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],

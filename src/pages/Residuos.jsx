@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation } from 'lucide-react'
+import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation, Calendar } from 'lucide-react'
 import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, consejos as consejosFijos } from '../data/residuosData'
 import { db } from '../firebase'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
+import AcordeonItem from '../components/panel/Acordeon'
 
 function useGpsCamion(activo) {
   const [distancia, setDistancia] = useState(2400)
@@ -100,7 +101,7 @@ export default function Residuos() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero amarillo */}
-      <div className="bg-gradient-to-br from-amarillo to-yellow-500 text-gray-900 dark:text-white py-10 sm:py-12 px-4">
+      <div className="bg-amarillo text-gray-900 dark:text-white py-10 sm:py-12 px-4">
         <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black/10 flex items-center justify-center shrink-0">
             <Trash2 className="w-7 h-7 sm:w-8 sm:h-8" />
@@ -240,11 +241,13 @@ export default function Residuos() {
           )}
         </div>
 
-        {/* Calendario semanal */}
-        <div>
-          <h2 className="text-xl font-bold font-poppins mb-5 flex items-center gap-2">
-            <Trash2 className="w-5 h-5 text-amarillo" /> Calendario Semanal
-          </h2>
+        {/* Calendario semanal — colapsado, como en el panel de trabajadores */}
+        <AcordeonItem
+          icono={Calendar}
+          color="amarillo"
+          titulo="Calendario Semanal"
+          descripcion="Qué residuo corresponde cada día"
+        >
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {calendario.map((dia) => {
               const esHoy = dia.dia === hoyCapitalizado
@@ -264,7 +267,7 @@ export default function Residuos() {
               )
             })}
           </div>
-        </div>
+        </AcordeonItem>
 
         {/* Alertas por zona */}
         <div>
@@ -316,11 +319,13 @@ export default function Residuos() {
           )}
         </div>
 
-        {/* Consejos */}
-        <div>
-          <h2 className="text-xl font-bold font-poppins mb-5 flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-amarillo" /> Consejos de Reciclado
-          </h2>
+        {/* Consejos — colapsado, como en el panel de trabajadores */}
+        <AcordeonItem
+          icono={Lightbulb}
+          color="amarillo"
+          titulo="Consejos de Reciclado"
+          descripcion="Tips para separar mejor tus residuos"
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {consejos.map(c => (
               <div key={c.titulo} className="card p-5">
@@ -330,7 +335,7 @@ export default function Residuos() {
               </div>
             ))}
           </div>
-        </div>
+        </AcordeonItem>
 
       </div>
     </div>

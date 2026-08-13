@@ -46,6 +46,26 @@ async function elegirVozCalida() {
   return preferida
 }
 
+// Voz de Tachín (mascota): la mayoría de los navegadores no ofrecen
+// voces infantiles reales en español, así que además de tratar de
+// encontrar una que sí lo aclare en el nombre, el efecto "más
+// infantil, tierna y amigable" se logra sobre todo con el pitch/rate
+// más altos con los que se la hace hablar (ver hablarTachin más abajo).
+let vozTachinCache = null
+async function elegirVozTachin() {
+  if (vozTachinCache !== null) return vozTachinCache
+  const voces = await obtenerVoces()
+  const esEspanol = voces.filter(v => v.lang?.toLowerCase().startsWith('es'))
+  const preferida =
+    esEspanol.find(v => /(infantil|child|kids|junior)/i.test(v.name)) ||
+    esEspanol.find(v => /google/i.test(v.name)) ||
+    esEspanol.find(v => /(mujer|female|paulina|mónica|monica|helena|elvira|sabina|lucia|luciana|camila|valentina)/i.test(v.name)) ||
+    esEspanol[0] ||
+    null
+  vozTachinCache = preferida
+  return preferida
+}
+
 // Corta el texto en oraciones (por ".", "!", "?" o "…") para poder
 // hablarlas una por una con una pausa real entre medio — el navegador
 // no soporta pausas tipo SSML dentro de una sola frase, así que la
@@ -61,12 +81,12 @@ function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function hablarFrase(frase, voz) {
+function hablarFrase(frase, voz, rate, pitch) {
   return new Promise(resolve => {
     const utterance = new SpeechSynthesisUtterance(frase)
     utterance.lang = 'es-AR'
-    utterance.rate = 0.9 // pausada, sin apurarse
-    utterance.pitch = 1.02 // casi natural, apenas suavizada (evita sonar "artificial")
+    utterance.rate = rate
+    utterance.pitch = pitch
     utterance.volume = 1
     if (voz) utterance.voice = voz
     utterance.onend = resolve
@@ -81,19 +101,33 @@ let generacionActual = 0
 
 // Dice un texto en voz alta, de a una oración por vez con una pequeña
 // pausa entre cada una, y resuelve cuando termina (o cuando se cancela).
-export async function hablar(texto) {
+// "opciones" permite pedir otra voz/tono — lo usa hablarTachin() para
+// sonar distinto (más infantil) del narrador general de la app.
+export async function hablar(texto, opciones = {}) {
   if (!soportaSintesisVoz()) return
+  const {
+    elegirVoz = elegirVozCalida,
+    rate = 0.9, // pausada, sin apurarse
+    pitch = 1.02, // casi natural, apenas suavizada (evita sonar "artificial")
+  } = opciones
   const miGeneracion = ++generacionActual
   window.speechSynthesis.cancel()
-  const voz = await elegirVozCalida()
+  const voz = await elegirVoz()
   const frases = dividirEnFrases(texto)
 
   for (let i = 0; i < frases.length; i++) {
     if (miGeneracion !== generacionActual) return // se canceló o se pidió hablar otra cosa
-    await hablarFrase(frases[i], voz)
+    await hablarFrase(frases[i], voz, rate, pitch)
     if (miGeneracion !== generacionActual) return
     if (i < frases.length - 1) await esperar(180) // pausa breve entre oraciones
   }
+}
+
+// Tachín habla con un tono más agudo y un pelín más rápido que el
+// narrador general de la app — es la mascota, no un aviso formal — así
+// que suena más infantil, tierna y amigable.
+export function hablarTachin(texto) {
+  return hablar(texto, { elegirVoz: elegirVozTachin, rate: 1.05, pitch: 1.45 })
 }
 
 export function detenerVoz() {
@@ -139,7 +173,7 @@ export function escuchar({ timeoutMs = 8000 } = {}) {
 
 const RANGO_ACENTOS = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g')
 
-function normalizar(texto) {
+export function normalizar(texto) {
   return texto
     .toLowerCase()
     .normalize('NFD')

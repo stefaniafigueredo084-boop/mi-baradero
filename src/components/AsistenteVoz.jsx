@@ -8,9 +8,9 @@ import { NOTIF_SECTORES } from '../data/notifSectores'
 
 const PREGUNTAS_SECTOR = {
   basura: '¿Querés activar notificaciones de recolección de residuos?',
-  eventos: '¿Querés activar notificaciones de eventos próximos?',
-  nuevosEventos: '¿Querés que te avise cuando se agreguen eventos nuevos a la agenda?',
+  eventos: '¿Querés activar notificaciones de eventos: cuando estén por empezar y cuando se agreguen nuevos a la agenda?',
   puntosVerdes: '¿Querés activar notificaciones de puntos verdes?',
+  combi: '¿Querés activar notificaciones de demoras y cambios de parada de la combi municipal?',
 }
 
 // Asistente conversacional por voz para registrarse sin usar el

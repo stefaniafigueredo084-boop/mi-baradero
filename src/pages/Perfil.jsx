@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { deleteUser } from 'firebase/auth'
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play } from 'lucide-react'
-import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
-import { db } from '../firebase'
+import { Link } from 'react-router-dom'
+import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
+import { pedirPermisoNotificacion, saludar } from '../utils/notificaciones'
+import { auth, db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 import { useAuth } from '../context/AuthContext'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 import CuentaVecino from '../components/CuentaVecino'
+import ImagenInput from '../components/panel/ImagenInput'
 
-const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, nuevosEventos: Bell, puntosVerdes: Recycle }
+const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, puntosVerdes: Recycle, combi: Bus }
 
 const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
@@ -26,41 +29,61 @@ const defaultPerfil = {
     basura: false,
     eventos: false,
     puntosVerdes: false,
-    nuevosEventos: false,
+    combi: false,
   },
   // Además de la notificación visual, ¿este sector te lo tengo que leer
-  // en voz alta? Solo tiene efecto si "Lector de pantalla" está activado.
+  // en voz alta?
   notifVoz: {
     basura: false,
     eventos: false,
     puntosVerdes: false,
-    nuevosEventos: false,
+    combi: false,
   },
 }
 
 export default function Perfil() {
   const { tema, setTema, tamanoFuente, setTamanoFuente, lector, setLector } = useAccesibilidad()
-  const { usuario } = useAuth()
+  const { usuario: cuenta } = useAuth()
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
-      return guardado ? { ...defaultPerfil, ...JSON.parse(guardado) } : defaultPerfil
+      if (!guardado) return defaultPerfil
+      const datos = JSON.parse(guardado)
+      // Migración: "Eventos próximos" y "Nuevos eventos" eran dos sectores
+      // separados y ahora son uno solo ("eventos"). Si alguien ya tenía
+      // activado cualquiera de los dos viejos, el sector combinado queda
+      // activado (no perdemos la preferencia que ya habían elegido).
+      if (datos.notif?.nuevosEventos) datos.notif.eventos = true
+      if (datos.notifVoz?.nuevosEventos) datos.notifVoz.eventos = true
+      return {
+        ...defaultPerfil,
+        ...datos,
+        notif: { ...defaultPerfil.notif, ...datos.notif },
+        notifVoz: { ...defaultPerfil.notifVoz, ...datos.notifVoz },
+      }
     } catch {
       return defaultPerfil
     }
   })
   const [guardado, setGuardado] = useState(false)
   const [editando, setEditando] = useState(false)
+  // Solo autoguarda cambios que hizo la persona tocando un campo — no
+  // el precargado inicial (localStorage o el doc de la cuenta al
+  // loguearse), que no es algo "nuevo" que haya que reescribir.
+  const tocado = useRef(false)
 
-  const set = (campo, valor) => setPerfil(p => ({ ...p, [campo]: valor }))
-  const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
-  const setNotifVoz = (campo, valor) => setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } }))
+  const set = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, [campo]: valor })) }
+  const setNotif = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } })) }
+  const setNotifVoz = (campo, valor) => { tocado.current = true; setPerfil(p => ({ ...p, notifVoz: { ...p.notifVoz, [campo]: valor } })) }
 
   // Al iniciar sesión, si esa cuenta ya tenía un perfil guardado (por
   // ejemplo, desde otro dispositivo) lo traemos para no perderlo.
   useEffect(() => {
-    if (!usuario) return
-    getDoc(doc(db, 'vecinos', usuario.uid)).then(snap => {
+    if (!cuenta) return
+    // Precarga el email de la cuenta (Google o el que usó para
+    // registrarse) — es un dato que ya dio, no hace falta pedírselo de nuevo.
+    setPerfil(p => ({ ...p, email: p.email || cuenta.email || '' }))
+    getDoc(doc(db, 'vecinos', cuenta.uid)).then(snap => {
       if (!snap.exists()) return
       const d = snap.data()
       setPerfil(p => ({
@@ -68,9 +91,21 @@ export default function Perfil() {
         nombre: d.nombre || p.nombre,
         apellido: d.apellido || p.apellido,
         notif: d.notif || p.notif,
+        avatar: d.avatar || p.avatar,
       }))
     }).catch(() => {})
-  }, [usuario])
+  }, [cuenta])
+
+  // Con sesión iniciada, cualquier cambio se guarda solo (con una
+  // pequeña espera, para no escribir en Firestore en cada tecla) — no
+  // hace falta un botón "Guardar" aparte, la cuenta ya identifica de
+  // quién es el perfil.
+  useEffect(() => {
+    if (!cuenta || !tocado.current || !perfil.nombre?.trim()) return
+    const id = setTimeout(() => { guardar() }, 900)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perfil, cuenta])
 
   const guardar = async () => {
     // Pedir permiso de notificaciones si hay alguna activa (si el
@@ -91,12 +126,13 @@ export default function Perfil() {
     // perfil se puede recuperar desde cualquier otro dispositivo.
     if (perfil.nombre?.trim()) {
       try {
-        const idDoc = usuario ? usuario.uid : idVecino()
-        const esNuevo = !usuario && esPrimerGuardadoVecino()
+        const esNuevo = !cuenta && esPrimerGuardadoVecino()
+        const idDoc = cuenta ? cuenta.uid : idVecino()
         await setDoc(doc(db, 'vecinos', idDoc), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
+          avatar: perfil.avatar || '',
           actualizadoEn: serverTimestamp(),
           ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
         }, { merge: true })
@@ -108,23 +144,34 @@ export default function Perfil() {
     }
 
     setGuardado(true)
-    setEditando(false)
     setTimeout(() => setGuardado(false), 3000)
-
-    if (hayNotif) {
-      mostrarNotificacion('✅ Mi Baradero — Perfil guardado', {
-        body: `Hola ${perfil.nombre || 'vecino'}, tus notificaciones están activas.`,
-        icon: '/logo-mibaradero.png',
-      })
-    }
   }
 
-  const limpiar = () => {
-    if (confirm('¿Querés borrar todos tus datos de perfil?')) {
-      localStorage.removeItem('mibaradero_perfil')
-      deleteDoc(doc(db, 'vecinos', usuario ? usuario.uid : idVecino())).catch(() => {})
-      olvidarVecino()
+  const [borrandoCuenta, setBorrandoCuenta] = useState(false)
+  const [errorBorrar, setErrorBorrar] = useState('')
+
+  const borrarCuenta = async () => {
+    if (!confirm('¿Querés borrar tu cuenta? Se borran tu perfil y tus notificaciones, y no se puede deshacer.')) return
+    setErrorBorrar('')
+    setBorrandoCuenta(true)
+    localStorage.removeItem('mibaradero_perfil')
+    try {
+      if (cuenta) {
+        await deleteDoc(doc(db, 'vecinos', cuenta.uid)).catch(() => {})
+        await deleteUser(cuenta)
+      } else {
+        await deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+        olvidarVecino()
+      }
       setPerfil(defaultPerfil)
+    } catch (err) {
+      if (err.code === 'auth/requires-recent-login') {
+        setErrorBorrar('Por seguridad, cerrá sesión y volvé a entrar antes de borrar la cuenta.')
+      } else {
+        setErrorBorrar('No se pudo borrar la cuenta. Probá de nuevo.')
+      }
+    } finally {
+      setBorrandoCuenta(false)
     }
   }
 
@@ -139,8 +186,8 @@ export default function Perfil() {
       {/* Hero */}
       <div className="bg-gradient-to-br from-verde-oscuro to-[#064020] text-white py-12 px-4">
         <div className="max-w-4xl mx-auto flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold font-poppins shrink-0">
-            {iniciales}
+          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold font-poppins shrink-0 overflow-hidden">
+            {perfil.avatar ? <img src={perfil.avatar} alt="" className="w-full h-full object-cover" /> : iniciales}
           </div>
           <div>
             <h1 className="text-3xl font-bold font-poppins">
@@ -160,8 +207,39 @@ export default function Perfil() {
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-        {/* Mi cuenta (Google o email/contraseña, opcional) */}
-        <CuentaVecino usuario={usuario} />
+        {/* Mientras se confirma si hay sesión iniciada, no mostramos nada
+            todavía — evita el parpadeo de "iniciá sesión" seguido de
+            inmediato por el perfil ya logueado. */}
+        {cuenta === undefined && (
+          <div className="card p-10 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 text-verde animate-spin" />
+          </div>
+        )}
+
+        {/* Sin sesión: solo se ve la tarjeta de "Mi cuenta". El resto del
+            perfil (datos, accesibilidad, notificaciones) aparece recién
+            después de loguearse, más abajo. */}
+        {cuenta === null && <CuentaVecino usuario={cuenta} />}
+
+        {cuenta && (
+          <>
+            {/* Mi cuenta (resumen: sesión iniciada + cerrar sesión) */}
+            <CuentaVecino usuario={cuenta} />
+
+            {/* Mi Pase (vive dentro de la página de la Combi) */}
+            <Link
+              to="/combi"
+              className="card p-5 flex items-center gap-4 hover:border-verde hover:border-2 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-verde/10 flex items-center justify-center shrink-0">
+                <Ticket className="w-6 h-6 text-verde" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold font-poppins text-gray-800">Mi Pase de la combi</p>
+                <p className="text-sm text-gray-500">Pedí tu categoría (estudiante, jubilado, discapacidad) y generá tu QR para viajar.</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-verde transition-colors shrink-0" />
+            </Link>
 
         {/* Datos personales */}
         <div className="card p-6">
@@ -177,6 +255,13 @@ export default function Perfil() {
               {editando ? 'Cancelar' : 'Editar'}
             </button>
           </div>
+
+          {editando && (
+            <div className="mb-5">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Foto de perfil (opcional)</label>
+              <ImagenInput valor={perfil.avatar} onChange={valor => set('avatar', valor)} />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -411,36 +496,33 @@ export default function Perfil() {
               )
             })}
           </div>
-          {lector === false && (
-            <p className="text-xs text-gray-400 mt-3">
-              💡 Para que las notificaciones se lean en voz alta necesitás activar "Lector de pantalla" más arriba.
-            </p>
-          )}
         </div>
 
-        {/* Botones */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        {/* Botón */}
+        <div className="flex">
           <button
-            onClick={guardar}
-            className="flex-1 flex items-center justify-center gap-2 bg-verde text-white font-bold py-3.5 rounded-2xl hover:bg-verde-oscuro transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+            onClick={borrarCuenta}
+            disabled={borrandoCuenta}
+            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border-2 border-red-200 text-red-400 hover:bg-red-50 font-semibold text-sm transition-all duration-200 disabled:opacity-60"
           >
-            <Save className="w-5 h-5" />
-            Guardar perfil
-          </button>
-          <button
-            onClick={limpiar}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border-2 border-red-200 text-red-400 hover:bg-red-50 font-semibold text-sm transition-all duration-200"
-          >
-            <Trash2 className="w-4 h-4" />
-            Borrar datos
+            {borrandoCuenta ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            Borrar cuenta
           </button>
         </div>
+
+        {errorBorrar && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-2xl p-4">
+            <p className="text-red-500 font-semibold text-sm">{errorBorrar}</p>
+          </div>
+        )}
 
         {guardado && (
           <div className="flex items-center gap-3 bg-verde/10 border border-verde/30 rounded-2xl p-4">
             <CheckCircle className="w-5 h-5 text-verde shrink-0" />
             <p className="text-verde-oscuro font-semibold text-sm">¡Perfil guardado correctamente!</p>
           </div>
+        )}
+          </>
         )}
 
       </div>

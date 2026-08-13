@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
-import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3 } from 'lucide-react'
+import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3, Navigation } from 'lucide-react'
 import { puntosVerdes as puntosFijos, materialesInfo } from '../data/puntosVerdesData'
 import { useColeccion } from '../hooks/useColeccion'
 import { posicionDesdeId } from '../utils/posicionHash'
+import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 
 const instrucciones = [
   {
@@ -43,6 +44,17 @@ const instrucciones = [
   },
 ]
 
+// Arma el link de Google Maps para llegar al punto: si en algún momento
+// se cargan coordenadas (lat/lng) usa eso, que es exacto; si no, busca
+// por dirección + "Baradero" para no confundirse con una calle del mismo
+// nombre en otra ciudad.
+function linkComoLlegar(punto) {
+  const destino = punto.lat && punto.lng
+    ? `${punto.lat},${punto.lng}`
+    : `${punto.direccion}, Baradero, Buenos Aires`
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}`
+}
+
 export default function PuntosVerdes() {
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null)
 
@@ -74,50 +86,48 @@ export default function PuntosVerdes() {
 
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
 
-        {/* Cómo llevar los residuos */}
-        <div>
-          <div className="mb-5">
-            <span className="inline-block bg-verde/10 text-verde text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
-              Antes de ir al punto verde
-            </span>
-            <h2 className="text-xl font-bold font-poppins flex items-center gap-2">
-              <Recycle className="w-5 h-5 text-verde" /> ¿Cómo llevar los residuos?
-            </h2>
-            <p className="text-gray-500 text-sm mt-1">Seguí estos pasos para reciclar correctamente</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {instrucciones.map(inst => (
-              <div key={inst.titulo} className="card p-4 text-center group hover:-translate-y-1 transition-all duration-200">
-                <div
-                  className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: inst.color + '18' }}
-                >
-                  {inst.icono}
+        <Acordeon>
+          <AcordeonItem
+            icono={Recycle}
+            color="verde"
+            titulo="¿Cómo llevar los residuos?"
+            descripcion="Seguí estos pasos para reciclar correctamente"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {instrucciones.map(inst => (
+                <div key={inst.titulo} className="card p-4 text-center group hover:-translate-y-1 transition-all duration-200">
+                  <div
+                    className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl"
+                    style={{ backgroundColor: inst.color + '18' }}
+                  >
+                    {inst.icono}
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">{inst.titulo}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">{inst.descripcion}</p>
                 </div>
-                <h3 className="text-sm font-bold text-gray-800 mb-1">{inst.titulo}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{inst.descripcion}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </AcordeonItem>
 
-        {/* Materiales */}
-        <div>
-          <h2 className="text-xl font-bold font-poppins mb-5 flex items-center gap-2">
-            <Recycle className="w-5 h-5 text-verde" /> Materiales Aceptados
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {Object.entries(materialesInfo).map(([nombre, info]) => (
-              <div key={nombre} className="card p-4 text-center hover:border-verde hover:border-2 transition-all cursor-pointer">
-                <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ backgroundColor: info.color + '20' }}>
-                  <Recycle className="w-5 h-5" style={{ color: info.color }} />
+          <AcordeonItem
+            icono={Recycle}
+            color="verde"
+            titulo="Materiales Aceptados"
+            descripcion="Qué podés llevar a los puntos verdes"
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {Object.entries(materialesInfo).map(([nombre, info]) => (
+                <div key={nombre} className="card p-4 text-center hover:border-verde hover:border-2 transition-all cursor-pointer">
+                  <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ backgroundColor: info.color + '20' }}>
+                    <Recycle className="w-5 h-5" style={{ color: info.color }} />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-800">{nombre}</p>
+                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{info.descripcion}</p>
                 </div>
-                <p className="text-sm font-semibold text-gray-800">{nombre}</p>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{info.descripcion}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </AcordeonItem>
+        </Acordeon>
 
         {/* Mapa + Lista */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -243,9 +253,19 @@ export default function PuntosVerdes() {
                   <span className="text-gray-500 text-sm">{puntoSeleccionado.direccion}</span>
                 </div>
               </div>
-              <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-verde/10 text-verde' : 'bg-red-100 text-red-500'}`}>
-                {puntoSeleccionado.activo ? '● Activo' : '● Inactivo'}
-              </span>
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-verde/10 text-verde' : 'bg-red-100 text-red-500'}`}>
+                  {puntoSeleccionado.activo ? '● Activo' : '● Inactivo'}
+                </span>
+                <a
+                  href={linkComoLlegar(puntoSeleccionado)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 bg-azul text-white text-sm font-semibold px-3.5 py-2 rounded-xl hover:bg-azul-oscuro transition-colors shrink-0"
+                >
+                  <Navigation className="w-4 h-4" /> Cómo llegar
+                </a>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Bus, Trash2, Calendar, MapPin, UserCircle } from 'lucide-react'
+import { Menu, X, Bus, Trash2, Calendar, MapPin, UserCircle, HelpCircle } from 'lucide-react'
 import LogoMiBaradero from './LogoMiBaradero'
+import { useTutorial } from '../context/TutorialContext'
 
 const navLinks = [
   { to: '/', label: 'Inicio', icon: null },
@@ -15,6 +16,7 @@ const navLinks = [
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const tutorial = useTutorial()
 
   return (
     <header className="sticky top-0 z-50 shadow-md">
@@ -51,6 +53,16 @@ export default function Header() {
                   </Link>
                 )
               })}
+              {/* Aparte de los links de navegación: no lleva a ningún lado,
+                  reabre a Tachín. Va acá arriba (no como botón flotante)
+                  para no mezclarse con los botones de accesibilidad/voz
+                  que ya están abajo a la derecha. */}
+              <button
+                onClick={tutorial?.abrirManualmente}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 font-inter text-gray-600 hover:bg-verde/8 hover:text-verde"
+              >
+                <HelpCircle className="w-4 h-4" /> Ayuda
+              </button>
             </nav>
 
             {/* Badge + Mobile button */}
@@ -96,6 +108,12 @@ export default function Header() {
                   </Link>
                 )
               })}
+              <button
+                onClick={() => { setMenuOpen(false); tutorial?.abrirManualmente() }}
+                className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-verde"
+              >
+                <HelpCircle className="w-5 h-5" /> Ayuda
+              </button>
             </nav>
             <div className="px-4 pb-4">
               <div className="bg-verde/5 border border-verde/15 rounded-xl p-3 text-xs text-verde-oscuro text-center">

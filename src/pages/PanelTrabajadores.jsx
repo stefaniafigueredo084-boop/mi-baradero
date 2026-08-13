@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { Bus, Calendar, History as HistoryIcon, Loader2, LogOut, Recycle, Trash2, Users, UserCheck } from 'lucide-react'
+import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Lightbulb, Loader2, LogOut, MapPin, Megaphone, Navigation, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 import { useTrabajador } from '../hooks/useTrabajador'
+import { useColeccion } from '../hooks/useColeccion'
 import { registrarHistorial } from '../utils/historial'
 import LoginTrabajadores from './LoginTrabajadores'
 import ColeccionCRUD from '../components/panel/ColeccionCRUD'
@@ -11,9 +12,13 @@ import EstadoCamion from '../components/panel/EstadoCamion'
 import CombiEnVivo from '../components/panel/CombiEnVivo'
 import CalendarioResiduos from '../components/panel/CalendarioResiduos'
 import AgregarTrabajador from '../components/panel/AgregarTrabajador'
+import GestionarTrabajadores from '../components/panel/GestionarTrabajadores'
 import Historial from '../components/panel/Historial'
 import Vecinos from '../components/panel/Vecinos'
-import ImportarDatosFijos from '../components/panel/ImportarDatosFijos'
+import SolicitudesCategoria from '../components/panel/SolicitudesCategoria'
+import ConfirmarPago from '../components/panel/ConfirmarPago'
+import EmbarqueScanner from '../components/panel/EmbarqueScanner'
+import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 import {
   camposEventos,
   camposHorariosCombi,
@@ -22,14 +27,11 @@ import {
   camposConsejosResiduos,
   camposPuntosVerdes,
 } from '../data/panelCampos'
-import { eventos as eventosFijos } from '../data/eventosData'
-import { horarios as horariosFijos, alertasCombi as alertasFijas } from '../data/combiData'
-import { zonas as zonasFijas, consejos as consejosFijos } from '../data/residuosData'
-import { puntosVerdes as puntosFijos } from '../data/puntosVerdesData'
 
 const TODAS_LAS_TABS = [
   { id: 'eventos', label: 'Eventos', icon: Calendar },
   { id: 'combi', label: 'Combi Municipal', icon: Bus },
+  { id: 'choferes', label: 'Choferes', icon: Car },
   { id: 'residuos', label: 'Residuos', icon: Trash2 },
   { id: 'puntosVerdes', label: 'Puntos Verdes', icon: Recycle },
   { id: 'usuarios', label: 'Usuarios', icon: Users, soloAdmin: true },
@@ -41,6 +43,14 @@ export default function PanelTrabajadores() {
   const [usuario, setUsuario] = useState(undefined) // undefined = cargando, null = sin sesión
   const [tab, setTab] = useState(null)
   const trabajador = useTrabajador(usuario?.uid)
+
+  // Solo para los badges de "pendientes" del acordeón — cuánto hay
+  // esperando acción, para que se note de un vistazo sin tener que
+  // abrir cada sección.
+  const { items: pasajesTodos } = useColeccion('pasajes')
+  const { items: pasajerosTodos } = useColeccion('pasajeros')
+  const pagosPendientes = pasajesTodos.filter(p => p.estado === 'pendiente').length
+  const categoriasPendientes = pasajerosTodos.filter(p => p.estadoVerificacion === 'pendiente').length
 
   useEffect(() => onAuthStateChanged(auth, u => {
     setUsuario(u)
@@ -72,6 +82,21 @@ export default function PanelTrabajadores() {
   }
 
   if (!usuario) return <LoginTrabajadores />
+
+  if (trabajador?.activo === false || trabajador?.rol === 'eliminado') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="card p-8 max-w-sm text-center">
+          <ShieldOff className="w-10 h-10 text-red-400 mx-auto mb-3" />
+          <h1 className="font-bold font-poppins text-lg text-gray-800 mb-1">Tu cuenta está desactivada</h1>
+          <p className="text-sm text-gray-500 mb-5">Ya no tenés acceso al panel. Si te parece que es un error, hablá con un administrador.</p>
+          <button onClick={cerrarSesion} className="btn-secondary w-full flex items-center justify-center gap-2">
+            <LogOut className="w-4 h-4" /> Cerrar sesión
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,127 +144,123 @@ export default function PanelTrabajadores() {
         )}
 
         {tab === 'eventos' && (
-          <div>
-            <EnviarAviso nombreDoc="avisoEventos" seccion="eventos" placeholder="Ej: La Fiesta de la Primavera empieza en 30 minutos" />
-            <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Eventos</h3>
-            <ImportarDatosFijos
-              coleccion="eventos"
-              seccion="eventos"
-              etiqueta="eventos"
-              datos={eventosFijos}
-              mapear={e => ({
-                titulo: e.titulo, imagenData: e.imagen, categoria: e.categoria, fechaDisplay: e.fechaDisplay,
-                hora: e.hora, ubicacion: e.ubicacion, descripcion: e.descripcion, color: e.color,
-                destacado: e.destacado, idOriginal: e.id,
-              })}
-            />
-            <ColeccionCRUD
-              coleccion="eventos"
-              seccion="eventos"
-              campos={camposEventos}
-              renderTitulo={i => i.titulo}
-              renderSubtitulo={i => [i.fechaDisplay, i.ubicacion].filter(Boolean).join(' · ')}
-            />
-          </div>
+          <Acordeon>
+            <AcordeonItem icono={Megaphone} color="azul" titulo="Avisos" descripcion="Publicar un aviso nuevo">
+              <EnviarAviso nombreDoc="avisoEventos" seccion="eventos" placeholder="Ej: La Fiesta de la Primavera empieza en 30 minutos" />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Calendar} color="verde" titulo="Eventos" descripcion="Agregar o editar eventos" abiertoPorDefecto>
+              <ColeccionCRUD
+                coleccion="eventos"
+                seccion="eventos"
+                campos={camposEventos}
+                renderTitulo={i => i.titulo}
+                renderSubtitulo={i => [i.fechaDisplay, i.ubicacion].filter(Boolean).join(' · ')}
+              />
+            </AcordeonItem>
+          </Acordeon>
+        )}
+
+        {tab === 'choferes' && (
+          <EmbarqueScanner soloHorarios={trabajador?.horariosAsignados} />
         )}
 
         {tab === 'combi' && (
-          <div>
-            <CombiEnVivo />
-            <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Horarios de la combi</h3>
-            <ImportarDatosFijos
-              coleccion="horariosCombi"
-              seccion="combi"
-              etiqueta="horarios"
-              datos={horariosFijos}
-              mapear={h => ({
-                salida: h.salida, llegada: h.llegada, origen: h.origen, destino: h.destino,
-                disponibles: h.disponibles, idOriginal: h.id,
-              })}
-            />
-            <ColeccionCRUD
-              coleccion="horariosCombi"
-              seccion="combi"
-              campos={camposHorariosCombi}
-              renderTitulo={i => `${i.salida} — ${i.origen} → ${i.destino}`}
-              renderSubtitulo={i => `Llega ${i.llegada || '-'} · ${i.disponibles} lugares`}
-            />
-            <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4 mt-10">Alertas y demoras</h3>
-            <p className="text-gray-500 text-sm mb-4 -mt-2">
-              Cada alerta que agregás acá también le llega como notificación a quienes activaron avisos de la combi.
-            </p>
-            <ImportarDatosFijos
-              coleccion="alertasCombi"
-              seccion="combi"
-              etiqueta="alertas"
-              datos={alertasFijas}
-              mapear={a => ({ tipo: a.tipo, horario: a.horario, mensaje: a.mensaje, hora: a.hora, idOriginal: a.id })}
-            />
-            <ColeccionCRUD
-              coleccion="alertasCombi"
-              seccion="combi"
-              campos={camposAlertasCombi}
-              renderTitulo={i => i.mensaje}
-              renderSubtitulo={i => `${i.tipo} · combi ${i.horario || ''}`}
-            />
-          </div>
+          <Acordeon>
+            <AcordeonItem
+              icono={CreditCard}
+              color="azul"
+              titulo="Confirmar pagos"
+              descripcion="Pasajes esperando confirmación"
+              badge={pagosPendientes}
+              abiertoPorDefecto={pagosPendientes > 0}
+            >
+              <ConfirmarPago />
+            </AcordeonItem>
+
+            <AcordeonItem
+              icono={ClipboardList}
+              color="azul"
+              titulo="Solicitudes de categoría"
+              descripcion="Certificados de estudiante/jubilado/discapacidad a revisar"
+              badge={categoriasPendientes}
+              abiertoPorDefecto={categoriasPendientes > 0}
+            >
+              <SolicitudesCategoria />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Navigation} color="verde" titulo="Combi en vivo" descripcion="Marcar la parada actual">
+              <CombiEnVivo />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Clock} color="verde" titulo="Horarios de la combi" descripcion="Agregar o editar los horarios del día">
+              <ColeccionCRUD
+                coleccion="horariosCombi"
+                seccion="combi"
+                campos={camposHorariosCombi}
+                renderTitulo={i => `${i.salida} — ${i.origen} → ${i.destino}`}
+                renderSubtitulo={i => `Llega ${i.llegada || '-'} · ${i.disponibles} lugares`}
+              />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Bell} color="amarillo" titulo="Alertas y demoras" descripcion="Publicar un aviso nuevo">
+              <p className="text-gray-500 text-sm mb-4">
+                Cada alerta que agregás acá también le llega como notificación a quienes activaron avisos de la combi.
+              </p>
+              <ColeccionCRUD
+                coleccion="alertasCombi"
+                seccion="combi"
+                campos={camposAlertasCombi}
+                renderTitulo={i => i.mensaje}
+                renderSubtitulo={i => `${i.tipo} · combi ${i.horario || ''}`}
+              />
+            </AcordeonItem>
+          </Acordeon>
         )}
 
         {tab === 'residuos' && (
-          <div>
-            <EstadoCamion />
-            <EnviarAviso
-              nombreDoc="avisoResiduos"
-              seccion="residuos"
-              presets={['🚛 El camión salió del depósito', '🚛 El camión está llegando a tu zona']}
-              placeholder="O escribí un aviso personalizado..."
-            />
-            <CalendarioResiduos />
-            <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4">Zonas y próxima recolección</h3>
-            <ImportarDatosFijos
-              coleccion="zonasResiduos"
-              seccion="residuos"
-              etiqueta="zonas"
-              datos={zonasFijas}
-              mapear={z => ({ nombre: z.nombre, horario: z.horario, proximaRecoleccion: z.proximaRecoleccion, idOriginal: z.id })}
-            />
-            <ColeccionCRUD
-              coleccion="zonasResiduos"
-              seccion="residuos"
-              campos={camposZonasResiduos}
-              renderTitulo={i => i.nombre}
-              renderSubtitulo={i => `${i.horario || ''} · en ${i.proximaRecoleccion} min`}
-            />
-            <h3 className="font-bold font-poppins text-lg text-gray-800 mb-4 mt-10">Consejos de reciclado</h3>
-            <ImportarDatosFijos
-              coleccion="consejosResiduos"
-              seccion="residuos"
-              etiqueta="consejos"
-              datos={consejosFijos}
-              mapear={c => ({ titulo: c.titulo, descripcion: c.descripcion, icono: c.icono, idOriginal: c.titulo })}
-            />
-            <ColeccionCRUD
-              coleccion="consejosResiduos"
-              seccion="residuos"
-              campos={camposConsejosResiduos}
-              renderTitulo={i => `${i.icono || ''} ${i.titulo}`}
-              renderSubtitulo={i => i.descripcion}
-            />
-          </div>
+          <Acordeon>
+            <AcordeonItem icono={Truck} color="verde" titulo="Estado del camión" descripcion="Dónde está ahora" abiertoPorDefecto>
+              <EstadoCamion />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Megaphone} color="azul" titulo="Avisos" descripcion="Publicar un aviso nuevo">
+              <EnviarAviso
+                nombreDoc="avisoResiduos"
+                seccion="residuos"
+                presets={['🚛 El camión salió del depósito', '🚛 El camión está llegando a tu zona']}
+                placeholder="O escribí un aviso personalizado..."
+              />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Calendar} color="azul" titulo="Calendario semanal" descripcion="Qué residuo corresponde cada día">
+              <CalendarioResiduos />
+            </AcordeonItem>
+
+            <AcordeonItem icono={MapPin} color="verde" titulo="Zonas y próxima recolección" descripcion="Agregar o editar zonas">
+              <ColeccionCRUD
+                coleccion="zonasResiduos"
+                seccion="residuos"
+                campos={camposZonasResiduos}
+                renderTitulo={i => i.nombre}
+                renderSubtitulo={i => `${i.horario || ''} · en ${i.proximaRecoleccion} min`}
+              />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Lightbulb} color="amarillo" titulo="Consejos de reciclado" descripcion="Agregar o editar consejos">
+              <ColeccionCRUD
+                coleccion="consejosResiduos"
+                seccion="residuos"
+                campos={camposConsejosResiduos}
+                renderTitulo={i => `${i.icono || ''} ${i.titulo}`}
+                renderSubtitulo={i => i.descripcion}
+              />
+            </AcordeonItem>
+          </Acordeon>
         )}
 
         {tab === 'puntosVerdes' && (
           <div>
-            <ImportarDatosFijos
-              coleccion="puntosVerdesExtra"
-              seccion="puntosVerdes"
-              etiqueta="puntos verdes"
-              datos={puntosFijos}
-              mapear={p => ({
-                nombre: p.nombre, direccion: p.direccion, horario: p.horario, materiales: p.materiales,
-                activo: p.activo, capacidad: p.capacidad, posX: p.posX, posY: p.posY, idOriginal: p.id,
-              })}
-            />
             <ColeccionCRUD
               coleccion="puntosVerdesExtra"
               seccion="puntosVerdes"
@@ -250,7 +271,16 @@ export default function PanelTrabajadores() {
           </div>
         )}
 
-        {tab === 'usuarios' && esAdmin && <AgregarTrabajador />}
+        {tab === 'usuarios' && esAdmin && (
+          <Acordeon>
+            <AcordeonItem icono={Users} color="verde" titulo="Cuentas del panel" descripcion="Desactivar, reactivar o eliminar" abiertoPorDefecto>
+              <GestionarTrabajadores />
+            </AcordeonItem>
+            <AcordeonItem icono={UserPlus} color="azul" titulo="Agregar trabajador" descripcion="Crear una cuenta nueva">
+              <AgregarTrabajador />
+            </AcordeonItem>
+          </Acordeon>
+        )}
         {tab === 'vecinos' && esAdmin && <Vecinos />}
         {tab === 'historial' && esAdmin && <Historial />}
       </div>

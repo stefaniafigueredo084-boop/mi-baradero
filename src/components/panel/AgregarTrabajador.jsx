@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { deleteApp, initializeApp } from 'firebase/app'
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { AlertCircle, CheckCircle, Loader2, ShieldCheck, UserPlus } from 'lucide-react'
 import { auth, db } from '../../firebase'
 import { registrarHistorial } from '../../utils/historial'
 import { SECTORES } from '../../data/sectores'
+import { useHorariosCombi } from '../../hooks/useHorariosCombi'
 
 // Crear una cuenta nueva con createUserWithEmailAndPassword() inicia
 // sesión automáticamente con ESA cuenta en la app actual — lo cual
@@ -16,14 +17,26 @@ export default function AgregarTrabajador() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [acceso, setAcceso] = useState('admin') // 'admin' | id de sector
+  const [horariosAsignados, setHorariosAsignados] = useState([])
   const [resultado, setResultado] = useState(null)
   const [creando, setCreando] = useState(false)
+  const horarios = useHorariosCombi()
+
+  const alternarHorario = id => {
+    setHorariosAsignados(actuales =>
+      actuales.includes(id) ? actuales.filter(h => h !== id) : [...actuales, id]
+    )
+  }
 
   const crear = async e => {
     e.preventDefault()
     setResultado(null)
     if (password.length < 6) {
       setResultado({ ok: false, mensaje: 'La contraseña debe tener al menos 6 caracteres.' })
+      return
+    }
+    if (acceso === 'choferes' && horariosAsignados.length === 0) {
+      setResultado({ ok: false, mensaje: 'Elegí al menos un horario para este chofer.' })
       return
     }
     setCreando(true)
@@ -35,7 +48,10 @@ export default function AgregarTrabajador() {
       await setDoc(doc(db, 'trabajadores', cred.user.uid), {
         email,
         rol,
+        activo: true,
+        creadoEn: serverTimestamp(),
         ...(rol === 'sector' ? { sector: acceso } : {}),
+        ...(acceso === 'choferes' ? { horariosAsignados } : {}),
       })
       await registrarHistorial({
         tipo: 'crear',
@@ -46,6 +62,7 @@ export default function AgregarTrabajador() {
       setEmail('')
       setPassword('')
       setAcceso('admin')
+      setHorariosAsignados([])
     } catch (err) {
       setResultado({
         ok: false,
@@ -110,6 +127,31 @@ export default function AgregarTrabajador() {
           </div>
         </div>
 
+        {acceso === 'choferes' && (
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Horarios asignados a este chofer</label>
+            <div className="space-y-1.5">
+              {horarios.map(h => (
+                <label
+                  key={h.id}
+                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border-2 cursor-pointer transition-colors ${
+                    horariosAsignados.includes(h.id) ? 'border-azul bg-azul/5' : 'border-gray-200'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={horariosAsignados.includes(h.id)}
+                    onChange={() => alternarHorario(h.id)}
+                    className="accent-azul w-4 h-4"
+                  />
+                  <span className="text-sm text-gray-800">{h.salida} — {h.origen} → {h.destino}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">Va a ver solo estos horarios en la pantalla de escaneo, no los del resto de los choferes.</p>
+          </div>
+        )}
+
         {resultado && (
           <p className={`text-sm flex items-center gap-1.5 ${resultado.ok ? 'text-verde' : 'text-red-500'}`}>
             {resultado.ok ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
@@ -122,7 +164,7 @@ export default function AgregarTrabajador() {
         </button>
       </form>
       <p className="text-xs text-gray-400 mt-5 leading-relaxed">
-        Para dar de baja a un trabajador hacelo desde Firebase Console → Authentication → Users: por seguridad, desde acá no se pueden eliminar cuentas de otras personas.
+        Para desactivar o eliminar una cuenta existente, usá la lista de arriba ("Cuentas del panel"). Por seguridad, "eliminar" le saca el acceso pero no borra la cuenta de acceso (email/contraseña) — para eso hace falta entrar a Firebase Console → Authentication → Users.
       </p>
     </div>
   )

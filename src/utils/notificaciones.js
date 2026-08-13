@@ -30,14 +30,6 @@ export function permisoConcedido() {
   return soportaNotificaciones() && Notification.permission === 'granted'
 }
 
-function lectorActivo() {
-  try {
-    return JSON.parse(localStorage.getItem('mibaradero_accesibilidad') || 'null')?.lector === true
-  } catch {
-    return false
-  }
-}
-
 function notifVozActiva(sector) {
   if (!sector) return false
   try {
@@ -48,9 +40,12 @@ function notifVozActiva(sector) {
   }
 }
 
-// Además de la notificación visual del navegador, si la persona tiene
-// activado el lector de pantalla Y eligió que este sector le llegue
-// hablado, lee el mensaje en voz alta.
+// Además de la notificación visual del navegador, si la persona eligió
+// (desde el formulario de perfil o desde el asistente de voz) que este
+// sector le llegue hablado, lee el mensaje en voz alta. No depende del
+// interruptor "Lector de pantalla": alguien que se registró por voz
+// nunca prende ese interruptor aparte, y sus preferencias de voz deben
+// funcionar igual.
 export function mostrarNotificacion(titulo, opciones, sector) {
   if (permisoConcedido()) {
     try {
@@ -60,7 +55,7 @@ export function mostrarNotificacion(titulo, opciones, sector) {
       // instanciar Notification directamente (piden Service Worker).
     }
   }
-  if (opciones?.body && lectorActivo() && notifVozActiva(sector)) {
+  if (opciones?.body && notifVozActiva(sector)) {
     hablar(opciones.body)
   }
 }

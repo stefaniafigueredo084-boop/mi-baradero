@@ -35,6 +35,10 @@ export const camposHorariosCombi = [
   { name: 'origen', label: 'Origen', type: 'select', options: ['Alsina', 'Portela', 'Baradero'] },
   { name: 'destino', label: 'Destino', type: 'select', options: ['Alsina', 'Portela', 'Baradero'] },
   { name: 'disponibles', label: 'Lugares disponibles', type: 'number', placeholder: '15', default: '15' },
+  { name: 'capacidadTotal', label: 'Capacidad total de asientos', type: 'number', placeholder: '19', default: '19' },
+  { name: 'asientosReservadosDiscapacidad', label: 'Asientos reservados — discapacidad', type: 'number', placeholder: '2', default: '2' },
+  { name: 'asientosReservadosJubilados', label: 'Asientos reservados — jubilados', type: 'number', placeholder: '2', default: '2' },
+  { name: 'minutosLiberacionReserva', label: 'Minutos antes de la salida para liberar reservas', type: 'number', placeholder: '15', default: '15' },
 ]
 
 export const camposAlertasCombi = [

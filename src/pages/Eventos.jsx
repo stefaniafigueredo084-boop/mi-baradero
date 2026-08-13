@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Calendar, MapPin, Clock, Filter, Star, Bell, BellOff, CheckCircle, Plus } from 'lucide-react'
+import { Calendar, MapPin, Clock, Filter, Star, Bell, BellOff, CheckCircle } from 'lucide-react'
 import { eventos as eventosFijos, categorias as categoriasBase } from '../data/eventosData'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
@@ -20,7 +20,6 @@ const categoriaBadgeColor = {
 export default function Eventos() {
   const [catActiva, setCatActiva] = useState('Todos')
   const [notifActiva, setNotifActiva] = useState(false)
-  const [notifNuevos, setNotifNuevos] = useState(false)
 
   // Eventos cargados desde el panel de trabajadores (Firestore), seguidos
   // de los eventos fijos del sitio como respaldo.
@@ -41,10 +40,6 @@ export default function Eventos() {
     title: '🎉 Mi Baradero — Eventos',
     body: saludar(aviso.mensaje),
   }), 'eventos')
-  const avisoNuevosEventos = useAviso('avisoEventos', notifNuevos, () => ({
-    title: '📅 Mi Baradero — Nuevos eventos',
-    body: saludar('Se agregó un nuevo evento a la agenda.'),
-  }), 'nuevosEventos')
 
   const activarNotif = async () => {
     if (notifActiva) {
@@ -55,24 +50,9 @@ export default function Eventos() {
     if (permiso === 'granted') {
       setNotifActiva(true)
       mostrarNotificacion('🎉 Mi Baradero — Eventos', {
-        body: saludar('Te avisaremos cuando se acerque un evento en Baradero.'),
+        body: saludar('Te avisaremos cuando haya un evento por comenzar o se agregue uno nuevo a la agenda.'),
         icon: '/logo-mibaradero.png',
       }, 'eventos')
-    }
-  }
-
-  const activarNotifNuevos = async () => {
-    if (notifNuevos) {
-      setNotifNuevos(false)
-      return
-    }
-    const permiso = await pedirPermisoNotificacion()
-    if (permiso === 'granted') {
-      setNotifNuevos(true)
-      mostrarNotificacion('📅 Mi Baradero — Nuevos eventos', {
-        body: saludar('Te avisaremos cuando se agregue un nuevo evento a la agenda.'),
-        icon: '/logo-mibaradero.png',
-      }, 'nuevosEventos')
     }
   }
 
@@ -132,70 +112,39 @@ export default function Eventos() {
         ))}
 
         {/* Notificaciones de eventos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="card p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-bold font-poppins flex items-center gap-2 mb-1">
-                  <Bell className="w-4 h-4 text-verde" />
-                  Eventos próximos
-                </h3>
-                <p className="text-sm text-gray-500">Recibí una notificación cuando un evento esté por comenzar.</p>
-              </div>
-              <button
-                onClick={activarNotif}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                  notifActiva
-                    ? 'bg-verde/10 text-verde border border-verde/30'
-                    : 'bg-verde text-white hover:bg-verde-oscuro shadow-sm'
-                }`}
-              >
-                {notifActiva ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
-                {notifActiva ? 'Activado' : 'Activar'}
-              </button>
+        <div className="card p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="font-bold font-poppins flex items-center gap-2 mb-1">
+                <Bell className="w-4 h-4 text-verde" />
+                Eventos
+              </h3>
+              <p className="text-sm text-gray-500">Recibí un aviso cuando un evento esté por comenzar, o cuando se agregue uno nuevo a la agenda.</p>
             </div>
-            {notifActiva && (
-              <div className="mt-3 flex items-center gap-2 bg-verde/5 border border-verde/20 rounded-xl p-3">
-                <CheckCircle className="w-4 h-4 text-verde shrink-0" />
-                <p className="text-xs text-verde-oscuro">Te avisaremos antes de cada evento de Baradero.</p>
-              </div>
-            )}
-            {avisoEventos?.mensaje && (
-              <div className="mt-3 flex items-center gap-2 bg-amarillo/10 border border-amarillo/30 rounded-xl p-3">
-                <Bell className="w-4 h-4 text-yellow-700 shrink-0" />
-                <p className="text-xs text-yellow-800">{avisoEventos.mensaje}</p>
-              </div>
-            )}
+            <button
+              onClick={activarNotif}
+              className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                notifActiva
+                  ? 'bg-verde/10 text-verde border border-verde/30'
+                  : 'bg-verde text-white hover:bg-verde-oscuro shadow-sm'
+              }`}
+            >
+              {notifActiva ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+              {notifActiva ? 'Activado' : 'Activar'}
+            </button>
           </div>
-
-          <div className="card p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-bold font-poppins flex items-center gap-2 mb-1">
-                  <Plus className="w-4 h-4 text-azul" />
-                  Nuevos eventos
-                </h3>
-                <p className="text-sm text-gray-500">Enterarte cuando se agregue un nuevo evento a la agenda.</p>
-              </div>
-              <button
-                onClick={activarNotifNuevos}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                  notifNuevos
-                    ? 'bg-azul/10 text-azul border border-azul/30'
-                    : 'bg-azul text-white hover:bg-azul-oscuro shadow-sm'
-                }`}
-              >
-                {notifNuevos ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
-                {notifNuevos ? 'Activado' : 'Activar'}
-              </button>
+          {notifActiva && (
+            <div className="mt-3 flex items-center gap-2 bg-verde/5 border border-verde/20 rounded-xl p-3">
+              <CheckCircle className="w-4 h-4 text-verde shrink-0" />
+              <p className="text-xs text-verde-oscuro">Te avisaremos de eventos próximos y nuevos en la agenda de Baradero.</p>
             </div>
-            {notifNuevos && (
-              <div className="mt-3 flex items-center gap-2 bg-azul/5 border border-azul/20 rounded-xl p-3">
-                <CheckCircle className="w-4 h-4 text-azul shrink-0" />
-                <p className="text-xs text-azul-oscuro">Te avisaremos cuando haya un evento nuevo en Baradero.</p>
-              </div>
-            )}
-          </div>
+          )}
+          {avisoEventos?.mensaje && (
+            <div className="mt-3 flex items-center gap-2 bg-amarillo/10 border border-amarillo/30 rounded-xl p-3">
+              <Bell className="w-4 h-4 text-yellow-700 shrink-0" />
+              <p className="text-xs text-yellow-800">{avisoEventos.mensaje}</p>
+            </div>
+          )}
         </div>
 
         {/* Próximos eventos */}
