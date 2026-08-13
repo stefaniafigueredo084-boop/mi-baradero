@@ -3,7 +3,6 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Mic, MicOff, X } from 'lucide-react'
 import { db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado } from '../utils/perfilLocal'
-import { usuarioVecino } from '../utils/usuario'
 import { hablar, escuchar, esAfirmativo, esNegativo, detenerVoz, soportaReconocimientoVoz } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 
@@ -116,17 +115,14 @@ export default function AsistenteVoz({ onClose }) {
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
 
     const esNuevo = esPrimerGuardadoVecino()
-    const usuario = await usuarioVecino(nombre, apellido)
     await setDoc(doc(db, 'vecinos', idVecino()), {
       nombre,
       apellido,
       notif: perfil.notif,
-      usuario,
       actualizadoEn: serverTimestamp(),
       ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
     }, { merge: true })
     if (esNuevo) marcarVecinoGuardado()
-    return usuario
   }
 
   const ejecutarConversacion = async () => {

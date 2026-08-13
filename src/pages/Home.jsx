@@ -138,7 +138,7 @@ export default function Home() {
           </div>
 
           <p className="text-2xl sm:text-3xl text-white/90 font-light mb-3 font-poppins">
-            Todo Baradero en tu mano
+            Todo Baradero en tus manos
           </p>
           <p className="text-white/70 text-base sm:text-lg max-w-xl mx-auto mb-10 font-inter">
             La plataforma digital que reúne los servicios, eventos y noticias de tu ciudad en un solo lugar.

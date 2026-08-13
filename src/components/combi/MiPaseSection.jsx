@@ -3,7 +3,6 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { BadgeCheck, Banknote, CheckCircle2, Clock, Contact, CreditCard, Lock, Loader2, MessageCircle, RefreshCw, ShieldCheck, Ticket } from 'lucide-react'
 import { db } from '../../firebase'
 import { idVecino, leerPerfilLocal } from '../../utils/perfilLocal'
-import { usuarioVecino, usuarioVecinoLocal } from '../../utils/usuario'
 import { usePasajero } from '../../hooks/usePasajero'
 import { usePasaje } from '../../hooks/usePasaje'
 import { useViaje } from '../../hooks/useViaje'
@@ -75,7 +74,6 @@ export default function MiPaseSection() {
     setEnviando(true)
     try {
       const nombreCompleto = `${perfilLocal.nombre} ${perfilLocal.apellido || ''}`.trim()
-      const usuario = usuarioVecinoLocal() || await usuarioVecino(perfilLocal.nombre, perfilLocal.apellido)
       const importe = calcularImporte(categoriaId, horario.origen, horario.destino)
       // Sin nada que pagar (categoría discapacidad), la forma de pago no
       // aplica — se guarda como transferencia para no mostrarle de
@@ -85,7 +83,6 @@ export default function MiPaseSection() {
       await setDoc(doc(db, 'pasajes', idPasaje(idVecino(), horario.id, fecha)), {
         pasajeroId: idVecino(),
         nombre: nombreCompleto,
-        usuario,
         categoria: categoriaId,
         horarioId: horario.id,
         fecha,
@@ -325,11 +322,9 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
     setEnviando(true)
     try {
       const nombreCompleto = `${perfilLocal.nombre} ${perfilLocal.apellido || ''}`.trim()
-      const usuario = usuarioVecinoLocal() || await usuarioVecino(perfilLocal.nombre, perfilLocal.apellido)
       const esNuevo = !pasajero
       await setDoc(doc(db, 'pasajeros', idVecino()), {
         nombre: nombreCompleto,
-        usuario,
         categoriaSolicitada: categoria.id,
         documentoUrl: documento,
         estadoVerificacion: 'pendiente',

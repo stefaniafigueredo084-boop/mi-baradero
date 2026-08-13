@@ -45,7 +45,6 @@ export default function Vecinos() {
             <div key={v.id} className="card p-4 flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <p className="font-semibold text-gray-800">{v.nombre} {v.apellido}</p>
-                {v.usuario && <p className="text-xs text-gray-400 font-mono">@{v.usuario}</p>}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(NOTIF_INFO).map(([key, { label, icon: Icon, color }]) => v.notif?.[key] && (

@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
+import { deleteUser } from 'firebase/auth'
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Link } from 'react-router-dom'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Save, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
-import { db } from '../firebase'
+import { auth, db } from '../firebase'
 import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
-import { usuarioVecino, usuarioVecinoLocal } from '../utils/usuario'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 import { useAuth } from '../context/AuthContext'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 import CuentaVecino from '../components/CuentaVecino'
+import ImagenInput from '../components/panel/ImagenInput'
 
 const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, puntosVerdes: Recycle, combi: Bus }
 
@@ -66,7 +67,6 @@ export default function Perfil() {
   })
   const [guardado, setGuardado] = useState(false)
   const [editando, setEditando] = useState(false)
-  const [usuario, setUsuario] = useState(usuarioVecinoLocal)
 
   const set = (campo, valor) => setPerfil(p => ({ ...p, [campo]: valor }))
   const setNotif = (campo, valor) => setPerfil(p => ({ ...p, notif: { ...p.notif, [campo]: valor } }))
@@ -87,6 +87,7 @@ export default function Perfil() {
         nombre: d.nombre || p.nombre,
         apellido: d.apellido || p.apellido,
         notif: d.notif || p.notif,
+        avatar: d.avatar || p.avatar,
       }))
     }).catch(() => {})
   }, [cuenta])
@@ -111,14 +112,12 @@ export default function Perfil() {
     if (perfil.nombre?.trim()) {
       try {
         const esNuevo = !cuenta && esPrimerGuardadoVecino()
-        const usuarioAsignado = await usuarioVecino(perfil.nombre, perfil.apellido)
-        setUsuario(usuarioAsignado)
         const idDoc = cuenta ? cuenta.uid : idVecino()
         await setDoc(doc(db, 'vecinos', idDoc), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
           notif: perfil.notif,
-          usuario: usuarioAsignado,
+          avatar: perfil.avatar || '',
           actualizadoEn: serverTimestamp(),
           ...(esNuevo ? { creadoEn: serverTimestamp() } : {}),
         }, { merge: true })
@@ -141,12 +140,31 @@ export default function Perfil() {
     }
   }
 
-  const limpiar = () => {
-    if (confirm('¿Querés borrar todos tus datos de perfil?')) {
-      localStorage.removeItem('mibaradero_perfil')
-      deleteDoc(doc(db, 'vecinos', cuenta ? cuenta.uid : idVecino())).catch(() => {})
-      olvidarVecino()
+  const [borrandoCuenta, setBorrandoCuenta] = useState(false)
+  const [errorBorrar, setErrorBorrar] = useState('')
+
+  const borrarCuenta = async () => {
+    if (!confirm('¿Querés borrar tu cuenta? Se borran tu perfil y tus notificaciones, y no se puede deshacer.')) return
+    setErrorBorrar('')
+    setBorrandoCuenta(true)
+    localStorage.removeItem('mibaradero_perfil')
+    try {
+      if (cuenta) {
+        await deleteDoc(doc(db, 'vecinos', cuenta.uid)).catch(() => {})
+        await deleteUser(cuenta)
+      } else {
+        await deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+        olvidarVecino()
+      }
       setPerfil(defaultPerfil)
+    } catch (err) {
+      if (err.code === 'auth/requires-recent-login') {
+        setErrorBorrar('Por seguridad, cerrá sesión y volvé a entrar antes de borrar la cuenta.')
+      } else {
+        setErrorBorrar('No se pudo borrar la cuenta. Probá de nuevo.')
+      }
+    } finally {
+      setBorrandoCuenta(false)
     }
   }
 
@@ -161,16 +179,13 @@ export default function Perfil() {
       {/* Hero */}
       <div className="bg-gradient-to-br from-verde-oscuro to-[#064020] text-white py-12 px-4">
         <div className="max-w-4xl mx-auto flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold font-poppins shrink-0">
-            {iniciales}
+          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold font-poppins shrink-0 overflow-hidden">
+            {perfil.avatar ? <img src={perfil.avatar} alt="" className="w-full h-full object-cover" /> : iniciales}
           </div>
           <div>
             <h1 className="text-3xl font-bold font-poppins">
               {perfil.nombre ? `${perfil.nombre} ${perfil.apellido}` : 'Mi Perfil'}
             </h1>
-            {usuario && (
-              <p className="text-green-200/80 text-sm font-mono mt-0.5">@{usuario}</p>
-            )}
             <p className="text-green-200 mt-1">
               {perfil.direccion ? perfil.direccion : 'Completá tu perfil para recibir notificaciones personalizadas'}
             </p>
@@ -233,6 +248,13 @@ export default function Perfil() {
               {editando ? 'Cancelar' : 'Editar'}
             </button>
           </div>
+
+          {editando && (
+            <div className="mb-5">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Foto de perfil (opcional)</label>
+              <ImagenInput valor={perfil.avatar} onChange={valor => set('avatar', valor)} />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -479,13 +501,20 @@ export default function Perfil() {
             Guardar perfil
           </button>
           <button
-            onClick={limpiar}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border-2 border-red-200 text-red-400 hover:bg-red-50 font-semibold text-sm transition-all duration-200"
+            onClick={borrarCuenta}
+            disabled={borrandoCuenta}
+            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border-2 border-red-200 text-red-400 hover:bg-red-50 font-semibold text-sm transition-all duration-200 disabled:opacity-60"
           >
-            <Trash2 className="w-4 h-4" />
-            Borrar datos
+            {borrandoCuenta ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            Borrar cuenta
           </button>
         </div>
+
+        {errorBorrar && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-2xl p-4">
+            <p className="text-red-500 font-semibold text-sm">{errorBorrar}</p>
+          </div>
+        )}
 
         {guardado && (
           <div className="flex items-center gap-3 bg-verde/10 border border-verde/30 rounded-2xl p-4">

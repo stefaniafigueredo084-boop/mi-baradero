@@ -63,7 +63,6 @@ export default function ConfirmarPago() {
               <div key={item.id} className={`card p-4 flex items-center justify-between gap-4 flex-wrap ${vencido ? 'border-2 border-red-200' : ''}`}>
                 <div className="min-w-0">
                   <p className="font-bold text-gray-800">{item.nombre}</p>
-                  {item.usuario && <p className="text-xs text-gray-400 font-mono">@{item.usuario}</p>}
                   <p className="text-sm text-gray-600 mt-1">
                     {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
                   </p>

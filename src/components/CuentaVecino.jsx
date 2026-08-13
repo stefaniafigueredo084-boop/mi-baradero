@@ -2,11 +2,12 @@ import { useState } from 'react'
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
 } from 'firebase/auth'
-import { AlertCircle, LogIn, LogOut, Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react'
+import { AlertCircle, CheckCircle, LogIn, LogOut, Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 import IconoGoogle from './IconoGoogle'
 
@@ -19,6 +20,7 @@ const MENSAJES_ERROR = {
   'auth/user-not-found': 'No existe una cuenta con ese email.',
   'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
   'auth/invalid-email': 'El email no es válido.',
+  'auth/missing-email': 'Escribí tu email arriba primero.',
   'auth/popup-closed-by-user': '',
 }
 
@@ -33,6 +35,8 @@ export default function CuentaVecino({ usuario }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
+  const [recuperando, setRecuperando] = useState(false)
+  const [recuperado, setRecuperado] = useState(false)
 
   const conGoogle = async () => {
     setError('')
@@ -62,6 +66,21 @@ export default function CuentaVecino({ usuario }) {
       setError(MENSAJES_ERROR[err.code] ?? 'No se pudo completar la operación.')
     } finally {
       setCargando(false)
+    }
+  }
+
+  const recuperarPassword = async () => {
+    setError('')
+    setRecuperado(false)
+    if (!email) { setError('Escribí tu email arriba primero.'); return }
+    setRecuperando(true)
+    try {
+      await sendPasswordResetEmail(auth, email)
+      setRecuperado(true)
+    } catch (err) {
+      setError(MENSAJES_ERROR[err.code] ?? 'No se pudo enviar el email de recuperación.')
+    } finally {
+      setRecuperando(false)
     }
   }
 
@@ -129,6 +148,23 @@ export default function CuentaVecino({ usuario }) {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
+
+        {modo === 'ingresar' && (
+          <button
+            type="button"
+            onClick={recuperarPassword}
+            disabled={recuperando}
+            className="text-xs text-gray-400 hover:text-verde font-medium disabled:opacity-60"
+          >
+            {recuperando ? 'Enviando...' : '¿Olvidaste tu contraseña?'}
+          </button>
+        )}
+
+        {recuperado && (
+          <p className="text-verde text-sm flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 shrink-0" /> Te enviamos un email para reestablecer tu contraseña.
+          </p>
+        )}
 
         {error && (
           <p className="text-red-500 text-sm flex items-center gap-1.5">

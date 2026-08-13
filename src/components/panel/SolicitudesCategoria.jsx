@@ -77,7 +77,6 @@ export default function SolicitudesCategoria() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="min-w-0">
                     <p className="font-bold text-gray-800">{item.nombre}</p>
-                    {item.usuario && <p className="text-xs text-gray-400 font-mono">@{item.usuario}</p>}
                     <span className="badge bg-amber-100 text-amber-700 text-xs font-semibold mt-1 inline-flex items-center gap-1">
                       <Clock3 className="w-3 h-3" /> Pide: {cat.label}
                     </span>

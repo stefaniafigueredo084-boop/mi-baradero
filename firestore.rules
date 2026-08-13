@@ -79,25 +79,11 @@ service cloud.firestore {
     match /config/calendarioResiduos { allow read: if true; allow write: if puedeEditar('residuos'); }
     match /config/combiEnVivo        { allow read: if true; allow write: if puedeEditar('combi'); }
 
-    // Usuarios: reserva de nombre de usuario legible (ej:
-    // "stefania.figueredo"), un documento por usuario tomado (el id del
-    // documento ES el usuario). Solo existe para garantizar que dos
-    // vecinos con el mismo nombre nunca terminen con el mismo usuario:
-    // "get" público para poder chequear si ya está tomado antes de
-    // reservarlo; "list" bloqueado para que no se pueda armar un padrón
-    // completo de usuarios recorriendo la colección.
-    match /usuarios/{usuario} {
-      allow get: if true;
-      allow list: if false;
-      allow create: if request.resource.data.keys().hasOnly(['id', 'creadoEn']);
-      allow update, delete: if false;
-    }
-
     // Perfiles de vecinos: se puede guardar sin estar logueado (visitante
     // anónimo identificado solo por un id aleatorio que guarda su propio
     // navegador) o con sesión iniciada (Google o email/contraseña), en
     // cuyo caso el id del documento es el uid de la cuenta. En ambos
-    // casos SOLO se puede mandar nombre/apellido/notif/usuario — nunca
+    // casos SOLO se puede mandar nombre/apellido/notif/avatar — nunca
     // telefono, direccion, email ni zona, que quedan exclusivamente en el
     // localStorage de cada vecino.
     //
@@ -106,7 +92,7 @@ service cloud.firestore {
     // (id == su uid), para poder recuperar su perfil desde otro
     // dispositivo o borrar sus datos.
     match /vecinos/{doc} {
-      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'usuario', 'creadoEn', 'actualizadoEn'])
+      allow create, update: if request.resource.data.keys().hasOnly(['nombre', 'apellido', 'notif', 'avatar', 'creadoEn', 'actualizadoEn'])
                              && (request.auth == null || request.auth.uid == doc);
       allow delete: if request.auth == null || request.auth.uid == doc;
       allow read: if esAdmin() || (estaLogueado() && request.auth.uid == doc);
@@ -138,7 +124,7 @@ service cloud.firestore {
       // token del QR), no importa qué valor tenga hoy (podría estar
       // "aprobada", que es exactamente el caso más común al renovar el
       // pase).
-      return cambios.hasOnly(['nombre', 'usuario', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'actualizadoEn'])
+      return cambios.hasOnly(['nombre', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'actualizadoEn'])
              && (!cambios.hasAny(['estadoVerificacion']) || request.resource.data.estadoVerificacion in ['sin_solicitud', 'pendiente']);
     }
 
@@ -146,7 +132,7 @@ service cloud.firestore {
       allow get: if true;
       allow list: if puedeEditar('combi');
       allow create: if request.resource.data.keys()
-                       .hasOnly(['nombre', 'usuario', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'creadoEn', 'actualizadoEn'])
+                       .hasOnly(['nombre', 'categoriaSolicitada', 'documentoUrl', 'token', 'tokenGeneradoEn', 'estadoVerificacion', 'creadoEn', 'actualizadoEn'])
                      && request.resource.data.estadoVerificacion in ['sin_solicitud', 'pendiente'];
       // El propio pasajero solo puede mandar una solicitud nueva o rotar
       // el token de su QR — nunca puede aprobarse o rechazarse a sí
@@ -196,7 +182,7 @@ service cloud.firestore {
     }
     function datosPasajeValidos() {
       return request.resource.data.keys().hasOnly([
-               'pasajeroId', 'nombre', 'usuario', 'categoria', 'horarioId', 'fecha',
+               'pasajeroId', 'nombre', 'categoria', 'horarioId', 'fecha',
                'salida', 'origen', 'destino', 'importe', 'estado', 'usado', 'creadoEn', 'actualizadoEn',
                'formaPago', 'vencePagoEn'
              ])
