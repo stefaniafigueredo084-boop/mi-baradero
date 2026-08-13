@@ -138,7 +138,18 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
     setEscaneando(true)
     try {
       const { Html5Qrcode } = await import('html5-qrcode')
-      const scanner = new Html5Qrcode('lector-qr-embarque')
+      // "useBarCodeDetectorIfSupported" va acá, en el constructor — no
+      // en las opciones de start() (ese es un config distinto, que no
+      // tiene este campo; ponerlo ahí no rompe nada pero tampoco hace
+      // nada). Cuando el celular lo soporta (Chrome/Android, la mayoría
+      // de los navegadores modernos), usa el lector de QR nativo en vez
+      // del que trae la librería por JavaScript — mucho más rápido y
+      // confiable para detectar el código apuntando la cámara. Sin esto
+      // es común que la cámara se vea perfecta pero nunca "enganche" el QR.
+      const scanner = new Html5Qrcode('lector-qr-embarque', {
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        verbose: false,
+      })
       scannerRef.current = scanner
       await scanner.start(
         { facingMode: 'environment' },
@@ -156,13 +167,6 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
             const lado = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75)
             return { width: lado, height: lado }
           },
-          // Si el celular lo soporta (Chrome/Android, la mayoría de los
-          // navegadores modernos), usa el lector de QR nativo en vez del
-          // que trae la librería por JavaScript — mucho más rápido y
-          // confiable para detectar el código apuntando la cámara. Sin
-          // esto es común que la cámara se vea perfecta pero nunca
-          // "enganche" el QR.
-          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
         },
         texto => {
           // Un escaneo por vez: pausamos mientras se procesa/muestra el resultado.
