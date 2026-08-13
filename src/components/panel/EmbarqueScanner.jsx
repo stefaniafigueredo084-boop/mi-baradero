@@ -156,6 +156,13 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
             const lado = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75)
             return { width: lado, height: lado }
           },
+          // Si el celular lo soporta (Chrome/Android, la mayoría de los
+          // navegadores modernos), usa el lector de QR nativo en vez del
+          // que trae la librería por JavaScript — mucho más rápido y
+          // confiable para detectar el código apuntando la cámara. Sin
+          // esto es común que la cámara se vea perfecta pero nunca
+          // "enganche" el QR.
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
         },
         texto => {
           // Un escaneo por vez: pausamos mientras se procesa/muestra el resultado.
