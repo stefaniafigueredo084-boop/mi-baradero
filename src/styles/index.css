@@ -61,6 +61,103 @@
     @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium;
   }
 
+  /* ---- Tachín (mascota guía) ---- */
+  .tachin-card {
+    @apply bg-white rounded-[28px] shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100;
+  }
+
+  .tachin-avatar-ring {
+    @apply w-14 h-14 rounded-full flex items-center justify-center shrink-0;
+    background: rgba(27, 142, 62, 0.14);
+  }
+
+  .tachin-avatar-fallback {
+    @apply w-10 h-10 flex items-center justify-center font-bold font-poppins text-lg;
+    color: #1B8E3E;
+  }
+
+  .tachin-live-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-verde shrink-0;
+    animation: tachinPulseDot 1.8s ease-in-out infinite;
+  }
+
+  .tachin-icon-btn {
+    @apply w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 transition-colors hover:bg-red-50 hover:text-red-600;
+  }
+
+  .tachin-progress-row {
+    @apply flex gap-1.5 mb-4;
+  }
+
+  .tachin-progress-seg {
+    @apply h-1 flex-1 rounded-full bg-gray-100;
+  }
+
+  .tachin-progress-seg.done {
+    @apply bg-verde;
+  }
+
+  .tachin-listening-pill {
+    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-full;
+    background: rgba(27, 142, 62, 0.12);
+  }
+
+  .tachin-listening-pill span {
+    @apply text-[11px] font-bold tracking-wide text-verde;
+  }
+
+  .tachin-bars {
+    @apply flex items-center gap-[2.5px] h-3;
+  }
+
+  .tachin-bars i {
+    @apply w-[2.5px] rounded-sm bg-verde block;
+    animation: tachinBar 1s ease-in-out infinite;
+  }
+
+  .tachin-bars i:nth-child(1) { height: 6px; animation-delay: 0s; }
+  .tachin-bars i:nth-child(2) { height: 12px; animation-delay: .15s; }
+  .tachin-bars i:nth-child(3) { height: 8px; animation-delay: .3s; }
+  .tachin-bars i:nth-child(4) { height: 12px; animation-delay: .45s; }
+
+  /* Botones "pill" — usados por Tachín: uno solo sólido por pantalla
+     (la acción principal), el resto en contorno o texto, para que se
+     entienda de un vistazo qué tocar primero. */
+  .btn-pill-primary {
+    @apply flex items-center justify-center gap-2 w-full text-white font-semibold py-3.5 px-5 rounded-full transition-all duration-300 shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+    background: linear-gradient(135deg, #1B8E3E, #0B6A2E);
+    box-shadow: 0 10px 20px -8px rgba(27, 142, 62, .5);
+  }
+
+  .btn-pill-outline {
+    @apply block w-full text-center font-semibold py-3 px-5 rounded-full border transition-colors duration-200;
+    border-color: #e2e8f0;
+    color: #64748b;
+  }
+
+  .btn-pill-outline:hover {
+    background-color: #f8fafc;
+  }
+
+  .btn-pill-outline.accent {
+    border-color: rgba(29, 143, 225, .4);
+    color: #1D8FE1;
+  }
+
+  .btn-pill-row {
+    @apply flex items-center justify-between w-full text-left font-semibold py-3.5 px-5 rounded-full transition-colors duration-200;
+    background-color: #f1f5f9;
+    color: #1e293b;
+  }
+
+  .btn-pill-row:hover {
+    background-color: #e2e8f0;
+  }
+
+  .link-quiet {
+    @apply block w-full text-center text-gray-400 hover:text-gray-600 text-xs font-semibold pt-2;
+  }
+
   .input-field {
     @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-verde focus:border-transparent transition-all duration-200 bg-white;
   }
@@ -128,6 +225,24 @@
   animation: markerPulse 2s ease-in-out infinite;
 }
 
+/* Tachín: punto "en vivo" junto al nombre mientras explica, y las
+   barritas del indicador de "Escuchando" (ver .tachin-listening-pill). */
+@keyframes tachinPulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.75); }
+}
+
+@keyframes tachinBar {
+  0%, 100% { transform: scaleY(.5); }
+  50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tachin-live-dot, .tachin-bars i {
+    animation: none;
+  }
+}
+
 /* ────────────────────────────────────────────────────────────────
    Modo oscuro
    Se activa agregando la clase "dark" a <html> (ver
@@ -173,6 +288,86 @@
 
 .dark .card {
   background-color: #1e293b;
+}
+
+/* Tachín en modo oscuro — mismos tokens que el resto del sitio
+   (superficie #1e293b, verde claro #4ade80 como acento). */
+.dark .tachin-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+.dark .tachin-avatar-ring {
+  background: rgba(74, 222, 128, .16);
+}
+
+.dark .tachin-avatar-fallback {
+  color: #4ade80;
+}
+
+.dark .tachin-live-dot {
+  background-color: #4ade80;
+}
+
+.dark .tachin-icon-btn {
+  background-color: #26344a;
+  color: #cbd5e1;
+}
+
+.dark .tachin-icon-btn:hover {
+  background-color: #4c1d1d;
+  color: #fca5a5;
+}
+
+.dark .tachin-progress-seg {
+  background-color: #334155;
+}
+
+.dark .tachin-progress-seg.done {
+  background-color: #4ade80;
+}
+
+.dark .tachin-listening-pill {
+  background: rgba(74, 222, 128, .16);
+}
+
+.dark .tachin-listening-pill span {
+  color: #4ade80;
+}
+
+.dark .tachin-bars i {
+  background-color: #4ade80;
+}
+
+.dark .btn-pill-outline {
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.dark .btn-pill-outline:hover {
+  background-color: #26344a;
+}
+
+.dark .btn-pill-outline.accent {
+  border-color: rgba(124, 195, 247, .35);
+  color: #7cc3f7;
+}
+
+.dark .btn-pill-row {
+  background-color: #26344a;
+  color: #f1f5f9;
+}
+
+.dark .btn-pill-row:hover {
+  background-color: #334155;
+}
+
+.dark .link-quiet {
+  color: #64748b;
+}
+
+.dark .link-quiet:hover {
+  color: #94a3b8;
 }
 
 .dark .bg-pattern {

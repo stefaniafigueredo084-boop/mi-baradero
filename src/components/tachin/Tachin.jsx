@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Mic } from 'lucide-react'
+import { X, ChevronRight } from 'lucide-react'
 import { useTutorial } from '../../context/TutorialContext'
 import { useAccesibilidad } from '../../context/AccesibilidadContext'
 import { SECTORES_TOUR } from '../../data/tutorialContenido'
@@ -45,17 +45,14 @@ function despacharRespuestaVoz(paso, texto, tutorial, sectorActual) {
   return false
 }
 
-// Avatar de Tachín (public/tachin.png). Si por algún motivo no carga,
-// se ve un círculo simple con "T" en su lugar, para no romper nada.
+// Avatar de Tachín (public/tachin.png), sobre un anillo verde suave en
+// vez de un cartel de color sólido. Si por algún motivo no carga, se ve
+// una "T" en el mismo lugar, para no romper nada.
 function AvatarTachin() {
   const [error, setError] = useState(false)
 
   if (error) {
-    return (
-      <div className="w-14 h-14 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-2xl font-bold font-poppins text-white shrink-0">
-        T
-      </div>
-    )
+    return <div className="tachin-avatar-fallback">T</div>
   }
 
   return (
@@ -66,7 +63,7 @@ function AvatarTachin() {
       // "object-contain" (no "cover") a propósito: Tachín es una figura
       // recortada (no llena todo el cuadro), un recorte circular le
       // cortaría el brazo del saludo.
-      className="w-16 h-16 object-contain shrink-0 drop-shadow-md"
+      className="w-10 h-10 object-contain shrink-0"
     />
   )
 }
@@ -174,37 +171,52 @@ export default function Tachin() {
       : 'Listo, entendí'
   }
 
+  // Subtítulo bajo el nombre: mientras explica algo del recorrido
+  // completo muestra en qué sector va (reemplaza al "Sector X de Y" que
+  // antes iba repetido más abajo, al lado del botón); en el resto de
+  // los pasos es el texto de siempre.
+  const subtitulo = tutorial.paso === 'explicando' && tutorial.modo === 'todo'
+    ? `Sector ${tutorial.indice + 1} de ${SECTORES_TOUR.length}`
+    : 'Te ayuda a conocer Mi Baradero'
+
   return (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center sm:justify-start p-4 sm:pl-8 animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
-        {/* Cabecera: mascota + "Parar", siempre en el mismo lugar mientras
-            se está explicando algo (no en el saludo inicial, ahí ya está
-            el botón "No, gracias" que cumple la misma función). */}
-        <div className="bg-gradient-to-br from-verde to-verde-oscuro p-4 flex items-center gap-3">
-          <AvatarTachin />
-          <div className="flex-1 min-w-0">
-            <p className="font-bold font-poppins text-white leading-tight">Tachín</p>
-            <p className="text-xs text-green-100">Te ayuda a conocer Mi Baradero</p>
+    <div className="fixed inset-0 z-[60] bg-black/45 backdrop-blur-sm flex items-end sm:items-center justify-center sm:justify-start p-4 sm:pl-8 animate-fade-in">
+      <div className="tachin-card animate-slide-up">
+        {/* Cabecera: mascota + nombre + "Parar" (siempre en el mismo
+            lugar mientras se está explicando algo; no en el saludo
+            inicial, ahí ya está el botón "No, gracias" que cumple la
+            misma función). */}
+        <div className="flex items-start gap-3 px-5 pt-5 pb-1">
+          <div className="tachin-avatar-ring">
+            <AvatarTachin />
+          </div>
+          <div className="flex-1 min-w-0 pt-0.5">
+            <div className="flex items-center gap-1.5">
+              {tutorial.paso === 'explicando' && <span className="tachin-live-dot" />}
+              <p className="font-bold font-poppins text-gray-900 leading-tight truncate">Tachín</p>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5 truncate">{subtitulo}</p>
           </div>
           {tutorial.paso !== 'saludo' && (
             <button
               onClick={tutorial.parar}
-              className="shrink-0 bg-white/15 hover:bg-white/25 text-white text-sm font-bold px-3.5 py-2.5 rounded-xl transition-colors"
+              className="tachin-icon-btn"
+              aria-label="Parar tutorial"
             >
-              Parar
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        <div className="p-5">
+        <div className="px-5 pb-5 pt-3">
           {tutorial.paso === 'saludo' && (
             <>
               <p className="text-gray-800 text-base leading-relaxed mb-5">
                 ¡Hola! Soy Tachín 👋 ¿Querés que te explique cómo funciona Mi Baradero?
               </p>
               <div className="flex flex-col gap-2.5">
-                <button onClick={tutorial.decirSi} className="btn-primary !text-base !py-3.5">Sí, dale</button>
-                <button onClick={tutorial.decirNo} className="btn-secondary !text-base !py-3.5">No, gracias</button>
+                <button onClick={tutorial.decirSi} className="btn-pill-primary !text-base !py-3.5">Sí, dale</button>
+                <button onClick={tutorial.decirNo} className="btn-pill-outline !text-base !py-3.5">No, gracias</button>
               </div>
             </>
           )}
@@ -213,11 +225,9 @@ export default function Tachin() {
             <>
               <p className="text-gray-800 text-base leading-relaxed mb-5">¿Cómo preferís que te explique?</p>
               <div className="flex flex-col gap-2.5">
-                <button onClick={tutorial.elegirTodoElRecorrido} className="btn-primary !text-base !py-3.5">Todo el recorrido</button>
-                <button onClick={tutorial.elegirUnSector} className="btn-secondary !text-base !py-3.5">Elegir un sector</button>
-                <button onClick={tutorial.parar} className="text-gray-400 hover:text-gray-600 text-sm font-semibold py-1.5">
-                  Ahora no
-                </button>
+                <button onClick={tutorial.elegirTodoElRecorrido} className="btn-pill-primary !text-base !py-3.5">Todo el recorrido</button>
+                <button onClick={tutorial.elegirUnSector} className="btn-pill-outline accent !text-base !py-3.5">Elegir un sector</button>
+                <button onClick={tutorial.parar} className="link-quiet">Ahora no</button>
               </div>
             </>
           )}
@@ -225,14 +235,15 @@ export default function Tachin() {
           {tutorial.paso === 'menuSectores' && (
             <>
               <p className="text-gray-800 text-base leading-relaxed mb-5">¿Qué sector te interesa?</p>
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2">
                 {SECTORES_TOUR.map(s => (
                   <button
                     key={s.id}
                     onClick={() => tutorial.elegirSector(s.id)}
-                    className="btn-secondary !text-base !py-3.5 !justify-start"
+                    className="btn-pill-row !text-base"
                   >
                     {s.titulo}
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
                   </button>
                 ))}
               </div>
@@ -241,19 +252,19 @@ export default function Tachin() {
 
           {tutorial.paso === 'explicando' && sectorActual && (
             <>
-              <p className="font-bold font-poppins text-verde-oscuro text-lg mb-1">{sectorActual.titulo}</p>
               {sectorActual.pasos.length > 1 && (
-                <p className="text-xs text-gray-400 mb-3">Paso {tutorial.pasoSector + 1} de {sectorActual.pasos.length}</p>
+                <div className="tachin-progress-row">
+                  {sectorActual.pasos.map((_, i) => (
+                    <span key={i} className={`tachin-progress-seg ${i <= tutorial.pasoSector ? 'done' : ''}`} />
+                  ))}
+                </div>
               )}
-              <p className={`text-gray-700 text-base leading-relaxed mb-5 ${sectorActual.pasos.length > 1 ? '' : 'mt-2'}`}>
-                {pasoActual?.texto}
-              </p>
-              <button onClick={tutorial.siguiente} className="btn-primary w-full !text-base !py-3.5">
+              <p className="font-bold font-poppins text-gray-900 text-lg mb-2">{sectorActual.titulo}</p>
+              <p className="text-gray-600 text-base leading-relaxed mb-5">{pasoActual?.texto}</p>
+              <button onClick={tutorial.siguiente} className="btn-pill-primary !text-base !py-3.5">
                 {etiquetaBoton}
+                <ChevronRight className="w-4 h-4" />
               </button>
-              {tutorial.modo === 'todo' && (
-                <p className="text-center text-xs text-gray-400 mt-3">Sector {tutorial.indice + 1} de {SECTORES_TOUR.length}</p>
-              )}
             </>
           )}
 
@@ -261,8 +272,8 @@ export default function Tachin() {
             <>
               <p className="text-gray-800 text-base leading-relaxed mb-5">¿Querés que te explique otro sector?</p>
               <div className="flex flex-col gap-2.5">
-                <button onClick={tutorial.quiereOtroSi} className="btn-primary !text-base !py-3.5">Sí</button>
-                <button onClick={tutorial.quiereOtroNo} className="btn-secondary !text-base !py-3.5">No, ya entendí</button>
+                <button onClick={tutorial.quiereOtroSi} className="btn-pill-primary !text-base !py-3.5">Sí</button>
+                <button onClick={tutorial.quiereOtroNo} className="btn-pill-outline !text-base !py-3.5">No, ya entendí</button>
               </div>
             </>
           )}
@@ -271,9 +282,12 @@ export default function Tachin() {
               activo también se puede contestar hablando — esto avisa
               que te está escuchando de verdad, no que se quedó trabada. */}
           {escuchando && (
-            <p className="flex items-center justify-center gap-1.5 text-xs text-verde font-bold mt-4">
-              <Mic className="w-3.5 h-3.5 animate-pulse" /> Escuchando…
-            </p>
+            <div className="flex justify-center mt-4">
+              <div className="tachin-listening-pill">
+                <div className="tachin-bars"><i /><i /><i /><i /></div>
+                <span>ESCUCHANDO</span>
+              </div>
+            </div>
           )}
         </div>
       </div>
