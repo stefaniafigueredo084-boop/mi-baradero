@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Lightbulb, Loader2, LogOut, MapPin, Megaphone, Navigation, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
+import LogoMiBaradero from '../components/LogoMiBaradero'
 import { useTrabajador } from '../hooks/useTrabajador'
 import { useColeccion } from '../hooks/useColeccion'
 import { registrarHistorial } from '../utils/historial'
@@ -101,21 +103,30 @@ export default function PanelTrabajadores() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-br from-verde-oscuro to-[#064020] text-white py-8 px-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Panel de Trabajadores</h1>
-            <p className="text-green-200 text-sm mt-1">
-              Conectado como {usuario.email}
-              {!esAdmin && trabajador?.sector && <> · Sector: {TODAS_LAS_TABS.find(t => t.id === trabajador.sector)?.label}</>}
-              {esAdmin && <> · Administrador general</>}
-            </p>
-          </div>
-          <button
-            onClick={cerrarSesion}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 rounded-2xl font-semibold transition-colors"
+        <div className="max-w-5xl mx-auto">
+          <Link
+            to="/"
+            className="inline-flex items-center transition-transform duration-200 hover:scale-[1.03] mb-5"
+            aria-label="Mi Baradero — ir al sitio"
           >
-            <LogOut className="w-4 h-4" /> Cerrar sesión
-          </button>
+            <LogoMiBaradero size="sm" theme="white" />
+          </Link>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Panel de Trabajadores</h1>
+              <p className="text-green-200 text-sm mt-1">
+                Conectado como {usuario.email}
+                {!esAdmin && trabajador?.sector && <> · Sector: {TODAS_LAS_TABS.find(t => t.id === trabajador.sector)?.label}</>}
+                {esAdmin && <> · Administrador general</>}
+              </p>
+            </div>
+            <button
+              onClick={cerrarSesion}
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 rounded-2xl font-semibold transition-colors"
+            >
+              <LogOut className="w-4 h-4" /> Cerrar sesión
+            </button>
+          </div>
         </div>
       </div>
 
