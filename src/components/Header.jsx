@@ -5,12 +5,12 @@ import LogoMiBaradero from './LogoMiBaradero'
 import { useTutorial } from '../context/TutorialContext'
 
 const navLinks = [
-  { to: '/', label: 'Inicio', icon: null },
-  { to: '/combi', label: 'Combi Municipal', icon: Bus },
-  { to: '/residuos', label: 'Recolección', icon: Trash2 },
-  { to: '/eventos', label: 'Eventos y Noticias', icon: Calendar },
-  { to: '/puntos-verdes', label: 'Puntos Verdes', icon: MapPin },
-  { to: '/perfil', label: 'Mi Perfil', icon: UserCircle },
+  { to: '/', label: 'Inicio', short: 'Inicio', icon: null },
+  { to: '/combi', label: 'Combi Municipal', short: 'Combi', icon: Bus },
+  { to: '/residuos', label: 'Recolección de Residuos', short: 'Residuos', icon: Trash2 },
+  { to: '/eventos', label: 'Eventos y Noticias', short: 'Eventos', icon: Calendar },
+  { to: '/puntos-verdes', label: 'Puntos Verdes', short: 'Puntos Verdes', icon: MapPin },
+  { to: '/perfil', label: 'Mi Perfil', short: 'Perfil', icon: UserCircle },
 ]
 
 export default function Header() {
@@ -19,13 +19,13 @@ export default function Header() {
   const tutorial = useTutorial()
 
   return (
-    <header className="sticky top-0 z-50 shadow-md">
+    <header className="sticky top-0 z-50 shadow-md bg-white">
       {/* Franja superior de identidad */}
       <div className="bg-gradient-to-r from-verde-oscuro via-verde to-azul h-1" />
 
       <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[68px]">
+        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
+          <div className="flex items-center justify-between min-h-[68px] gap-4">
 
             {/* Logo — lleva al inicio; si ya estás en la home, sube al tope de la página */}
             <Link
@@ -39,22 +39,22 @@ export default function Header() {
               </div>
             </Link>
 
-            {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.map(({ to, label, icon: Icon }) => {
+            {/* Desktop nav — etiquetas cortas para que entre sin apretarse */}
+            <nav className="hidden xl:flex items-center gap-0.5">
+              {navLinks.map(({ to, short, icon: Icon }) => {
                 const active = location.pathname === to
                 return (
                   <Link
                     key={to}
                     to={to}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 font-inter ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 font-inter ${
                       active
                         ? 'bg-verde text-white shadow-sm'
                         : 'text-gray-600 hover:bg-verde/8 hover:text-verde'
                     }`}
                   >
                     {Icon && <Icon className="w-4 h-4" />}
-                    {label}
+                    {short}
                   </Link>
                 )
               })}
@@ -64,7 +64,7 @@ export default function Header() {
                   que ya están abajo a la derecha. */}
               <button
                 onClick={tutorial?.abrirManualmente}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 font-inter text-gray-600 hover:bg-verde/8 hover:text-verde"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 font-inter text-gray-600 hover:bg-verde/8 hover:text-verde"
               >
                 <HelpCircle className="w-4 h-4" /> Ayuda
               </button>
@@ -77,7 +77,7 @@ export default function Header() {
                 En línea
               </span>
               <button
-                className="lg:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                className="xl:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="Menú"
               >
@@ -89,7 +89,7 @@ export default function Header() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="lg:hidden border-t border-gray-100 animate-fade-in">
+          <div className="xl:hidden border-t border-gray-100 animate-fade-in">
             {/* Logo grande en móvil */}
             <div className="px-4 py-4 border-b border-gray-50 flex items-center gap-3 bg-gray-50/60">
               <LogoMiBaradero size="sm" theme="color" />
