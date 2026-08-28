@@ -180,7 +180,7 @@ export default function Tachin() {
     : 'Te ayuda a conocer Mi Baradero'
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/45 backdrop-blur-sm flex items-end sm:items-center justify-center sm:justify-start p-4 sm:pl-8 animate-fade-in">
+    <div className="fixed inset-0 z-[60] bg-black/45 backdrop-blur-sm flex items-end sm:items-center justify-center sm:justify-end p-4 sm:pr-8 animate-fade-in">
       <div className="tachin-card animate-slide-up">
         {/* Cabecera: mascota + nombre + "Parar" (siempre en el mismo
             lugar mientras se está explicando algo; no en el saludo
