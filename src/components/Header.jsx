@@ -27,8 +27,13 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[68px]">
 
-            {/* Logo */}
-            <Link to="/" className="flex items-center group shrink-0">
+            {/* Logo — lleva al inicio; si ya estás en la home, sube al tope de la página */}
+            <Link
+              to="/"
+              onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }) }}
+              className="flex items-center group shrink-0"
+              aria-label="Mi Baradero — ir al inicio"
+            >
               <div className="transition-transform duration-200 group-hover:scale-105">
                 <LogoMiBaradero size="md" theme="color" />
               </div>

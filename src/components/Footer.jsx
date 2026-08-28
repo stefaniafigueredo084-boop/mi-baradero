@@ -14,7 +14,14 @@ export default function Footer() {
       {/* Logo central grande */}
       <div className="border-b border-white/10 py-10 px-4">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-4 text-center">
-          <LogoMiBaradero size="lg" theme="white" />
+          <Link
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
+            className="inline-block transition-transform duration-200 hover:scale-105"
+            aria-label="Mi Baradero — ir al inicio"
+          >
+            <LogoMiBaradero size="lg" theme="white" />
+          </Link>
           <p className="text-green-200 text-sm max-w-md leading-relaxed mt-2">
             La plataforma digital que conecta a los vecinos de Baradero con los servicios, eventos y noticias de su ciudad — todo en un solo lugar.
           </p>
@@ -105,9 +112,14 @@ export default function Footer() {
       {/* Base */}
       <div className="border-t border-white/10 px-4 py-5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-green-400">
-          <div className="flex items-center gap-2">
+          <Link
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 transition-opacity hover:opacity-80"
+            aria-label="Mi Baradero — ir al inicio"
+          >
             <LogoMiBaradero size="sm" theme="white" />
-          </div>
+          </Link>
           <span>© 2026 Mi Baradero · Todos los derechos reservados</span>
         </div>
       </div>
