@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth'
-import { AlertCircle, CheckCircle, LogIn, LogOut, Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react'
+import { AlertCircle, CheckCircle, Eye, EyeOff, LogIn, LogOut, Loader2, Mail, ShieldCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 import IconoGoogle from './IconoGoogle'
 
@@ -33,6 +33,8 @@ export default function CuentaVecino({ usuario }) {
   const [modo, setModo] = useState('ingresar') // 'ingresar' | 'registro'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [password2, setPassword2] = useState('')
+  const [verPass, setVerPass] = useState(false)
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
   const [recuperando, setRecuperando] = useState(false)
@@ -53,6 +55,10 @@ export default function CuentaVecino({ usuario }) {
   const enviar = async e => {
     e.preventDefault()
     setError('')
+    if (modo === 'registro' && password !== password2) {
+      setError('Las contraseñas no coinciden.')
+      return
+    }
     setCargando(true)
     try {
       if (modo === 'registro') {
@@ -62,6 +68,7 @@ export default function CuentaVecino({ usuario }) {
       }
       setEmail('')
       setPassword('')
+      setPassword2('')
     } catch (err) {
       setError(MENSAJES_ERROR[err.code] ?? 'No se pudo completar la operación.')
     } finally {
@@ -139,15 +146,39 @@ export default function CuentaVecino({ usuario }) {
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
-        <input
-          type="password"
-          required
-          minLength={6}
-          placeholder="Contraseña"
-          className="input-field"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
+        <div className="relative">
+          <input
+            type={verPass ? 'text' : 'password'}
+            required
+            minLength={6}
+            placeholder="Contraseña"
+            autoComplete={modo === 'registro' ? 'new-password' : 'current-password'}
+            className="input-field pr-11"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setVerPass(v => !v)}
+            aria-label={verPass ? 'Ocultar contraseña' : 'Ver contraseña'}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-verde transition-colors"
+          >
+            {verPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {modo === 'registro' && (
+          <input
+            type={verPass ? 'text' : 'password'}
+            required
+            minLength={6}
+            placeholder="Repetir contraseña"
+            autoComplete="new-password"
+            className={`input-field ${password2 && password2 !== password ? '!border-red-400' : ''}`}
+            value={password2}
+            onChange={e => setPassword2(e.target.value)}
+          />
+        )}
 
         {modo === 'ingresar' && (
           <button
@@ -188,6 +219,7 @@ export default function CuentaVecino({ usuario }) {
         onClick={() => {
           setModo(m => (m === 'registro' ? 'ingresar' : 'registro'))
           setError('')
+          setPassword2('')
         }}
         className="w-full text-center text-sm text-verde font-semibold mt-4 hover:text-verde-oscuro"
       >
