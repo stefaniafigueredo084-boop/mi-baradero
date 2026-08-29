@@ -187,8 +187,10 @@ export default function Tachin() {
             inicial, ahí ya está el botón "No, gracias" que cumple la
             misma función). */}
         <div className="flex items-start gap-3 px-5 pt-5 pb-1">
-          <div className="tachin-avatar-ring">
-            <AvatarTachin />
+          <div className={`tachin-avatar-ring ${tutorial.paso === 'saludo' ? 'tachin-avatar-ring--saludo' : ''}`}>
+            <div className="tachin-avatar-anim">
+              <AvatarTachin />
+            </div>
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
             <div className="flex items-center gap-1.5">

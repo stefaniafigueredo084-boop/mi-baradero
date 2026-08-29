@@ -67,8 +67,26 @@
   }
 
   .tachin-avatar-ring {
-    @apply w-14 h-14 rounded-full flex items-center justify-center shrink-0;
+    @apply w-14 h-14 rounded-full flex items-center justify-center shrink-0 relative;
     background: rgba(27, 142, 62, 0.14);
+  }
+
+  /* Durante el saludo, un aro que "late" alrededor de Tachín para llamar la atención */
+  .tachin-avatar-ring--saludo::after {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    box-shadow: 0 0 0 0 rgba(27, 142, 62, 0.45);
+    animation: tachinRingPulse 2s ease-out infinite;
+  }
+
+  /* La mascota: entra con un rebote y después flota suave (idle). Se
+     detiene si el visitante pidió menos movimiento. */
+  .tachin-avatar-anim {
+    @apply flex items-center justify-center;
+    transform-origin: 50% 85%;
+    animation:
+      tachinPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      tachinBob 3.4s ease-in-out 0.6s infinite;
   }
 
   .tachin-avatar-fallback {
@@ -237,10 +255,32 @@
   50% { transform: scaleY(1); }
 }
 
+/* Entrada de la mascota: aparece dando un saltito */
+@keyframes tachinPopIn {
+  0%   { opacity: 0; transform: scale(.4) translateY(8px) rotate(-8deg); }
+  60%  { opacity: 1; transform: scale(1.08) translateY(0) rotate(3deg); }
+  100% { opacity: 1; transform: scale(1) translateY(0) rotate(0); }
+}
+
+/* Flotar suave (idle), con un leve balanceo */
+@keyframes tachinBob {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-3px) rotate(1.5deg); }
+}
+
+/* Aro que late durante el saludo */
+@keyframes tachinRingPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(27, 142, 62, 0.45); }
+  70%  { box-shadow: 0 0 0 12px rgba(27, 142, 62, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(27, 142, 62, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .tachin-live-dot, .tachin-bars i {
+  .tachin-live-dot, .tachin-bars i,
+  .tachin-avatar-anim, .tachin-avatar-ring--saludo::after {
     animation: none;
   }
+  .tachin-avatar-anim { opacity: 1; transform: none; }
 }
 
 /* ────────────────────────────────────────────────────────────────
