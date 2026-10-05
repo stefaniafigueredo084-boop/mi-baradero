@@ -1,3 +1,5 @@
+import { ICONOS_CONSEJO } from './iconosConsejo'
+
 // Definición de los campos de cada formulario del panel de trabajadores.
 // Cada "campo" describe cómo se renderiza (CampoInput) y cómo se valida
 // (required) un valor dentro de un documento de Firestore.
@@ -51,7 +53,7 @@ export const camposAlertasCombi = [
 export const camposConsejosResiduos = [
   { name: 'titulo', label: 'Título', type: 'text', required: true, placeholder: 'Ej: Reciclá el vidrio' },
   { name: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Explicá el consejo...' },
-  { name: 'icono', label: 'Emoji', type: 'text', placeholder: '🌿' },
+  { name: 'icono', label: 'Ícono', type: 'select', options: Object.keys(ICONOS_CONSEJO) },
 ]
 
 export const estadosCamionOpciones = [
@@ -61,11 +63,11 @@ export const estadosCamionOpciones = [
 ]
 
 export const calendarioResiduosDefault = [
-  { dia: 'Lunes', tipo: 'Residuos Comunes', color: 'verde', icono: '🗑️', descripcion: 'Bolsas negras de residuos domiciliarios generales' },
-  { dia: 'Martes', tipo: 'Sin recolección', color: 'gris', icono: '❌', descripcion: 'No hay servicio de recolección' },
-  { dia: 'Miércoles', tipo: 'Reciclables', color: 'azul', icono: '♻️', descripcion: 'Plásticos, vidrio, papel y cartón en bolsa verde' },
-  { dia: 'Jueves', tipo: 'Sin recolección', color: 'gris', icono: '❌', descripcion: 'No hay servicio de recolección' },
-  { dia: 'Viernes', tipo: 'Residuos Comunes', color: 'verde', icono: '🗑️', descripcion: 'Bolsas negras de residuos domiciliarios generales' },
-  { dia: 'Sábado', tipo: 'Sin recolección', color: 'gris', icono: '❌', descripcion: 'No hay servicio de recolección' },
-  { dia: 'Domingo', tipo: 'Sin recolección', color: 'gris', icono: '❌', descripcion: 'No hay servicio de recolección' },
+  { dia: 'Lunes', tipo: 'Residuos Comunes', color: 'verde', descripcion: 'Bolsas negras de residuos domiciliarios generales' },
+  { dia: 'Martes', tipo: 'Sin recolección', color: 'gris', descripcion: 'No hay servicio de recolección' },
+  { dia: 'Miércoles', tipo: 'Reciclables', color: 'azul', descripcion: 'Plásticos, vidrio, papel y cartón en bolsa verde' },
+  { dia: 'Jueves', tipo: 'Sin recolección', color: 'gris', descripcion: 'No hay servicio de recolección' },
+  { dia: 'Viernes', tipo: 'Residuos Comunes', color: 'verde', descripcion: 'Bolsas negras de residuos domiciliarios generales' },
+  { dia: 'Sábado', tipo: 'Sin recolección', color: 'gris', descripcion: 'No hay servicio de recolección' },
+  { dia: 'Domingo', tipo: 'Sin recolección', color: 'gris', descripcion: 'No hay servicio de recolección' },
 ]

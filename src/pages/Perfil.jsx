@@ -197,8 +197,8 @@ export default function Perfil() {
               {perfil.direccion ? perfil.direccion : 'Completá tu perfil para recibir notificaciones personalizadas'}
             </p>
             {perfil.zona && (
-              <span className="inline-block mt-2 bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                📍 {perfil.zona}
+              <span className="inline-flex items-center gap-1 mt-2 bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <MapPin className="w-3 h-3" /> {perfil.zona}
               </span>
             )}
           </div>

@@ -214,7 +214,7 @@ export default function Tachin() {
           {tutorial.paso === 'saludo' && (
             <>
               <p className="text-gray-800 text-base leading-relaxed mb-5">
-                ¡Hola! Soy Tachín 👋 ¿Querés que te explique cómo funciona Mi Baradero?
+                ¡Hola! Soy Tachín. ¿Querés que te explique cómo funciona Mi Baradero?
               </p>
               <div className="flex flex-col gap-2.5">
                 <button onClick={tutorial.decirSi} className="btn-pill-primary !text-base !py-3.5">Sí, dale</button>

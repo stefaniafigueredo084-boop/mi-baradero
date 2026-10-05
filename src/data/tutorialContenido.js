@@ -57,4 +57,19 @@ export const SECTORES_TOUR = [
       { texto: 'Acá encontrás dónde llevar pilas, botellas y otros reciclables cerca tuyo, con la dirección y los horarios de cada punto.' },
     ],
   },
+  {
+    id: 'reclamos',
+    ruta: '/reclamos',
+    titulo: 'Reclamos y Sugerencias',
+    pasos: [
+      {
+        texto: 'Acá le avisás al municipio si algo no anda bien: elegís si es una queja, un reclamo, una sugerencia o una felicitación, el tema, y escribís qué pasó. Si querés, sumás una foto.',
+        ancla: '#reclamos-form',
+      },
+      {
+        texto: 'Más abajo, en "Mis reclamos", ves en qué estado está lo que mandaste y la respuesta del municipio.',
+        ancla: '#mis-reclamos',
+      },
+    ],
+  },
 ]

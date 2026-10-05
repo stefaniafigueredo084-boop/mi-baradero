@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3, Navigation } from 'lucide-react'
+import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3, Navigation, ShoppingBag, Droplets, Package, Ban, Layers, GlassWater } from 'lucide-react'
 import { puntosVerdes as puntosFijos, materialesInfo } from '../data/puntosVerdesData'
 import { useColeccion } from '../hooks/useColeccion'
 import { posicionDesdeId } from '../utils/posicionHash'
@@ -7,37 +7,37 @@ import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 
 const instrucciones = [
   {
-    icono: '🛍️',
+    icono: ShoppingBag,
     titulo: 'Bolsas separadas',
     descripcion: 'Llevá los reciclables en una bolsa separada de los residuos orgánicos. No mezcles.',
     color: '#1B8E3E',
   },
   {
-    icono: '🧼',
+    icono: Droplets,
     titulo: 'Envases limpios',
     descripcion: 'Enjuagá botellas, latas y envases antes de llevarlos. No es necesario que estén perfectos.',
     color: '#1D8FE1',
   },
   {
-    icono: '📦',
+    icono: Package,
     titulo: 'Aplastar y doblar',
     descripcion: 'Aplastá botellas plásticas y doblá cajas de cartón para ocupar menos espacio.',
     color: '#F5C400',
   },
   {
-    icono: '🚫',
+    icono: Ban,
     titulo: 'Sin líquidos ni restos',
     descripcion: 'Vaciá completamente los envases. No lleves bolsas con restos de comida adentro.',
     color: '#e65100',
   },
   {
-    icono: '🗂️',
+    icono: Layers,
     titulo: 'Separar por tipo',
     descripcion: 'Si podés, separar papel, plástico, vidrio y metal facilita mucho el reciclaje.',
     color: '#6a1b9a',
   },
   {
-    icono: '🪟',
+    icono: GlassWater,
     titulo: 'Vidrio con cuidado',
     descripcion: 'El vidrio va envuelto o en bolsa resistente para evitar accidentes al depositarlo.',
     color: '#0B6A2E',
@@ -97,10 +97,10 @@ export default function PuntosVerdes() {
               {instrucciones.map(inst => (
                 <div key={inst.titulo} className="card p-4 text-center group hover:-translate-y-1 transition-all duration-200">
                   <div
-                    className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl"
-                    style={{ backgroundColor: inst.color + '18' }}
+                    className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+                    style={{ backgroundColor: inst.color + '18', color: inst.color }}
                   >
-                    {inst.icono}
+                    <inst.icono className="w-6 h-6" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-800 mb-1">{inst.titulo}</h3>
                   <p className="text-xs text-gray-500 leading-relaxed">{inst.descripcion}</p>

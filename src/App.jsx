@@ -11,6 +11,7 @@ import CombiMunicipal from './pages/CombiMunicipal'
 import Residuos from './pages/Residuos'
 import Eventos from './pages/Eventos'
 import PuntosVerdes from './pages/PuntosVerdes'
+import Reclamos from './pages/Reclamos'
 import Perfil from './pages/Perfil'
 import PanelTrabajadores from './pages/PanelTrabajadores'
 import { nombreVecino } from './utils/perfilLocal'
@@ -74,7 +75,7 @@ function Layout() {
       await hablar(`Hola de nuevo, ${nombre}. Qué bueno tenerte otra vez en Mi Baradero.`)
       if (cancelado || !soportaReconocimientoVoz()) return
 
-      await hablar('¿Qué querés hacer? Podés decirme, por ejemplo: combi, residuos, eventos, puntos verdes, o tu perfil.')
+      await hablar('¿Qué querés hacer? Podés decirme, por ejemplo: combi, residuos, eventos, puntos verdes, reclamos, o tu perfil.')
       if (cancelado) return
       setEscuchandoSaludo(true)
       try {
@@ -108,6 +109,7 @@ function Layout() {
           <Route path="/residuos" element={<Residuos />} />
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/puntos-verdes" element={<PuntosVerdes />} />
+          <Route path="/reclamos" element={<Reclamos />} />
           <Route path="/perfil" element={<Perfil />} />
           {/* Mi Pase pasó a ser una sección dentro de /combi — se deja
               este redirect para que un link o marcador viejo no rompa. */}

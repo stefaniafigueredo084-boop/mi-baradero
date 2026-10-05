@@ -1,8 +1,12 @@
+import { Building2, Cross, Train, Trees } from 'lucide-react'
+
+// "icono" es un componente de lucide-react: se dibuja con <p.icono />
+// en el mapa, la lista de paradas y el panel.
 export const paradas = [
-  { id: 1, nombre: 'Estación', descripcion: 'Terminal de ómnibus y ferroviaria', icono: '🚉', posX: 15, posY: 50 },
-  { id: 2, nombre: 'Centro de Camioneros', descripcion: 'Av. Costanera s/n', icono: '🏢', posX: 35, posY: 35 },
-  { id: 3, nombre: 'Plaza Principal', descripcion: 'Plaza Mitre - Centro', icono: '🌳', posX: 55, posY: 50 },
-  { id: 4, nombre: 'Hospital', descripcion: 'Hospital Municipal Baradero', icono: '🏥', posX: 75, posY: 65 },
+  { id: 1, nombre: 'Estación', descripcion: 'Terminal de ómnibus y ferroviaria', icono: Train, posX: 15, posY: 50 },
+  { id: 2, nombre: 'Centro de Camioneros', descripcion: 'Av. Costanera s/n', icono: Building2, posX: 35, posY: 35 },
+  { id: 3, nombre: 'Plaza Principal', descripcion: 'Plaza Mitre - Centro', icono: Trees, posX: 55, posY: 50 },
+  { id: 4, nombre: 'Hospital', descripcion: 'Hospital Municipal Baradero', icono: Cross, posX: 75, posY: 65 },
 ]
 
 export const rutas = [

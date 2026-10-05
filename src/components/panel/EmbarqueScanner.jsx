@@ -256,8 +256,8 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
               <p className="text-xs text-gray-500">de {viaje.asientos.capacidadTotal} totales</p>
             </div>
             <div className="text-xs text-gray-500 flex flex-col gap-0.5">
-              <span>♿ Discapacidad: {viaje.asientos.prioritarios.discapacidad.libres}/{viaje.asientos.prioritarios.discapacidad.reservados} reservados libres</span>
-              <span>👴 Jubilados: {viaje.asientos.prioritarios.jubilado.libres}/{viaje.asientos.prioritarios.jubilado.reservados} reservados libres</span>
+              <span>Discapacidad: {viaje.asientos.prioritarios.discapacidad.libres}/{viaje.asientos.prioritarios.discapacidad.reservados} reservados libres</span>
+              <span>Jubilados: {viaje.asientos.prioritarios.jubilado.libres}/{viaje.asientos.prioritarios.jubilado.reservados} reservados libres</span>
             </div>
             {viaje.asientos.liberado && (
               <span className="badge bg-amber-100 text-amber-700 text-xs ml-auto">Reservas ya liberadas</span>

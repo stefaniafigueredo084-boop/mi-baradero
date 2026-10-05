@@ -38,7 +38,7 @@ export default function CalendarioResiduos() {
       </h3>
       <div className="space-y-2">
         {dias.map((d, i) => (
-          <div key={d.dia} className="grid grid-cols-2 sm:grid-cols-[110px_1fr_150px_70px] gap-2 items-center bg-gray-50 rounded-xl p-3">
+          <div key={d.dia} className="grid grid-cols-2 sm:grid-cols-[110px_1fr_150px] gap-2 items-center bg-gray-50 rounded-xl p-3">
             <span className="font-semibold text-gray-700 text-sm">{d.dia}</span>
             <input
               className="input-field !py-2.5 !text-sm"
@@ -55,18 +55,12 @@ export default function CalendarioResiduos() {
               <option value="azul">Azul</option>
               <option value="gris">Gris (sin servicio)</option>
             </select>
-            <input
-              className="input-field !py-2.5 !text-sm text-center"
-              value={d.icono}
-              onChange={e => cambiarDia(i, 'icono', e.target.value)}
-              placeholder="🗑️"
-            />
           </div>
         ))}
       </div>
       <button onClick={guardar} disabled={guardando} className="btn-primary mt-4 flex items-center gap-2 disabled:opacity-60">
         {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-        {guardado ? 'Guardado ✓' : 'Guardar calendario'}
+        {guardado ? 'Guardado' : 'Guardar calendario'}
       </button>
     </div>
   )

@@ -37,7 +37,7 @@ export default function Eventos() {
   }, [eventos])
 
   const avisoEventos = useAviso('avisoEventos', notifActiva, aviso => ({
-    title: '🎉 Mi Baradero — Eventos',
+    title: 'Mi Baradero — Eventos',
     body: saludar(aviso.mensaje),
   }), 'eventos')
 
@@ -49,7 +49,7 @@ export default function Eventos() {
     const permiso = await pedirPermisoNotificacion()
     if (permiso === 'granted') {
       setNotifActiva(true)
-      mostrarNotificacion('🎉 Mi Baradero — Eventos', {
+      mostrarNotificacion('Mi Baradero — Eventos', {
         body: saludar('Te avisaremos cuando haya un evento por comenzar o se agregue uno nuevo a la agenda.'),
         icon: '/logo-mibaradero.png',
       }, 'eventos')

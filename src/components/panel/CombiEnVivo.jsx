@@ -42,7 +42,7 @@ export default function CombiEnVivo() {
               paradaId === p.id ? 'bg-verde text-white border-verde shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
             }`}
           >
-            <span className="text-2xl block mb-1">{p.icono}</span>
+            <p.icono className="w-7 h-7 mx-auto mb-1.5" />
             <span className="font-bold text-sm">{p.nombre}</span>
           </button>
         ))}

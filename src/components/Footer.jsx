@@ -55,6 +55,7 @@ export default function Footer() {
                 { to: '/residuos', label: 'Recolección de Residuos' },
                 { to: '/eventos', label: 'Eventos y Noticias' },
                 { to: '/puntos-verdes', label: 'Puntos Verdes' },
+                { to: '/reclamos', label: 'Reclamos y Sugerencias' },
               ].map(({ to, label }) => (
                 <li key={to}>
                   <Link

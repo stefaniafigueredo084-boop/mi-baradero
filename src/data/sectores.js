@@ -7,6 +7,7 @@ export const SECTORES = [
   { id: 'residuos', label: 'Residuos' },
   { id: 'puntosVerdes', label: 'Puntos Verdes' },
   { id: 'choferes', label: 'Choferes' },
+  { id: 'reclamos', label: 'Atención al Vecino (Reclamos)' },
 ]
 
 export const labelSector = id => SECTORES.find(s => s.id === id)?.label || id

@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation, Calendar } from 'lucide-react'
+import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation, Calendar, Recycle } from 'lucide-react'
 import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, consejos as consejosFijos } from '../data/residuosData'
 import { db } from '../firebase'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import AcordeonItem from '../components/panel/Acordeon'
+import { iconoConsejo } from '../data/iconosConsejo'
 
 function useGpsCamion(activo) {
   const [distancia, setDistancia] = useState(2400)
@@ -24,7 +25,7 @@ function useGpsCamion(activo) {
       setDistancia(prev => {
         const nueva = prev - 80
         if (nueva <= 500 && !notifEnviada) {
-          mostrarNotificacion('🚛 Mi Baradero — Camión cerca', {
+          mostrarNotificacion('Mi Baradero — Camión cerca', {
             body: saludar('El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!'),
             icon: '/logo-mibaradero.png',
           }, 'basura')
@@ -57,6 +58,10 @@ const colorMap = {
   gris: { bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-400', icon: 'bg-gray-300' },
 }
 
+// Ícono de cada día según el tipo de recolección (el color que ya viene
+// en los datos).
+const ICONO_DIA = { verde: Trash2, azul: Recycle, gris: XCircle }
+
 export default function Residuos() {
   const [notifActiva, setNotifActiva] = useState(false)
   const [gpsActivo, setGpsActivo] = useState(false)
@@ -79,7 +84,7 @@ export default function Residuos() {
   ], [consejosLive])
 
   const avisoResiduos = useAviso('avisoResiduos', notifActiva, aviso => ({
-    title: '🚛 Mi Baradero — Recolección de Residuos',
+    title: 'Mi Baradero — Recolección de Residuos',
     body: saludar(aviso.mensaje),
   }), 'basura')
 
@@ -225,7 +230,7 @@ export default function Residuos() {
 
               {cerca && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                  <span className="text-2xl">🚛</span>
+                  <Truck className="w-7 h-7 text-red-500 shrink-0" />
                   <div>
                     <p className="font-bold text-red-600">¡El camión está muy cerca!</p>
                     <p className="text-sm text-red-500">Sacá las bolsas al cordón ahora.</p>
@@ -252,6 +257,7 @@ export default function Residuos() {
             {calendario.map((dia) => {
               const esHoy = dia.dia === hoyCapitalizado
               const c = colorMap[dia.color]
+              const IconoDia = ICONO_DIA[dia.color] || XCircle
               return (
                 <div
                   key={dia.dia}
@@ -260,7 +266,7 @@ export default function Residuos() {
                   {esHoy && <span className="text-xs font-bold text-amarillo block mb-1">HOY</span>}
                   <p className="text-xs font-semibold text-gray-600 mb-2">{dia.dia}</p>
                   <div className={`w-10 h-10 rounded-xl ${c.icon} flex items-center justify-center mx-auto mb-2`}>
-                    <span className="text-lg">{dia.icono}</span>
+                    <IconoDia className="w-5 h-5 text-white" />
                   </div>
                   <p className={`text-xs font-medium ${c.text}`}>{dia.tipo}</p>
                 </div>
@@ -296,7 +302,7 @@ export default function Residuos() {
                 </div>
                 {zonaSeleccionada?.id === zona.id && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-verde font-medium">✓ Zona seleccionada — Recibirás alertas aquí</p>
+                    <p className="text-xs text-verde font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
                   </div>
                 )}
               </button>
@@ -327,13 +333,18 @@ export default function Residuos() {
           descripcion="Tips para separar mejor tus residuos"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {consejos.map(c => (
+            {consejos.map(c => {
+              const IconoConsejo = iconoConsejo(c.icono)
+              return (
               <div key={c.titulo} className="card p-5">
-                <div className="text-3xl mb-3">{c.icono}</div>
+                <div className="w-12 h-12 rounded-2xl bg-amarillo/25 text-yellow-700 flex items-center justify-center mb-3">
+                  <IconoConsejo className="w-6 h-6" />
+                </div>
                 <h3 className="font-semibold font-poppins text-gray-800 mb-1">{c.titulo}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{c.descripcion}</p>
               </div>
-            ))}
+              )
+            })}
           </div>
         </AcordeonItem>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Bus, Trash2, Calendar, MapPin, UserCircle, HelpCircle } from 'lucide-react'
+import { Menu, X, Bus, Trash2, Calendar, MapPin, MessageSquare, UserCircle, HelpCircle } from 'lucide-react'
 import LogoMiBaradero from './LogoMiBaradero'
 import { useTutorial } from '../context/TutorialContext'
 
@@ -10,6 +10,7 @@ const navLinks = [
   { to: '/residuos', label: 'Recolección de Residuos', short: 'Residuos', icon: Trash2 },
   { to: '/eventos', label: 'Eventos y Noticias', short: 'Eventos', icon: Calendar },
   { to: '/puntos-verdes', label: 'Puntos Verdes', short: 'Puntos Verdes', icon: MapPin },
+  { to: '/reclamos', label: 'Reclamos y Sugerencias', short: 'Reclamos', icon: MessageSquare },
   { to: '/perfil', label: 'Mi Perfil', short: 'Perfil', icon: UserCircle },
 ]
 

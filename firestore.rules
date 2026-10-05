@@ -101,6 +101,59 @@ service cloud.firestore {
     // Historial de actividad: cualquier trabajador logueado y activo puede
     // agregar una entrada (login/logout/acciones), pero es de solo lectura
     // para el admin, e inmutable para todos (no se edita ni se borra).
+    // Reclamos: quejas, reclamos, sugerencias y felicitaciones que manda
+    // cualquier vecino desde /reclamos, sin login. Siempre nacen en
+    // estado "nuevo" y solo con los campos del formulario — el vecino no
+    // puede escribirse una respuesta ni marcarse el reclamo como resuelto.
+    //
+    // "get" es público (el vecino consulta el estado de SU reclamo por
+    // el id que quedó guardado en su dispositivo, igual que con pasajes);
+    // "list" — recorrer todos los reclamos de todos los vecinos — es solo
+    // del sector reclamos/admin. Cambiar estado, responder o eliminar
+    // también es solo de ellos.
+    //
+    // Cada reclamo tiene un "departamento" (según el tema que eligió el
+    // vecino, o al que lo derivó un empleado). Un sector del panel ve y
+    // atiende solo los de sus departamentos; Atención al Vecino (sector
+    // "reclamos") y el admin, todos. Este mapa tiene que coincidir con
+    // DEPARTAMENTOS en src/data/reclamosData.js.
+    function departamentoValido(depto) {
+      return depto in ['atencionVecino', 'transporte', 'higieneUrbana', 'ambiente', 'cultura',
+                       'obrasPublicas', 'alumbrado', 'espaciosVerdes', 'sistemas'];
+    }
+    function deptosDelSector(sector) {
+      return {
+        'combi': ['transporte'],
+        'residuos': ['higieneUrbana'],
+        'puntosVerdes': ['ambiente'],
+        'eventos': ['cultura']
+      }.get(sector, []);
+    }
+    function atiendeReclamo(depto) {
+      return puedeEditar('reclamos')
+             || (estaLogueado() && estaActivo() && trabajador().rol == 'sector'
+                 && depto in deptosDelSector(trabajador().sector));
+    }
+
+    match /reclamos/{id} {
+      allow get: if true;
+      allow list: if atiendeReclamo(resource.data.departamento);
+      allow create: if request.resource.data.keys()
+                       .hasOnly(['tipo', 'area', 'departamento', 'mensaje', 'ubicacion', 'nombre', 'fotoUrl', 'estado', 'creadoEn', 'actualizadoEn'])
+                     && departamentoValido(request.resource.data.departamento)
+                     && request.resource.data.estado == 'nuevo'
+                     && request.resource.data.tipo in ['queja', 'reclamo', 'sugerencia', 'felicitacion']
+                     && request.resource.data.mensaje is string
+                     && request.resource.data.mensaje.size() >= 10
+                     && request.resource.data.mensaje.size() <= 1000;
+      // Un sector puede cambiar estado, responder y derivar a otro
+      // departamento los reclamos que le llegan; eliminar es solo de
+      // Atención al Vecino / admin.
+      allow update: if atiendeReclamo(resource.data.departamento)
+                    && departamentoValido(request.resource.data.departamento);
+      allow delete: if puedeEditar('reclamos');
+    }
+
     match /historial/{doc} {
       allow create: if estaLogueado() && estaActivo();
       allow read: if esAdmin();

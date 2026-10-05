@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Bus, MapPin, Clock, Users, CheckCircle, Navigation, Bell, BellOff, AlertTriangle, Info, Ticket } from 'lucide-react'
+import { Bus, MapPin, Clock, Users, CheckCircle, Navigation, Bell, BellOff, AlertTriangle, Info, Ticket, Accessibility } from 'lucide-react'
 import { useCombiSimulation } from '../hooks/useCombiSimulation'
 import { useCombiEnVivo } from '../hooks/useCombiEnVivo'
 import { useColeccion } from '../hooks/useColeccion'
@@ -27,7 +27,7 @@ export default function CombiMunicipal() {
     if (enVivo.paradaId !== ultimaParadaId.current) {
       ultimaParadaId.current = enVivo.paradaId
       if (notifActiva) {
-        mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
+        mostrarNotificacion('Mi Baradero — Combi Municipal', {
           body: saludar(`${enVivo.estadoActual}. ¡Prepará tu pasaje!`),
           icon: '/logo-mibaradero.png',
         }, 'combi')
@@ -43,7 +43,7 @@ export default function CombiMunicipal() {
     const permiso = await pedirPermisoNotificacion()
     if (permiso === 'granted') {
       setNotifActiva(true)
-      mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
+      mostrarNotificacion('Mi Baradero — Combi Municipal', {
         body: saludar('Te avisaremos cuando la combi cambie de posición.'),
         icon: '/logo-mibaradero.png',
       }, 'combi')
@@ -70,7 +70,7 @@ export default function CombiMunicipal() {
     if (ultima && ultima.id !== ultimaAlertaId.current) {
       ultimaAlertaId.current = ultima.id
       if (notifActiva) {
-        mostrarNotificacion('🚌 Mi Baradero — Combi Municipal', {
+        mostrarNotificacion('Mi Baradero — Combi Municipal', {
           body: saludar(ultima.mensaje),
           icon: '/logo-mibaradero.png',
         }, 'combi')
@@ -161,8 +161,8 @@ export default function CombiMunicipal() {
                 className="absolute transform -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${p.posX}%`, top: `${p.posY}%` }}
               >
-                <div className="w-8 h-8 rounded-full bg-white border-2 border-verde shadow-md flex items-center justify-center text-sm">
-                  {p.icono}
+                <div className="w-8 h-8 rounded-full bg-white border-2 border-verde shadow-md flex items-center justify-center text-verde">
+                  <p.icono className="w-4 h-4" />
                 </div>
                 {/* max-w + truncate (en vez de whitespace-nowrap sin límite):
                     las paradas están a 20% de distancia entre sí en el mapa, así
@@ -264,7 +264,9 @@ export default function CombiMunicipal() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {paradas.map(p => (
               <div key={p.id} className="card p-5 text-center hover:border-verde hover:border-2 cursor-pointer transition-all">
-                <div className="text-3xl mb-2">{p.icono}</div>
+                <div className="w-12 h-12 rounded-2xl bg-verde/10 text-verde flex items-center justify-center mx-auto mb-3">
+                  <p.icono className="w-6 h-6" />
+                </div>
                 <h3 className="font-semibold font-poppins text-gray-800 text-sm">{p.nombre}</h3>
                 <p className="text-xs text-gray-500 mt-1">{p.descripcion}</p>
               </div>
@@ -329,7 +331,7 @@ function LugaresConPase({ horario }) {
       <span className="text-[11px] text-gray-500">{libres} con pase QR</span>
       {!liberado && hayReservados && (
         <span className="text-[11px] text-gray-400">
-          (♿ {prioritarios.discapacidad.libres}/{prioritarios.discapacidad.reservados} · 👴 {prioritarios.jubilado.libres}/{prioritarios.jubilado.reservados})
+          (<Accessibility className="w-3 h-3 inline -mt-0.5" aria-label="Discapacidad" /> {prioritarios.discapacidad.libres}/{prioritarios.discapacidad.reservados} · Jubilados {prioritarios.jubilado.libres}/{prioritarios.jubilado.reservados})
         </span>
       )}
     </div>

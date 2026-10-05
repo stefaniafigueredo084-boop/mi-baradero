@@ -62,7 +62,7 @@ export default function EnviarAviso({ nombreDoc, seccion, presets, placeholder }
           Enviar
         </button>
       </div>
-      {enviado && <p className="text-verde text-sm font-semibold mt-3">Aviso enviado ✓</p>}
+      {enviado && <p className="text-verde text-sm font-semibold mt-3">Aviso enviado</p>}
     </div>
   )
 }

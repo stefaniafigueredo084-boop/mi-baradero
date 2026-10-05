@@ -10,6 +10,7 @@ export const COMANDOS_VOZ = [
   { ruta: '/residuos', etiqueta: 'Recolección de Residuos', palabras: ['residuo', 'residuos', 'basura', 'camion', 'recoleccion'] },
   { ruta: '/eventos', etiqueta: 'Eventos y Noticias', palabras: ['evento', 'eventos', 'noticia', 'noticias', 'agenda', 'fiesta'] },
   { ruta: '/puntos-verdes', etiqueta: 'Puntos Verdes', palabras: ['punto verde', 'puntos verdes', 'reciclaje', 'reciclar'] },
+  { ruta: '/reclamos', etiqueta: 'Reclamos y Sugerencias', palabras: ['reclamo', 'reclamos', 'queja', 'quejas', 'sugerencia', 'sugerencias', 'denuncia'] },
   { ruta: '/perfil', etiqueta: 'tu Perfil', palabras: ['perfil', 'mis datos', 'mis notificaciones'] },
 ]
 

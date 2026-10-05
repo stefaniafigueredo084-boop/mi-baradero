@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Lightbulb, Loader2, LogOut, MapPin, Megaphone, Navigation, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
+import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Info, Lightbulb, Loader2, LogOut, MapPin, Megaphone, MessageSquare, Navigation, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 import LogoMiBaradero from '../components/LogoMiBaradero'
 import { useTrabajador } from '../hooks/useTrabajador'
@@ -20,6 +20,10 @@ import Vecinos from '../components/panel/Vecinos'
 import SolicitudesCategoria from '../components/panel/SolicitudesCategoria'
 import ConfirmarPago from '../components/panel/ConfirmarPago'
 import EmbarqueScanner from '../components/panel/EmbarqueScanner'
+import ReclamosPanel from '../components/panel/ReclamosPanel'
+import ComoLleganReclamos from '../components/panel/ComoLleganReclamos'
+import { useReclamos } from '../hooks/useReclamos'
+import { DEPARTAMENTOS, departamentoDeReclamo, departamentosDelSector } from '../data/reclamosData'
 import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 import {
   camposEventos,
@@ -36,6 +40,7 @@ const TODAS_LAS_TABS = [
   { id: 'choferes', label: 'Choferes', icon: Car },
   { id: 'residuos', label: 'Residuos', icon: Trash2 },
   { id: 'puntosVerdes', label: 'Puntos Verdes', icon: Recycle },
+  { id: 'reclamos', label: 'Reclamos', icon: MessageSquare },
   { id: 'usuarios', label: 'Usuarios', icon: Users, soloAdmin: true },
   { id: 'vecinos', label: 'Vecinos', icon: UserCheck, soloAdmin: true },
   { id: 'historial', label: 'Historial', icon: HistoryIcon, soloAdmin: true },
@@ -54,6 +59,15 @@ export default function PanelTrabajadores() {
   const pagosPendientes = pasajesTodos.filter(p => p.estado === 'pendiente').length
   const categoriasPendientes = pasajerosTodos.filter(p => p.estadoVerificacion === 'pendiente').length
 
+  // Reclamos de vecinos: el admin y Atención al Vecino (sector
+  // "reclamos") ven todos; cada sector, solo los de sus departamentos.
+  const veTodosLosReclamos = trabajador?.rol === 'admin' || trabajador?.sector === 'reclamos'
+  const { items: reclamos, cargando: cargandoReclamos } = useReclamos(
+    veTodosLosReclamos ? null : departamentosDelSector(trabajador?.sector)
+  )
+  const sinAtender = lista => lista.filter(r => (r.estado || 'nuevo') === 'nuevo').length
+  const reclamosNuevos = sinAtender(reclamos)
+
   useEffect(() => onAuthStateChanged(auth, u => {
     setUsuario(u)
     if (u) registrarHistorial({ tipo: 'login', seccion: 'usuarios', detalle: '' })
@@ -69,6 +83,24 @@ export default function PanelTrabajadores() {
       setTab(tabsVisibles[0].id)
     }
   }, [tabsVisibles, tab])
+
+  // Sección "Reclamos de vecinos" dentro de la pestaña de un sector:
+  // solo los reclamos de los departamentos de ese sector.
+  const acordeonReclamos = sector => {
+    const lista = reclamos.filter(r => departamentoDeReclamo(r).sector === sector)
+    const deptos = DEPARTAMENTOS.filter(d => d.sector === sector).map(d => d.label).join(', ')
+    return (
+      <AcordeonItem
+        icono={MessageSquare}
+        color="amarillo"
+        titulo="Reclamos de vecinos"
+        descripcion={`Quejas y reclamos que llegan a ${deptos}`}
+        badge={sinAtender(lista)}
+      >
+        <ReclamosPanel items={lista} cargando={cargandoReclamos} />
+      </AcordeonItem>
+    )
+  }
 
   const cerrarSesion = async () => {
     await registrarHistorial({ tipo: 'logout', seccion: 'usuarios', detalle: '' })
@@ -142,6 +174,9 @@ export default function PanelTrabajadores() {
                 }`}
               >
                 <Icon className="w-4 h-4" /> {label}
+                {id === 'reclamos' && reclamosNuevos > 0 && (
+                  <span className="bg-red-50 text-red-500 text-xs font-bold px-2 py-0.5 rounded-full">{reclamosNuevos}</span>
+                )}
               </button>
             ))}
           </div>
@@ -169,6 +204,8 @@ export default function PanelTrabajadores() {
                 renderSubtitulo={i => [i.fechaDisplay, i.ubicacion].filter(Boolean).join(' · ')}
               />
             </AcordeonItem>
+
+            {acordeonReclamos('eventos')}
           </Acordeon>
         )}
 
@@ -226,6 +263,8 @@ export default function PanelTrabajadores() {
                 renderSubtitulo={i => `${i.tipo} · combi ${i.horario || ''}`}
               />
             </AcordeonItem>
+
+            {acordeonReclamos('combi')}
           </Acordeon>
         )}
 
@@ -239,7 +278,7 @@ export default function PanelTrabajadores() {
               <EnviarAviso
                 nombreDoc="avisoResiduos"
                 seccion="residuos"
-                presets={['🚛 El camión salió del depósito', '🚛 El camión está llegando a tu zona']}
+                presets={['El camión salió del depósito', 'El camión está llegando a tu zona']}
                 placeholder="O escribí un aviso personalizado..."
               />
             </AcordeonItem>
@@ -263,23 +302,48 @@ export default function PanelTrabajadores() {
                 coleccion="consejosResiduos"
                 seccion="residuos"
                 campos={camposConsejosResiduos}
-                renderTitulo={i => `${i.icono || ''} ${i.titulo}`}
+                renderTitulo={i => i.titulo}
                 renderSubtitulo={i => i.descripcion}
               />
             </AcordeonItem>
+
+            {acordeonReclamos('residuos')}
           </Acordeon>
         )}
 
         {tab === 'puntosVerdes' && (
-          <div>
-            <ColeccionCRUD
-              coleccion="puntosVerdesExtra"
-              seccion="puntosVerdes"
-              campos={camposPuntosVerdes}
-              renderTitulo={i => i.nombre}
-              renderSubtitulo={i => i.direccion}
-            />
-          </div>
+          <Acordeon>
+            <AcordeonItem icono={Recycle} color="verde" titulo="Puntos verdes" descripcion="Agregar o editar puntos de reciclaje" abiertoPorDefecto>
+              <ColeccionCRUD
+                coleccion="puntosVerdesExtra"
+                seccion="puntosVerdes"
+                campos={camposPuntosVerdes}
+                renderTitulo={i => i.nombre}
+                renderSubtitulo={i => i.direccion}
+              />
+            </AcordeonItem>
+
+            {acordeonReclamos('puntosVerdes')}
+          </Acordeon>
+        )}
+
+        {tab === 'reclamos' && (
+          <Acordeon>
+            <AcordeonItem
+              icono={MessageSquare}
+              color="verde"
+              titulo="Bandeja de reclamos"
+              descripcion="Todos los reclamos de vecinos, de todos los departamentos"
+              badge={reclamosNuevos}
+              abiertoPorDefecto
+            >
+              <ReclamosPanel items={reclamos} cargando={cargandoReclamos} completa />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Info} color="azul" titulo="Cómo llegan y quién los atiende" descripcion="El recorrido de un reclamo y qué departamento se encarga de cada tema">
+              <ComoLleganReclamos />
+            </AcordeonItem>
+          </Acordeon>
         )}
 
         {tab === 'usuarios' && esAdmin && (

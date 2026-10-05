@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bus, Trash2, Calendar, MapPin, ChevronRight, ArrowRight, Play, Star, Send, CheckCircle } from 'lucide-react'
+import { Bus, Trash2, Calendar, MapPin, MessageSquare, ChevronRight, ArrowRight, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
 import LogoMiBaradero from '../components/LogoMiBaradero'
@@ -67,56 +67,8 @@ function EventoCard({ evento, destacado }) {
   )
 }
 
-const ETIQUETAS = { 1: 'Muy mala', 2: 'Podría mejorar', 3: 'Está bien', 4: 'Muy buena', 5: '¡Excelente!' }
-const CATEGORIAS = ['Diseño', 'Facilidad de uso', 'Información', 'Velocidad', 'Otro']
-
-function StarRating({ value, onChange }) {
-  const [hovered, setHovered] = useState(0)
-  return (
-    <div className="flex gap-2">
-      {[1, 2, 3, 4, 5].map(n => (
-        <button
-          key={n}
-          type="button"
-          onClick={() => onChange(n)}
-          onMouseEnter={() => setHovered(n)}
-          onMouseLeave={() => setHovered(0)}
-          className="transition-transform duration-150 hover:scale-125 focus:outline-none"
-          aria-label={`${n} estrella${n > 1 ? 's' : ''}`}
-        >
-          <Star className={`w-10 h-10 transition-colors duration-150 ${n <= (hovered || value) ? 'fill-amarillo text-amarillo' : 'text-gray-300'}`} />
-        </button>
-      ))}
-    </div>
-  )
-}
-
 export default function Home() {
   const [filtroEvento, setFiltroEvento] = useState('todos')
-  const [puntuacion, setPuntuacion] = useState(0)
-  const [categoria, setCategoria] = useState('')
-  const [sugerencia, setSugerencia] = useState('')
-  const [enviado, setEnviado] = useState(false)
-  const [errorFeedback, setErrorFeedback] = useState('')
-
-  function handleFeedback(e) {
-    e.preventDefault()
-    if (puntuacion === 0) { setErrorFeedback('Por favor seleccioná una puntuación.'); return }
-    setErrorFeedback('')
-
-    const estrellas = '⭐'.repeat(puntuacion)
-    const lineas = [
-      `*Valoración Mi Baradero*`,
-      `Puntuación: ${estrellas} (${puntuacion}/5) — ${ETIQUETAS[puntuacion]}`,
-      categoria ? `Aspecto destacado: ${categoria}` : null,
-      sugerencia ? `Sugerencia: ${sugerencia}` : null,
-    ].filter(Boolean).join('\n')
-
-    const url = `https://wa.me/5493329383105?text=${encodeURIComponent(lineas)}`
-    window.open(url, '_blank', 'noopener,noreferrer')
-    setEnviado(true)
-  }
-
   const eventosFiltrados = filtroEvento === 'todos'
     ? galeriaEventos
     : galeriaEventos.filter(e => e.tipo === filtroEvento)
@@ -212,6 +164,26 @@ export default function Home() {
               gradient="bg-gradient-to-br from-[#0B6A2E] to-[#064020]"
             />
           </div>
+
+          {/* Reclamos: va aparte de las 4 tarjetas porque no es un servicio
+              que se consulta, sino el canal para escribirle al municipio. */}
+          <Link
+            to="/reclamos"
+            className="group mt-6 lg:mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white border-2 border-gray-200 hover:border-verde rounded-2xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-verde/10 text-verde flex items-center justify-center shrink-0">
+              <MessageSquare className="w-7 h-7" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold font-poppins text-gray-800">Reclamos y Sugerencias</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                ¿Algo no anda bien en tu barrio? Mandá tu queja, reclamo o idea al municipio y seguí la respuesta.
+              </p>
+            </div>
+            <span className="shrink-0 inline-flex items-center gap-2 text-sm font-semibold text-verde group-hover:gap-3 transition-all">
+              Enviar un reclamo <ArrowRight className="w-4 h-4" />
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -299,105 +271,6 @@ export default function Home() {
               Agenda completa
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ── VALORACIÓN ─────────────────────────────────────────────── */}
-      <section id="valoracion" className="py-16 px-4 bg-pattern">
-        <div className="max-w-xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="inline-block bg-amarillo/15 text-yellow-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-3">
-              Tu opinión importa
-            </span>
-            <h2 className="section-title text-gray-800">Valorá la aplicación</h2>
-            <p className="section-subtitle">Contanos cómo fue tu experiencia y qué mejorarías</p>
-          </div>
-
-          {enviado ? (
-            <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="bg-verde/10 rounded-full p-5">
-                  <CheckCircle className="w-14 h-14 text-verde" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold font-poppins text-gray-800 mb-2">¡Gracias por tu opinión!</h3>
-              <p className="text-gray-500 mb-4">Tu valoración nos ayuda a mejorar Mi Baradero para todos los vecinos.</p>
-              <div className="flex justify-center gap-1 mb-3">
-                {[1,2,3,4,5].map(n => (
-                  <Star key={n} className={`w-7 h-7 ${n <= puntuacion ? 'fill-amarillo text-amarillo' : 'text-gray-200'}`} />
-                ))}
-              </div>
-              <p className="text-verde font-semibold text-lg mb-6">{ETIQUETAS[puntuacion]}</p>
-              <button onClick={() => { setPuntuacion(0); setCategoria(''); setSugerencia(''); setEnviado(false) }} className="btn-primary">
-                Enviar otra valoración
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleFeedback} className="bg-white rounded-3xl shadow-xl overflow-hidden">
-
-              {/* Estrellas */}
-              <div className="p-8 border-b border-gray-100">
-                <h3 className="font-bold font-poppins text-gray-800 mb-5 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-amarillo fill-amarillo" /> Puntuación general
-                </h3>
-                <div className="flex flex-col items-center gap-3">
-                  <StarRating value={puntuacion} onChange={setPuntuacion} />
-                  {puntuacion > 0 && <span className="text-verde font-semibold">{ETIQUETAS[puntuacion]}</span>}
-                  {errorFeedback && <p className="text-red-500 text-sm">{errorFeedback}</p>}
-                </div>
-              </div>
-
-              {/* Categoría */}
-              <div className="p-8 border-b border-gray-100">
-                <h3 className="font-bold font-poppins text-gray-800 mb-4">
-                  ¿Qué aspecto querés destacar?{' '}
-                  <span className="text-gray-400 font-normal text-sm">(opcional)</span>
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIAS.map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setCategoria(categoria === cat ? '' : cat)}
-                      className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
-                        categoria === cat
-                          ? 'bg-verde text-white border-verde shadow-md shadow-verde/20'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-verde hover:text-verde'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sugerencia */}
-              <div className="p-8 border-b border-gray-100">
-                <h3 className="font-bold font-poppins text-gray-800 mb-4">
-                  ¿Qué mejorarías?{' '}
-                  <span className="text-gray-400 font-normal text-sm">(opcional)</span>
-                </h3>
-                <textarea
-                  value={sugerencia}
-                  onChange={e => setSugerencia(e.target.value)}
-                  placeholder="Contanos qué le agregarías, qué cambiarías o qué no te gustó..."
-                  maxLength={500}
-                  rows={4}
-                  className="input-field resize-none text-sm leading-relaxed"
-                />
-                <p className="text-gray-400 text-xs text-right mt-1">{sugerencia.length}/500</p>
-              </div>
-
-              {/* Enviar */}
-              <div className="p-8 bg-gray-50">
-                <button type="submit" className="btn-primary w-full flex items-center justify-center gap-2 text-base">
-                  <Send className="w-5 h-5" /> Enviar valoración
-                </button>
-                <p className="text-gray-400 text-xs text-center mt-3">Tu opinión es anónima y nos ayuda a mejorar la plataforma.</p>
-              </div>
-
-            </form>
-          )}
         </div>
       </section>
 

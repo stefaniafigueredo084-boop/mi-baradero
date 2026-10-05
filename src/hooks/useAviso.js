@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
 import { mostrarNotificacion } from '../utils/notificaciones'
+import { sinEmojis } from '../utils/texto'
+
+// Un aviso guardado antes de sacar los emojis del sitio puede traer
+// alguno en el texto: se limpia al leerlo.
+const limpiarAviso = datos =>
+  Object.fromEntries(Object.entries(datos).map(([clave, valor]) => [clave, typeof valor === 'string' ? sinEmojis(valor) : valor]))
 
 // Escucha el documento config/{nombreDoc} donde el panel de trabajadores
 // publica avisos puntuales (EnviarAviso). Devuelve el último aviso, y si
@@ -15,7 +21,7 @@ export function useAviso(nombreDoc, activo, formatear, sector) {
 
   useEffect(() => {
     return onSnapshot(doc(db, 'config', nombreDoc), snap => {
-      const datos = snap.exists() ? snap.data() : null
+      const datos = snap.exists() ? limpiarAviso(snap.data()) : null
       setAviso(datos)
       if (ultimoEnviadoEn.current === undefined) {
         ultimoEnviadoEn.current = datos?.enviadoEn ?? null
