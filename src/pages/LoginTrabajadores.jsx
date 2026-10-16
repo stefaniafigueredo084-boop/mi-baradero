@@ -44,14 +44,14 @@ export default function LoginTrabajadores() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-verde-oscuro to-[#064020] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-primario-oscuro to-[#171A45] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <LogoMiBaradero size="md" theme="white" />
         </div>
-        <form onSubmit={ingresar} className="bg-white rounded-3xl shadow-2xl p-7">
+        <form onSubmit={ingresar} className="bg-white rounded shadow-2xl p-7">
           <div className="flex items-center gap-2 mb-1">
-            <Shield className="w-5 h-5 text-verde" />
+            <Shield className="w-5 h-5 text-primario" />
             <h1 className="text-xl font-bold font-poppins text-gray-800">Panel de Trabajadores</h1>
           </div>
           <p className="text-gray-500 text-sm mb-6">Acceso exclusivo para personal municipal</p>

@@ -58,7 +58,7 @@ export default function SolicitudesCategoria() {
   return (
     <div className="mb-10">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <ShieldQuestion className="w-5 h-5 text-verde" /> Solicitudes de categoría
+        <ShieldQuestion className="w-5 h-5 text-primario" /> Solicitudes de categoría
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         Estudiante, jubilado o discapacidad: revisá el documento y aprobá o rechazá el pase con beneficio.
@@ -129,7 +129,7 @@ export default function SolicitudesCategoria() {
                     <button
                       onClick={() => aprobar(item)}
                       disabled={procesando === item.id}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-verde text-white hover:bg-verde-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-primario text-white hover:bg-primario-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
                     >
                       {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       Aprobar

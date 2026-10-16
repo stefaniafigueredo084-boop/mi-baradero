@@ -81,7 +81,7 @@ export const noticias = [
     fechaDisplay: 'hace 4 días',
     categoria: 'Obras Públicas',
     resumen: 'El municipio finalizó la instalación de 320 luminarias LED en las calles del centro histórico, reduciendo el consumo eléctrico un 60%.',
-    color: '#1B8E3E',
+    color: '#3D8B68',
   },
   {
     id: 2,
@@ -90,7 +90,7 @@ export const noticias = [
     fechaDisplay: 'hace 7 días',
     categoria: 'Educación',
     resumen: 'Se abrió la inscripción para las becas de estudio municipales. Hasta 200 becas disponibles para estudiantes universitarios.',
-    color: '#1D8FE1',
+    color: '#17A673',
   },
   {
     id: 3,
@@ -99,7 +99,7 @@ export const noticias = [
     fechaDisplay: 'hace 10 días',
     categoria: 'Turismo',
     resumen: 'La Secretaría de Turismo de la Provincia distinguió a Baradero como uno de los 10 destinos turísticos más visitados de Buenos Aires.',
-    color: '#0057B8',
+    color: '#0F7A54',
   },
   {
     id: 4,
@@ -108,7 +108,7 @@ export const noticias = [
     fechaDisplay: 'hace 12 días',
     categoria: 'Deportes',
     resumen: 'Alumnos de escuelas de Baradero participarán en los Juegos Bonaerenses 2026 representando al partido.',
-    color: '#0B6A2E',
+    color: '#285E47',
   },
   {
     id: 5,
@@ -117,7 +117,7 @@ export const noticias = [
     fechaDisplay: 'hace 17 días',
     categoria: 'Obras Públicas',
     resumen: 'Comenzaron las obras de renovación del parque sobre el río Baradero con nuevos senderos, juegos y espacios verdes.',
-    color: '#1B8E3E',
+    color: '#3D8B68',
   },
   {
     id: 6,
@@ -126,7 +126,7 @@ export const noticias = [
     fechaDisplay: 'hace 21 días',
     categoria: 'Salud',
     resumen: 'El municipio realiza feria de salud con atención odontológica, oftalmológica y controles generales sin cargo en barrios periféricos.',
-    color: '#F5C400',
+    color: '#FF6B4A',
   },
 ]
 

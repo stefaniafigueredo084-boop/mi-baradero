@@ -75,9 +75,9 @@ export default function AgregarTrabajador() {
   }
 
   return (
-    <div className="card p-6 max-w-lg">
+    <div className="card p-4 max-w-lg">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <UserPlus className="w-5 h-5 text-verde" /> Agregar trabajador
+        <UserPlus className="w-5 h-5 text-primario" /> Agregar trabajador
       </h3>
       <p className="text-gray-500 text-sm mb-5">Creá una cuenta para que otro empleado pueda entrar al panel.</p>
       <form onSubmit={crear} className="space-y-4">
@@ -107,17 +107,17 @@ export default function AgregarTrabajador() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Acceso al panel</label>
           <div className="space-y-2">
-            <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-colors ${acceso === 'admin' ? 'border-verde bg-verde/5' : 'border-gray-200'}`}>
-              <input type="radio" name="acceso" checked={acceso === 'admin'} onChange={() => setAcceso('admin')} className="accent-verde w-4 h-4" />
-              <ShieldCheck className="w-4 h-4 text-verde shrink-0" />
+            <label className={`flex items-center gap-2.5 p-3 rounded border-2 cursor-pointer transition-colors ${acceso === 'admin' ? 'border-primario bg-primario/5' : 'border-gray-200'}`}>
+              <input type="radio" name="acceso" checked={acceso === 'admin'} onChange={() => setAcceso('admin')} className="accent-primario w-4 h-4" />
+              <ShieldCheck className="w-4 h-4 text-primario shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-gray-800">Administrador general</p>
                 <p className="text-xs text-gray-500">Accede a todas las secciones y al historial de actividad.</p>
               </div>
             </label>
             {SECTORES.map(s => (
-              <label key={s.id} className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-colors ${acceso === s.id ? 'border-azul bg-azul/5' : 'border-gray-200'}`}>
-                <input type="radio" name="acceso" checked={acceso === s.id} onChange={() => setAcceso(s.id)} className="accent-azul w-4 h-4" />
+              <label key={s.id} className={`flex items-center gap-2.5 p-3 rounded border-2 cursor-pointer transition-colors ${acceso === s.id ? 'border-secundario bg-secundario/5' : 'border-gray-200'}`}>
+                <input type="radio" name="acceso" checked={acceso === s.id} onChange={() => setAcceso(s.id)} className="accent-secundario w-4 h-4" />
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Solo {s.label}</p>
                   <p className="text-xs text-gray-500">Únicamente puede ver y editar esta sección.</p>
@@ -134,15 +134,15 @@ export default function AgregarTrabajador() {
               {horarios.map(h => (
                 <label
                   key={h.id}
-                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border-2 cursor-pointer transition-colors ${
-                    horariosAsignados.includes(h.id) ? 'border-azul bg-azul/5' : 'border-gray-200'
+                  className={`flex items-center gap-2.5 p-2.5 rounded border-2 cursor-pointer transition-colors ${
+                    horariosAsignados.includes(h.id) ? 'border-secundario bg-secundario/5' : 'border-gray-200'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={horariosAsignados.includes(h.id)}
                     onChange={() => alternarHorario(h.id)}
-                    className="accent-azul w-4 h-4"
+                    className="accent-secundario w-4 h-4"
                   />
                   <span className="text-sm text-gray-800">{h.salida} — {h.origen} → {h.destino}</span>
                 </label>
@@ -153,7 +153,7 @@ export default function AgregarTrabajador() {
         )}
 
         {resultado && (
-          <p className={`text-sm flex items-center gap-1.5 ${resultado.ok ? 'text-verde' : 'text-red-500'}`}>
+          <p className={`text-sm flex items-center gap-1.5 ${resultado.ok ? 'text-primario' : 'text-red-500'}`}>
             {resultado.ok ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
             {resultado.mensaje}
           </p>

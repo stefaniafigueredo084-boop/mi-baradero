@@ -24,7 +24,7 @@ function MiReclamo({ reclamo }) {
   const tipo = tipoReclamoPorId(reclamo.tipo)
   const estado = estadoReclamoPorId(reclamo.estado)
   return (
-    <div className="bg-white rounded-2xl shadow-md p-5">
+    <div className="bg-white rounded shadow-md p-5">
       <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`badge text-xs font-semibold ${tipo.color}`}><tipo.icono className="w-3.5 h-3.5" /> {tipo.label}</span>
@@ -38,8 +38,8 @@ function MiReclamo({ reclamo }) {
         {' · '}Lo atiende: {departamentoDeReclamo(reclamo).label}
       </p>
       {reclamo.respuesta && (
-        <div className="mt-3 bg-green-50 border border-green-200 rounded-xl p-3">
-          <p className="text-xs font-bold text-verde mb-1">Respuesta del municipio</p>
+        <div className="mt-3 bg-green-50 border border-green-200 rounded p-3">
+          <p className="text-xs font-bold text-primario mb-1">Respuesta del municipio</p>
           <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words">{reclamo.respuesta}</p>
         </div>
       )}
@@ -112,32 +112,32 @@ export default function Reclamos() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-verde-oscuro to-azul text-white py-10 sm:py-12 px-4">
-        <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-            <MessageSquare className="w-7 h-7 sm:w-8 sm:h-8" />
+      <div className="bg-primario text-white py-5 sm:py-6 px-4">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Reclamos y Sugerencias</h1>
+            <h1 className="text-xl sm:text-2xl font-bold font-poppins">Reclamos y Sugerencias</h1>
             <p className="text-white/80 text-sm sm:text-base">Contale al municipio qué pasa en tu barrio y seguí la respuesta</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-10">
+      <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
 
         {enviado ? (
-          <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 text-center">
+          <div className="bg-white rounded shadow-xl p-8 sm:p-10 text-center">
             <div className="flex justify-center mb-4">
-              <div className="bg-verde/10 rounded-full p-5">
-                <CheckCircle className="w-14 h-14 text-verde" />
+              <div className="bg-secundario/10 rounded-full p-5">
+                <CheckCircle className="w-14 h-14 text-secundario" />
               </div>
             </div>
             <h2 className="text-2xl font-bold font-poppins text-gray-800 mb-2">¡Recibimos tu mensaje!</h2>
             <p className="text-gray-500 mb-4">
               Ya le llegó al municipio. Guardá este código por si necesitás consultar:
             </p>
-            <p className="inline-block bg-gray-100 text-gray-800 font-bold font-poppins text-xl tracking-widest px-5 py-2.5 rounded-xl mb-6">
+            <p className="inline-block bg-gray-100 text-gray-800 font-bold font-poppins text-xl tracking-widest px-5 py-2.5 rounded mb-6">
               {codigoReclamo(enviado.id)}
             </p>
             <p className="text-gray-500 text-sm mb-6">
@@ -148,7 +148,7 @@ export default function Reclamos() {
             </button>
           </div>
         ) : (
-          <form onSubmit={enviar} className="bg-white rounded-3xl shadow-xl overflow-hidden" id="reclamos-form">
+          <form onSubmit={enviar} className="bg-white rounded shadow-xl overflow-hidden" id="reclamos-form">
 
             {/* Tipo */}
             <div className="p-6 sm:p-8 border-b border-gray-100">
@@ -160,10 +160,10 @@ export default function Reclamos() {
                     type="button"
                     onClick={() => setTipo(t.id)}
                     aria-pressed={tipo === t.id}
-                    className={`text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+                    className={`text-left p-4 rounded border-2 transition-all duration-200 ${
                       tipo === t.id
-                        ? 'border-verde bg-verde/10'
-                        : 'border-gray-200 hover:border-verde'
+                        ? 'border-primario bg-primario/10'
+                        : 'border-gray-200 hover:border-primario'
                     }`}
                   >
                     <span className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-2 ${t.color}`} aria-hidden="true">
@@ -188,8 +188,8 @@ export default function Reclamos() {
                     aria-pressed={area === a.id}
                     className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
                       area === a.id
-                        ? 'bg-verde text-white border-verde shadow-md shadow-verde/20'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-verde hover:text-verde'
+                        ? 'bg-primario text-white border-primario shadow-md shadow-primario/20'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-primario hover:text-primario'
                     }`}
                   >
                     {a.label}
@@ -218,7 +218,7 @@ export default function Reclamos() {
 
               <div>
                 <label htmlFor="reclamo-ubicacion" className="font-bold font-poppins text-gray-800 mb-3 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-verde" /> ¿Dónde es?
+                  <MapPin className="w-4 h-4 text-primario" /> ¿Dónde es?
                   <span className="text-gray-400 font-normal text-sm">(opcional)</span>
                 </label>
                 <input
@@ -234,11 +234,11 @@ export default function Reclamos() {
 
               <div>
                 <p className="font-bold font-poppins text-gray-800 mb-3 flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-verde" /> Foto
+                  <Camera className="w-4 h-4 text-primario" /> Foto
                   <span className="text-gray-400 font-normal text-sm">(opcional)</span>
                 </p>
                 {foto && (
-                  <div className="relative w-full h-44 rounded-2xl overflow-hidden mb-3 border-2 border-gray-200">
+                  <div className="relative w-full h-44 rounded overflow-hidden mb-3 border-2 border-gray-200">
                     <img src={foto} alt="Foto adjunta al reclamo" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -250,7 +250,7 @@ export default function Reclamos() {
                     </button>
                   </div>
                 )}
-                <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 hover:border-verde hover:text-verde font-semibold text-sm transition-colors">
+                <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded border-2 border-gray-200 text-gray-600 hover:border-primario hover:text-primario font-semibold text-sm transition-colors">
                   {procesandoFoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                   {foto ? 'Cambiar foto' : 'Agregar una foto'}
                   <input type="file" accept="image/*" className="hidden" onChange={manejarFoto} disabled={procesandoFoto} />
@@ -295,7 +295,7 @@ export default function Reclamos() {
         {/* Mis reclamos */}
         <section id="mis-reclamos">
           <h2 className="font-bold font-poppins text-xl text-gray-800 flex items-center gap-2 mb-1">
-            <ClipboardList className="w-5 h-5 text-verde" /> Mis reclamos
+            <ClipboardList className="w-5 h-5 text-primario" /> Mis reclamos
           </h2>
           <p className="text-gray-500 text-sm mb-5">Lo que enviaste desde este dispositivo y en qué estado está.</p>
 

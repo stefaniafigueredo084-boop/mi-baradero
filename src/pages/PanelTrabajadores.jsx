@@ -110,7 +110,7 @@ export default function PanelTrabajadores() {
   if (usuario === undefined || (usuario && trabajador === undefined)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-8 h-8 text-verde animate-spin" />
+        <Loader2 className="w-8 h-8 text-primario animate-spin" />
       </div>
     )
   }
@@ -134,7 +134,7 @@ export default function PanelTrabajadores() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-verde-oscuro to-[#064020] text-white py-8 px-4">
+      <div className="bg-gradient-to-br from-primario-oscuro to-[#171A45] text-white py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <Link
             to="/"
@@ -146,7 +146,7 @@ export default function PanelTrabajadores() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Panel de Trabajadores</h1>
-              <p className="text-green-200 text-sm mt-1">
+              <p className="text-white/80 text-sm mt-1">
                 Conectado como {usuario.email}
                 {!esAdmin && trabajador?.sector && <> · Sector: {TODAS_LAS_TABS.find(t => t.id === trabajador.sector)?.label}</>}
                 {esAdmin && <> · Administrador general</>}
@@ -170,7 +170,7 @@ export default function PanelTrabajadores() {
                 key={id}
                 onClick={() => setTab(id)}
                 className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all ${
-                  tab === id ? 'bg-verde text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-verde'
+                  tab === id ? 'bg-primario text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-primario'
                 }`}
               >
                 <Icon className="w-4 h-4" /> {label}

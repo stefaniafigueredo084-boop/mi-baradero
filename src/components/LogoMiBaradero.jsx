@@ -27,7 +27,7 @@ export default function LogoMiBaradero({ size = 'md', theme = 'color' }) {
         className="font-poppins font-bold tracking-tight"
         style={{
           fontSize: h * 0.38,
-          color: isWhite ? 'white' : '#0B6A2E',
+          color: isWhite ? 'white' : '#285E47',
         }}
       >
         Mi Baradero

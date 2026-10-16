@@ -25,9 +25,9 @@ export default function CombiEnVivo() {
   const actual = paradas.find(p => p.id === paradaId)
 
   return (
-    <div className="card p-6 mb-8">
+    <div className="card p-4 mb-8">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <Navigation className="w-5 h-5 text-verde" /> Combi en vivo
+        <Navigation className="w-5 h-5 text-primario" /> Combi en vivo
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         Marcá dónde está la combi ahora: se actualiza al instante para todos los vecinos y les llega una notificación.
@@ -38,8 +38,8 @@ export default function CombiEnVivo() {
             key={p.id}
             disabled={guardando}
             onClick={() => marcar(p)}
-            className={`p-4 rounded-2xl border-2 text-center transition-all disabled:opacity-50 ${
-              paradaId === p.id ? 'bg-verde text-white border-verde shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+            className={`p-4 rounded border-2 text-center transition-all disabled:opacity-50 ${
+              paradaId === p.id ? 'bg-primario text-white border-primario shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-primario'
             }`}
           >
             <p.icono className="w-7 h-7 mx-auto mb-1.5" />

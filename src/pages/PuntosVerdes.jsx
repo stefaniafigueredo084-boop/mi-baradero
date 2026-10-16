@@ -10,19 +10,19 @@ const instrucciones = [
     icono: ShoppingBag,
     titulo: 'Bolsas separadas',
     descripcion: 'Llevá los reciclables en una bolsa separada de los residuos orgánicos. No mezcles.',
-    color: '#1B8E3E',
+    color: '#3D8B68',
   },
   {
     icono: Droplets,
     titulo: 'Envases limpios',
     descripcion: 'Enjuagá botellas, latas y envases antes de llevarlos. No es necesario que estén perfectos.',
-    color: '#1D8FE1',
+    color: '#17A673',
   },
   {
     icono: Package,
     titulo: 'Aplastar y doblar',
     descripcion: 'Aplastá botellas plásticas y doblá cajas de cartón para ocupar menos espacio.',
-    color: '#F5C400',
+    color: '#FF6B4A',
   },
   {
     icono: Ban,
@@ -40,7 +40,7 @@ const instrucciones = [
     icono: GlassWater,
     titulo: 'Vidrio con cuidado',
     descripcion: 'El vidrio va envuelto o en bolsa resistente para evitar accidentes al depositarlo.',
-    color: '#0B6A2E',
+    color: '#285E47',
   },
 ]
 
@@ -72,19 +72,19 @@ export default function PuntosVerdes() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero azul */}
-      <div className="bg-gradient-to-br from-azul-oscuro to-azul text-white py-10 sm:py-12 px-4">
-        <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-            <Recycle className="w-7 h-7 sm:w-8 sm:h-8" />
+      <div className="bg-primario text-white py-5 sm:py-6 px-4">
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+            <Recycle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Puntos Verdes</h1>
-            <p className="text-blue-200 text-sm sm:text-base">Reciclá cerca de vos y cuidá Baradero</p>
+            <h1 className="text-xl sm:text-2xl font-bold font-poppins">Puntos Verdes</h1>
+            <p className="text-white/80 text-sm sm:text-base">Reciclá cerca de vos y cuidá Baradero</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 py-5 space-y-6">
 
         <Acordeon>
           <AcordeonItem
@@ -117,7 +117,7 @@ export default function PuntosVerdes() {
           >
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {Object.entries(materialesInfo).map(([nombre, info]) => (
-                <div key={nombre} className="card p-4 text-center hover:border-verde hover:border-2 transition-all cursor-pointer">
+                <div key={nombre} className="card p-4 text-center hover:border-primario hover:border-2 transition-all cursor-pointer">
                   <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ backgroundColor: info.color + '20' }}>
                     <Recycle className="w-5 h-5" style={{ color: info.color }} />
                   </div>
@@ -134,9 +134,9 @@ export default function PuntosVerdes() {
           {/* Mapa simulado */}
           <div className="lg:col-span-3">
             <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-azul" /> Mapa de Puntos Verdes
+              <MapPin className="w-5 h-5 text-secundario" /> Mapa de Puntos Verdes
             </h2>
-            <div className="relative bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl border border-gray-200 h-80 overflow-hidden">
+            <div className="relative bg-gradient-to-br from-emerald-50 to-green-50 rounded border border-gray-200 h-80 overflow-hidden">
               {/* Grid de mapa ficticio */}
               <div className="absolute inset-0 opacity-20">
                 {Array.from({ length: 8 }, (_, i) => (
@@ -168,8 +168,8 @@ export default function PuntosVerdes() {
                   <div className={`w-10 h-10 rounded-full border-3 flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 ${
                     punto.activo
                       ? puntoSeleccionado?.id === punto.id
-                        ? 'bg-azul border-azul-oscuro scale-125'
-                        : 'bg-verde border-verde-oscuro'
+                        ? 'bg-secundario border-secundario-oscuro scale-125'
+                        : 'bg-primario border-primario-oscuro'
                       : 'bg-gray-400 border-gray-500'
                   }`} style={{ border: '3px solid' }}>
                     <Recycle className="w-4 h-4 text-white" />
@@ -181,9 +181,9 @@ export default function PuntosVerdes() {
               ))}
 
               {/* Leyenda */}
-              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-xl p-2.5 text-xs space-y-1.5">
+              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded p-2.5 text-xs space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-verde" />
+                  <div className="w-4 h-4 rounded-full bg-primario" />
                   <span className="text-gray-600">Activo</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export default function PuntosVerdes() {
           {/* Lista de puntos */}
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
-              <Leaf className="w-5 h-5 text-verde" /> Lista de Puntos
+              <Leaf className="w-5 h-5 text-primario" /> Lista de Puntos
             </h2>
             <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-hide pr-1">
               {puntosVerdes.map(punto => (
@@ -210,7 +210,7 @@ export default function PuntosVerdes() {
                   onClick={() => setPuntoSeleccionado(puntoSeleccionado?.id === punto.id ? null : punto)}
                   className={`w-full card p-4 text-left border-2 transition-all ${
                     puntoSeleccionado?.id === punto.id
-                      ? 'border-azul ring-2 ring-azul/20'
+                      ? 'border-secundario ring-2 ring-secundario/20'
                       : 'border-transparent'
                   } ${!punto.activo ? 'opacity-60' : ''}`}
                 >
@@ -220,7 +220,7 @@ export default function PuntosVerdes() {
                       <p className="text-xs text-gray-500 mt-0.5 truncate">{punto.direccion}</p>
                     </div>
                     {punto.activo
-                      ? <CheckCircle className="w-4 h-4 text-verde shrink-0" />
+                      ? <CheckCircle className="w-4 h-4 text-secundario shrink-0" />
                       : <XCircle className="w-4 h-4 text-red-400 shrink-0" />
                     }
                   </div>
@@ -230,7 +230,7 @@ export default function PuntosVerdes() {
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {punto.materiales.slice(0, 3).map(m => (
-                      <span key={m} className="text-xs px-2 py-0.5 rounded-full bg-verde/10 text-verde">{m}</span>
+                      <span key={m} className="text-xs px-2 py-0.5 rounded-full bg-primario/10 text-primario">{m}</span>
                     ))}
                     {punto.materiales.length > 3 && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">+{punto.materiales.length - 3}</span>
@@ -244,24 +244,24 @@ export default function PuntosVerdes() {
 
         {/* Detalle del punto seleccionado */}
         {puntoSeleccionado && (
-          <div className="card p-6 border-2 border-azul/30 animate-slide-up">
+          <div className="card p-4 border-2 border-secundario/30 animate-slide-up">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-xl font-bold font-poppins text-gray-800">{puntoSeleccionado.nombre}</h3>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <MapPin className="w-4 h-4 text-azul" />
+                  <MapPin className="w-4 h-4 text-secundario" />
                   <span className="text-gray-500 text-sm">{puntoSeleccionado.direccion}</span>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
-                <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-verde/10 text-verde' : 'bg-red-100 text-red-500'}`}>
+                <span className={`badge text-sm ${puntoSeleccionado.activo ? 'bg-primario/10 text-primario' : 'bg-red-100 text-red-500'}`}>
                   {puntoSeleccionado.activo ? '● Activo' : '● Inactivo'}
                 </span>
                 <a
                   href={linkComoLlegar(puntoSeleccionado)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 bg-azul text-white text-sm font-semibold px-3.5 py-2 rounded-xl hover:bg-azul-oscuro transition-colors shrink-0"
+                  className="flex items-center gap-1.5 bg-secundario text-white text-sm font-semibold px-3.5 py-2 rounded-xl hover:bg-secundario-oscuro transition-colors shrink-0"
                 >
                   <Navigation className="w-4 h-4" /> Cómo llegar
                 </a>
@@ -269,22 +269,22 @@ export default function PuntosVerdes() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-              <div className="bg-gray-50 rounded-xl p-4">
+              <div className="bg-gray-50 rounded p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-azul" />
+                  <Clock className="w-4 h-4 text-secundario" />
                   <span className="font-semibold text-gray-700 text-sm">Horario</span>
                 </div>
                 <p className="text-gray-600 text-sm">{puntoSeleccionado.horario}</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
+              <div className="bg-gray-50 rounded p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <BarChart3 className="w-4 h-4 text-verde" />
+                  <BarChart3 className="w-4 h-4 text-primario" />
                   <span className="font-semibold text-gray-700 text-sm">Capacidad actual</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${puntoSeleccionado.capacidad > 80 ? 'bg-red-400' : puntoSeleccionado.capacidad > 50 ? 'bg-amarillo' : 'bg-verde'}`}
+                      className={`h-2 rounded-full ${puntoSeleccionado.capacidad > 80 ? 'bg-red-400' : puntoSeleccionado.capacidad > 50 ? 'bg-acento' : 'bg-primario'}`}
                       style={{ width: `${puntoSeleccionado.capacidad}%` }}
                     />
                   </div>
@@ -295,14 +295,14 @@ export default function PuntosVerdes() {
 
             <div>
               <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Recycle className="w-4 h-4 text-verde" />
+                <Recycle className="w-4 h-4 text-primario" />
                 Materiales aceptados
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {puntoSeleccionado.materiales.map(mat => {
                   const info = materialesInfo[mat]
                   return (
-                    <div key={mat} className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+                    <div key={mat} className="flex items-center gap-2 p-2.5 rounded bg-gray-50 border border-gray-100">
                       <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: info?.color || '#888' }} />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-800">{mat}</p>

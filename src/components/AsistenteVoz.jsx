@@ -169,10 +169,10 @@ export default function AsistenteVoz({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col animate-slide-up">
+      <div className="bg-white rounded shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col animate-slide-up">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="font-bold font-poppins text-gray-800 flex items-center gap-2">
-            {escuchando ? <Mic className="w-5 h-5 text-verde animate-pulse" /> : <MicOff className="w-5 h-5 text-gray-400" />}
+            {escuchando ? <Mic className="w-5 h-5 text-primario animate-pulse" /> : <MicOff className="w-5 h-5 text-gray-400" />}
             Asistente de voz
           </h3>
           <button onClick={cerrar} className="p-2 rounded-xl hover:bg-gray-100 transition-colors" aria-label="Cerrar">
@@ -193,7 +193,7 @@ export default function AsistenteVoz({ onClose }) {
               <div key={i} className={`flex ${m.quien === 'bot' ? 'justify-start' : 'justify-end'}`}>
                 <div
                   className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${
-                    m.quien === 'bot' ? 'bg-gray-100 text-gray-800' : 'bg-verde text-white'
+                    m.quien === 'bot' ? 'bg-gray-100 text-gray-800' : 'bg-primario text-white'
                   }`}
                 >
                   {m.texto}

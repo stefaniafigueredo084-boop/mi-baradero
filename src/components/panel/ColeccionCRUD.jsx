@@ -84,7 +84,7 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
   return (
     <div>
       {editandoId ? (
-        <form onSubmit={guardar} className="card p-6 mb-6 space-y-4">
+        <form onSubmit={guardar} className="card p-4 mb-6 space-y-4">
           <h3 className="font-bold font-poppins text-lg text-gray-800">
             {editandoId === 'nuevo' ? 'Nuevo registro' : 'Editar registro'}
           </h3>
@@ -128,7 +128,7 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
               <div className="flex gap-2 shrink-0">
                 <button
                   onClick={() => empezarEdicion(item)}
-                  className="p-2.5 rounded-xl bg-azul/10 text-azul hover:bg-azul/20 transition-colors"
+                  className="p-2.5 rounded-xl bg-secundario/10 text-secundario hover:bg-secundario/20 transition-colors"
                   aria-label="Editar"
                 >
                   <Pencil className="w-4 h-4" />

@@ -10,7 +10,7 @@ export const paradas = [
 ]
 
 export const rutas = [
-  { id: 1, nombre: 'Ruta Alsina - Portela - Baradero', color: '#1B8E3E' },
+  { id: 1, nombre: 'Ruta Alsina - Portela - Baradero', color: '#3D8B68' },
 ]
 
 export const horarios = [

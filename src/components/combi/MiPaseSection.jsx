@@ -14,7 +14,7 @@ import CopiarCampo from '../CopiarCampo'
 import PaseQR from '../pase/PaseQR'
 
 const COLOR_CATEGORIA = {
-  azul: 'border-azul bg-azul/5 text-azul-oscuro',
+  azul: 'border-secundario bg-secundario/5 text-secundario-oscuro',
   amber: 'border-amber-400 bg-amber-50 text-amber-700',
   teal: 'border-teal-500 bg-teal-50 text-teal-700',
 }
@@ -110,9 +110,9 @@ export default function MiPaseSection() {
   }
 
   return (
-    <div className="card p-6 lg:p-8">
+    <div className="card p-4 lg:p-8">
       <div className="flex items-center gap-2 mb-1">
-        <Ticket className="w-5 h-5 text-verde" />
+        <Ticket className="w-5 h-5 text-primario" />
         <h2 className="text-xl font-bold font-poppins">Mi Pase</h2>
       </div>
       <p className="text-gray-500 text-sm mb-6">
@@ -122,7 +122,7 @@ export default function MiPaseSection() {
       {!tieneNombre ? (
         <form onSubmit={guardarNombre} className="max-w-sm space-y-3">
           <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-            <Contact className="w-4 h-4 text-verde" /> Antes, ¿cómo te llamás?
+            <Contact className="w-4 h-4 text-primario" /> Antes, ¿cómo te llamás?
           </p>
           <input className="input-field" placeholder="Nombre" value={nombreForm} onChange={e => setNombreForm(e.target.value)} required />
           <input className="input-field" placeholder="Apellido" value={apellidoForm} onChange={e => setApellidoForm(e.target.value)} />
@@ -161,7 +161,7 @@ export default function MiPaseSection() {
           {!horario && <p className="text-sm text-gray-400">Elegí fecha y horario para ver el precio y comprar tu pasaje.</p>}
 
           {horario && cargandoPasaje && (
-            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 text-verde animate-spin" /></div>
+            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 text-primario animate-spin" /></div>
           )}
 
           {horario && !cargandoPasaje && !pasaje && (
@@ -175,9 +175,9 @@ export default function MiPaseSection() {
                   return (
                     <div
                       key={cat.id}
-                      className={`rounded-xl border-2 p-4 transition-colors ${
+                      className={`rounded border-2 p-4 transition-colors ${
                         categoriaId === cat.id && !bloqueada
-                          ? (COLOR_CATEGORIA[cat.color] || 'border-verde bg-verde/5 text-verde-oscuro')
+                          ? (COLOR_CATEGORIA[cat.color] || 'border-primario bg-primario/5 text-primario-oscuro')
                           : 'border-gray-200'
                       }`}
                     >
@@ -188,7 +188,7 @@ export default function MiPaseSection() {
                           disabled={bloqueada}
                           checked={categoriaId === cat.id}
                           onChange={() => setCategoriaId(cat.id)}
-                          className="accent-verde w-4 h-4 mt-0.5"
+                          className="accent-primario w-4 h-4 mt-0.5"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
@@ -221,7 +221,7 @@ export default function MiPaseSection() {
                       type="button"
                       onClick={() => setFormaPago('transferencia')}
                       className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
-                        formaPago === 'transferencia' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                        formaPago === 'transferencia' ? 'bg-primario text-white border-primario' : 'bg-white text-gray-600 border-gray-200 hover:border-primario'
                       }`}
                     >
                       <CreditCard className="w-4 h-4" /> Transferencia
@@ -230,14 +230,14 @@ export default function MiPaseSection() {
                       type="button"
                       onClick={() => setFormaPago('efectivo')}
                       className={`flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm border-2 transition-all ${
-                        formaPago === 'efectivo' ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                        formaPago === 'efectivo' ? 'bg-primario text-white border-primario' : 'bg-white text-gray-600 border-gray-200 hover:border-primario'
                       }`}
                     >
                       <Banknote className="w-4 h-4" /> Efectivo
                     </button>
                   </div>
                   {formaPago === 'efectivo' && (
-                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2 leading-relaxed">
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mt-2 leading-relaxed">
                       Se paga en persona en {puntosPagoParaRuta(horario.origen, horario.destino).map(p => p.nombre).join(' o ')},
                       {' '}{puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
                       Tenés que pagarlo antes de que salga tu combi ({horario.salida} hs) — si no, la reserva vence y vas a tener que generarla de nuevo.
@@ -274,11 +274,11 @@ function HorarioOption({ horario, fecha, seleccionado, onSeleccionar }) {
 
   return (
     <label
-      className={`flex items-center justify-between gap-3 p-3 rounded-xl border-2 transition-colors ${
+      className={`flex items-center justify-between gap-3 p-3 rounded border-2 transition-colors ${
         deshabilitado
           ? 'opacity-60 cursor-not-allowed border-gray-100 bg-gray-50'
           : seleccionado
-          ? 'border-verde bg-verde/5 cursor-pointer'
+          ? 'border-primario bg-primario/5 cursor-pointer'
           : 'border-gray-200 hover:border-gray-300 cursor-pointer'
       }`}
     >
@@ -289,7 +289,7 @@ function HorarioOption({ horario, fecha, seleccionado, onSeleccionar }) {
           disabled={deshabilitado}
           checked={seleccionado}
           onChange={() => onSeleccionar(horario.id)}
-          className="accent-verde w-4 h-4 shrink-0"
+          className="accent-primario w-4 h-4 shrink-0"
         />
         <span className="text-sm truncate">
           <span className="font-semibold text-gray-800">{horario.salida}</span>{' '}
@@ -303,7 +303,7 @@ function HorarioOption({ horario, fecha, seleccionado, onSeleccionar }) {
           ? <span className="text-gray-300">...</span>
           : sinLugar
           ? <span className="text-red-500">Sin lugar</span>
-          : <span className="text-verde">{viaje.asientos.libres} libres</span>}
+          : <span className="text-primario">{viaje.asientos.libres} libres</span>}
       </span>
     </label>
   )
@@ -342,7 +342,7 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
 
   if (enviado) {
     return (
-      <p className="text-xs text-verde mt-2 pl-6 flex items-center gap-1.5">
+      <p className="text-xs text-primario mt-2 pl-6 flex items-center gap-1.5">
         <Clock className="w-3 h-3 shrink-0" /> Solicitud enviada, un empleado la va a revisar.
       </p>
     )
@@ -387,14 +387,14 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
   if (pasaje.estado === 'confirmado') {
     return (
       <div className="text-center max-w-sm">
-        <div className="mb-4 bg-verde/10 border border-verde/30 rounded-xl p-3 flex items-center justify-center gap-2 text-verde-oscuro font-bold text-sm">
+        <div className="mb-4 bg-primario/10 border border-primario/30 rounded p-3 flex items-center justify-center gap-2 text-primario-oscuro font-bold text-sm">
           <BadgeCheck className="w-4 h-4" /> Pasaje confirmado
         </div>
         <PaseQR codigo={pasaje.codigo} />
         <div className="mt-4 text-sm text-gray-600 space-y-0.5">
           <p>{cat.label} · {pasaje.origen} → {pasaje.destino}</p>
           <p>{formatearFecha(pasaje.fecha)} · {pasaje.salida} hs</p>
-          <p className="font-bold text-verde-oscuro">Importe abonado: {formatoPesos(pasaje.importe)}</p>
+          <p className="font-bold text-primario-oscuro">Importe abonado: {formatoPesos(pasaje.importe)}</p>
         </div>
         <p className="text-xs text-gray-400 mt-4 leading-relaxed">
           Mostrale esta pantalla al conductor para embarcar.
@@ -410,7 +410,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
 
   if (vencido) {
     return (
-      <div className="max-w-sm bg-red-50 border border-red-200 rounded-xl p-5">
+      <div className="max-w-sm bg-red-50 border border-red-200 rounded p-5">
         <p className="text-xs font-bold text-red-600 flex items-center gap-1.5 mb-3">
           <Clock className="w-3.5 h-3.5" /> Reserva vencida
         </p>
@@ -449,7 +449,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
   const linkWhatsApp = `https://wa.me/${datosPago.telefono}?text=${encodeURIComponent(mensaje)}`
 
   return (
-    <div className="max-w-sm bg-amber-50 border border-amber-200 rounded-xl p-5">
+    <div className="max-w-sm bg-amber-50 border border-amber-200 rounded p-5">
       <p className="text-xs font-bold text-amber-700 flex items-center gap-1.5 mb-3">
         <Clock className="w-3.5 h-3.5" /> Estado: Pago pendiente
       </p>

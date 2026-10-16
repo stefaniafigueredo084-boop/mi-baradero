@@ -3,10 +3,10 @@ import { Bus, Trash2, Calendar, Recycle, Users } from 'lucide-react'
 import { useColeccion } from '../../hooks/useColeccion'
 
 const NOTIF_INFO = {
-  basura: { label: 'Residuos', icon: Trash2, color: 'text-amarillo bg-amarillo/10' },
-  eventos: { label: 'Eventos', icon: Calendar, color: 'text-verde bg-verde/10' },
-  puntosVerdes: { label: 'Puntos Verdes', icon: Recycle, color: 'text-verde bg-verde/10' },
-  combi: { label: 'Combi Municipal', icon: Bus, color: 'text-azul bg-azul/10' },
+  basura: { label: 'Residuos', icon: Trash2, color: 'text-acento bg-acento/10' },
+  eventos: { label: 'Eventos', icon: Calendar, color: 'text-primario bg-primario/10' },
+  puntosVerdes: { label: 'Puntos Verdes', icon: Recycle, color: 'text-primario bg-primario/10' },
+  combi: { label: 'Combi Municipal', icon: Bus, color: 'text-secundario bg-secundario/10' },
 }
 
 export default function Vecinos() {
@@ -17,7 +17,7 @@ export default function Vecinos() {
   return (
     <div>
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <Users className="w-5 h-5 text-verde" /> Vecinos registrados
+        <Users className="w-5 h-5 text-primario" /> Vecinos registrados
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         Vecinos que guardaron su perfil en la app. Solo se guarda nombre y preferencias de notificación —
@@ -25,12 +25,12 @@ export default function Vecinos() {
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-6 max-w-md">
-        <div className="card p-5 text-center">
-          <p className="text-3xl font-bold font-poppins text-verde">{cargando ? '—' : items.length}</p>
+        <div className="card p-4 text-center">
+          <p className="text-3xl font-bold font-poppins text-primario">{cargando ? '—' : items.length}</p>
           <p className="text-sm text-gray-500 mt-1">Vecinos registrados</p>
         </div>
-        <div className="card p-5 text-center">
-          <p className="text-3xl font-bold font-poppins text-azul">{cargando ? '—' : conNotif}</p>
+        <div className="card p-4 text-center">
+          <p className="text-3xl font-bold font-poppins text-secundario">{cargando ? '—' : conNotif}</p>
           <p className="text-sm text-gray-500 mt-1">Con notificaciones activas</p>
         </div>
       </div>

@@ -8,12 +8,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        verde: '#1B8E3E',
-        'verde-oscuro': '#0B6A2E',
-        azul: '#1D8FE1',
-        'azul-oscuro': '#0057B8',
-        amarillo: '#F5C400',
-        'amarillo-oscuro': '#C9A400',
+        // Paleta "Verde Tranqui" (misma estructura que Azul Río, en verde suave)
+        primario: '#3D8B68',
+        'primario-oscuro': '#285E47',
+        'primario-suave': '#E0EFE7',
+        secundario: '#6AAE4E',
+        'secundario-oscuro': '#4B8A33',
+        'secundario-suave': '#E7F4DF',
+        acento: '#F2B53E',
+        'acento-oscuro': '#C98A12',
+        tinta: '#1D3328',
+        'fondo-app': '#F1F6F3',
+      },
+      // Redondeo contenido: lo más redondo del sitio es suave, no "burbuja"
+      borderRadius: {
+        xl: '0.625rem',
+        '2xl': '0.75rem',
+        '3xl': '0.75rem',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],

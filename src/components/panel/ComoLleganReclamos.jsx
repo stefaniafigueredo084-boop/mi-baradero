@@ -33,7 +33,7 @@ export default function ComoLleganReclamos() {
       <ol className="space-y-3">
         {PASOS.map((paso, i) => (
           <li key={paso.titulo} className="flex gap-3">
-            <span className="w-7 h-7 rounded-full bg-verde text-white text-sm font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+            <span className="w-7 h-7 rounded-full bg-primario text-white text-sm font-bold flex items-center justify-center shrink-0">{i + 1}</span>
             <div>
               <p className="font-semibold text-gray-800 text-sm">{paso.titulo}</p>
               <p className="text-sm text-gray-500 leading-relaxed">{paso.texto}</p>
@@ -63,7 +63,7 @@ export default function ComoLleganReclamos() {
                   <tr key={area.id} className="border-b border-gray-100 last:border-0">
                     <td className="py-2.5 pr-3 text-gray-700">{area.label}</td>
                     <td className="py-2.5 pr-3 font-semibold text-gray-800">
-                      <span className="inline-flex items-center gap-1.5"><ArrowRight className="w-3.5 h-3.5 text-verde shrink-0" /> {depto.label}</span>
+                      <span className="inline-flex items-center gap-1.5"><ArrowRight className="w-3.5 h-3.5 text-primario shrink-0" /> {depto.label}</span>
                     </td>
                     <td className="py-2.5 text-gray-500">{dondeLoVe(depto.sector)}</td>
                   </tr>

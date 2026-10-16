@@ -4,10 +4,10 @@ import { useColeccion } from '../../hooks/useColeccion'
 import { labelSector } from '../../data/sectores'
 
 const TIPOS = {
-  login:  { label: 'Inició sesión', icon: LogIn,   color: 'text-verde bg-verde/10' },
+  login:  { label: 'Inició sesión', icon: LogIn,   color: 'text-primario bg-primario/10' },
   logout: { label: 'Cerró sesión',  icon: LogOut,  color: 'text-gray-500 bg-gray-100' },
-  crear:  { label: 'Agregó',        icon: Plus,    color: 'text-verde bg-verde/10' },
-  editar: { label: 'Editó',         icon: Pencil,  color: 'text-azul bg-azul/10' },
+  crear:  { label: 'Agregó',        icon: Plus,    color: 'text-primario bg-primario/10' },
+  editar: { label: 'Editó',         icon: Pencil,  color: 'text-secundario bg-secundario/10' },
   eliminar: { label: 'Eliminó',     icon: Trash2,  color: 'text-red-500 bg-red-50' },
 }
 
@@ -32,7 +32,7 @@ export default function Historial() {
   return (
     <div>
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <History className="w-5 h-5 text-verde" /> Historial de actividad
+        <History className="w-5 h-5 text-primario" /> Historial de actividad
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         Entradas, salidas y cambios de contenido de cada trabajador, en todas las secciones del panel.

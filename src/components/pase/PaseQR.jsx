@@ -11,16 +11,16 @@ export default function PaseQR({ codigo }) {
       {/* Grande a propósito: se suele escanear desde OTRO celular, no
           desde una hoja impresa — más chico, la pantalla del celular
           (brillo, reflejo, refresco) hace que cueste mucho más leerlo. */}
-      <div className="bg-white border-4 border-verde rounded-2xl p-5 mx-auto w-fit">
+      <div className="bg-white border-4 border-primario rounded p-5 mx-auto w-fit">
         <QRCodeSVG value={codigo || ''} size={260} level="M" />
       </div>
 
       {/* Mismo código que codifica el QR, bien grande — para dictarle
           al conductor de viva voz si falla la cámara o no hay señal. */}
       {codigo && (
-        <div className="mt-3 bg-verde/5 border border-verde/20 rounded-xl py-2.5 text-center">
+        <div className="mt-3 bg-primario/5 border border-primario/20 rounded py-2.5 text-center">
           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Código para dictar</p>
-          <p className="text-2xl font-bold font-poppins text-verde-oscuro tracking-[0.3em]">{codigo}</p>
+          <p className="text-2xl font-bold font-poppins text-primario-oscuro tracking-[0.3em]">{codigo}</p>
         </div>
       )}
     </div>

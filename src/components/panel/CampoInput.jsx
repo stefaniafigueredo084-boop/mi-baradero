@@ -44,7 +44,7 @@ export default function CampoInput({ campo, valor, onChange }) {
               type="button"
               onClick={() => onChange(activo ? seleccionados.filter(v => v !== op) : [...seleccionados, op])}
               className={`px-3 py-1.5 rounded-full text-sm font-semibold border-2 transition-colors ${
-                activo ? 'bg-verde text-white border-verde' : 'bg-white text-gray-600 border-gray-200 hover:border-verde'
+                activo ? 'bg-primario text-white border-primario' : 'bg-white text-gray-600 border-gray-200 hover:border-primario'
               }`}
             >
               {op}
@@ -62,7 +62,7 @@ export default function CampoInput({ campo, valor, onChange }) {
           type="checkbox"
           checked={!!valor}
           onChange={e => onChange(e.target.checked)}
-          className="w-5 h-5 accent-verde"
+          className="w-5 h-5 accent-primario"
         />
         <span className="text-base text-gray-700">{campo.checkboxLabel || 'Sí'}</span>
       </label>

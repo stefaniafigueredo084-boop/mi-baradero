@@ -7,8 +7,8 @@ import { Lightbulb, ThumbsDown, ThumbsUp, Wrench } from 'lucide-react'
 export const TIPOS_RECLAMO = [
   { id: 'queja', label: 'Queja', icono: ThumbsDown, color: 'bg-red-50 text-red-500', desc: 'Algo te molestó o no funcionó bien' },
   { id: 'reclamo', label: 'Reclamo', icono: Wrench, color: 'bg-amber-100 text-amber-700', desc: 'Algo que hay que arreglar o resolver' },
-  { id: 'sugerencia', label: 'Sugerencia', icono: Lightbulb, color: 'bg-azul/10 text-azul', desc: 'Una idea para mejorar' },
-  { id: 'felicitacion', label: 'Felicitación', icono: ThumbsUp, color: 'bg-verde/10 text-verde', desc: 'Algo que salió bien' },
+  { id: 'sugerencia', label: 'Sugerencia', icono: Lightbulb, color: 'bg-secundario/10 text-secundario', desc: 'Una idea para mejorar' },
+  { id: 'felicitacion', label: 'Felicitación', icono: ThumbsUp, color: 'bg-primario/10 text-primario', desc: 'Algo que salió bien' },
 ]
 
 // Departamento municipal que se encarga de cada reclamo. "sector" es el
@@ -47,8 +47,8 @@ export const AREAS_RECLAMO = [
 // puede poner un trabajador desde el panel (ver firestore.rules).
 export const ESTADOS_RECLAMO = [
   { id: 'nuevo', label: 'Recibido', color: 'bg-amber-100 text-amber-700' },
-  { id: 'en_proceso', label: 'En proceso', color: 'bg-azul/10 text-azul' },
-  { id: 'resuelto', label: 'Resuelto', color: 'bg-verde/10 text-verde' },
+  { id: 'en_proceso', label: 'En proceso', color: 'bg-secundario/10 text-secundario' },
+  { id: 'resuelto', label: 'Resuelto', color: 'bg-primario/10 text-primario' },
 ]
 
 export const tipoReclamoPorId = id => TIPOS_RECLAMO.find(t => t.id === id) || TIPOS_RECLAMO[1]

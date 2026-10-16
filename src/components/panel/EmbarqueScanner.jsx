@@ -222,9 +222,9 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
     <div>
       <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
         <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2">
-          <ScanLine className="w-5 h-5 text-verde" /> Embarque — escanear pasajes
+          <ScanLine className="w-5 h-5 text-primario" /> Embarque — escanear pasajes
         </h3>
-        <span className="flex items-center gap-1.5 bg-verde/10 text-verde text-xs font-bold px-3 py-1.5 rounded-full">
+        <span className="flex items-center gap-1.5 bg-primario/10 text-primario text-xs font-bold px-3 py-1.5 rounded-full">
           <ClipboardCheck className="w-3.5 h-3.5" /> {contador} escaneados hoy
         </span>
       </div>
@@ -234,7 +234,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           : 'Elegí el viaje y escaneá el QR de cada pasajero al subir.'}
       </p>
 
-      <div className="card p-5 mb-5">
+      <div className="card p-4 mb-5">
         <label className="block text-sm font-semibold text-gray-700 mb-1.5">
           {soloHorarios?.length ? 'Tu horario (hoy)' : 'Horario del viaje (hoy)'}
         </label>
@@ -249,10 +249,10 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         </select>
 
         {horario && viaje && !viaje.cargando && (
-          <div className="mt-4 bg-verde/5 border border-verde/20 rounded-xl p-4 flex items-center gap-4 flex-wrap">
-            <Users className="w-5 h-5 text-verde shrink-0" />
+          <div className="mt-4 bg-primario/5 border border-primario/20 rounded p-4 flex items-center gap-4 flex-wrap">
+            <Users className="w-5 h-5 text-primario shrink-0" />
             <div>
-              <p className="font-bold text-verde-oscuro text-lg">{viaje.asientos.libres} libres</p>
+              <p className="font-bold text-primario-oscuro text-lg">{viaje.asientos.libres} libres</p>
               <p className="text-xs text-gray-500">de {viaje.asientos.capacidadTotal} totales</p>
             </div>
             <div className="text-xs text-gray-500 flex flex-col gap-0.5">
@@ -266,10 +266,10 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         )}
 
         {horario && !cargandoVendidos && (
-          <div className="mt-3 bg-azul/5 border border-azul/20 rounded-xl p-4 flex items-center gap-4 flex-wrap">
-            <Ticket className="w-5 h-5 text-azul shrink-0" />
+          <div className="mt-3 bg-secundario/5 border border-secundario/20 rounded p-4 flex items-center gap-4 flex-wrap">
+            <Ticket className="w-5 h-5 text-secundario shrink-0" />
             <div>
-              <p className="font-bold text-azul-oscuro text-lg">{vendidos.length} pasajes vendidos</p>
+              <p className="font-bold text-secundario-oscuro text-lg">{vendidos.length} pasajes vendidos</p>
               <p className="text-xs text-gray-500">{vendidos.filter(p => p.usado).length} ya embarcaron</p>
             </div>
             {vendidos.length > 0 && (
@@ -284,7 +284,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         )}
       </div>
 
-      <div className="card p-5 mb-5">
+      <div className="card p-4 mb-5">
         {!escaneando ? (
           <button
             onClick={iniciarCamara}
@@ -305,7 +305,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
             adentro en vez de fallar en silencio. Sacarlo una vez que
             ande. */}
         {debug && (
-          <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-600 space-y-0.5 font-mono">
+          <div className="mt-3 bg-gray-50 border border-gray-200 rounded p-3 text-xs text-gray-600 space-y-0.5 font-mono">
             <p>Lector nativo del celular: <strong>{debug.nativo ? 'sí' : 'no'}</strong></p>
             <p>Video de la cámara arrancó: <strong>{debug.videoListo ? 'sí' : 'todavía no'}</strong></p>
             <p>Cuadros analizados sin detectar nada: <strong>{debug.intentos}</strong></p>
@@ -314,12 +314,12 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         )}
 
         <div className={escaneando ? 'relative mt-4' : 'hidden'}>
-          <div id="lector-qr-embarque" className="rounded-xl overflow-hidden min-h-[240px]" />
+          <div id="lector-qr-embarque" className="rounded overflow-hidden min-h-[240px]" />
           {/* Cartel superpuesto a la cámara con el resultado del último
               escaneo — para que se vea de una sin tener que mirar más
               abajo de la pantalla mientras se sigue escaneando. */}
           {resultado && (
-            <div className={`absolute inset-x-2 top-2 rounded-xl p-3 shadow-lg flex items-center gap-2 animate-fade-in ${resultado.ok ? 'bg-verde text-white' : 'bg-red-500 text-white'}`}>
+            <div className={`absolute inset-x-2 top-2 rounded p-3 shadow-lg flex items-center gap-2 animate-fade-in ${resultado.ok ? 'bg-primario text-white' : 'bg-red-500 text-white'}`}>
               {resultado.ok ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertTriangle className="w-5 h-5 shrink-0" />}
               <div className="min-w-0">
                 <p className="font-bold text-sm leading-tight">{resultado.ok ? '¡Válido!' : 'Rechazado'}</p>
@@ -355,12 +355,12 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
       </div>
 
       {resultado && (
-        <div className={`card p-5 flex items-start gap-3 ${resultado.ok ? 'border-2 border-verde/30 bg-verde/5' : 'border-2 border-red-200 bg-red-50'}`}>
+        <div className={`card p-4 flex items-start gap-3 ${resultado.ok ? 'border-2 border-primario/30 bg-primario/5' : 'border-2 border-red-200 bg-red-50'}`}>
           {resultado.ok
-            ? <CheckCircle2 className="w-6 h-6 text-verde shrink-0" />
+            ? <CheckCircle2 className="w-6 h-6 text-secundario shrink-0" />
             : <AlertTriangle className="w-6 h-6 text-red-500 shrink-0" />}
           <div>
-            <p className={`font-bold ${resultado.ok ? 'text-verde-oscuro' : 'text-red-600'}`}>{resultado.mensaje}</p>
+            <p className={`font-bold ${resultado.ok ? 'text-primario-oscuro' : 'text-red-600'}`}>{resultado.mensaje}</p>
             {resultado.ok && resultado.detalle && (
               <p className="text-sm text-gray-600 mt-0.5">
                 {resultado.detalle.nombre} · {resultado.detalle.categoria} · {resultado.detalle.tarifa}

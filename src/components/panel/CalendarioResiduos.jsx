@@ -32,13 +32,13 @@ export default function CalendarioResiduos() {
   if (!dias) return <p className="text-gray-400 text-sm">Cargando...</p>
 
   return (
-    <div className="card p-6 mb-8">
+    <div className="card p-4 mb-8">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-4">
-        <CalendarDays className="w-5 h-5 text-amarillo" /> Calendario semanal de recolección
+        <CalendarDays className="w-5 h-5 text-acento" /> Calendario semanal de recolección
       </h3>
       <div className="space-y-2">
         {dias.map((d, i) => (
-          <div key={d.dia} className="grid grid-cols-2 sm:grid-cols-[110px_1fr_150px] gap-2 items-center bg-gray-50 rounded-xl p-3">
+          <div key={d.dia} className="grid grid-cols-2 sm:grid-cols-[110px_1fr_150px] gap-2 items-center bg-gray-50 rounded p-3">
             <span className="font-semibold text-gray-700 text-sm">{d.dia}</span>
             <input
               className="input-field !py-2.5 !text-sm"

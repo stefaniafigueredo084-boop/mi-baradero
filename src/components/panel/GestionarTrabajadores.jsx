@@ -54,7 +54,7 @@ export default function GestionarTrabajadores() {
   return (
     <div className="mb-10">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <Users className="w-5 h-5 text-verde" /> Cuentas del panel
+        <Users className="w-5 h-5 text-primario" /> Cuentas del panel
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         Desactivar es reversible (se puede reactivar en cualquier momento). Eliminar es para cuentas que no hace falta conservar.
@@ -75,10 +75,10 @@ export default function GestionarTrabajadores() {
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-800 truncate">{t.email}</p>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span className="badge bg-azul/10 text-azul text-xs font-semibold px-2 py-0.5 rounded-full">
+                      <span className="badge bg-secundario/10 text-secundario text-xs font-semibold px-2 py-0.5 rounded-full">
                         {t.rol === 'admin' ? 'Administrador general' : `Solo ${labelSector(t.sector)}`}
                       </span>
-                      <span className={`badge text-xs font-semibold px-2 py-0.5 rounded-full ${activo ? 'bg-verde/10 text-verde' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`badge text-xs font-semibold px-2 py-0.5 rounded-full ${activo ? 'bg-primario/10 text-primario' : 'bg-gray-100 text-gray-500'}`}>
                         {activo ? 'Activa' : 'Desactivada'}
                       </span>
                     </div>
@@ -92,7 +92,7 @@ export default function GestionarTrabajadores() {
                         onClick={() => alternarActivo(t)}
                         disabled={procesando === t.id}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs transition-colors disabled:opacity-60 ${
-                          activo ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-verde/10 text-verde hover:bg-verde/20'
+                          activo ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-primario/10 text-primario hover:bg-primario/20'
                         }`}
                       >
                         {procesando === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : activo ? <Ban className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}

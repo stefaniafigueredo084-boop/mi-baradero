@@ -12,7 +12,7 @@ export const camposEventos = [
   { name: 'hora', label: 'Hora', type: 'text', placeholder: 'Ej: 20:00' },
   { name: 'ubicacion', label: 'Ubicación', type: 'text', placeholder: 'Ej: Plaza Mitre', default: 'Baradero' },
   { name: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Contá de qué se trata el evento...' },
-  { name: 'color', label: 'Color de la tarjeta', type: 'color', default: '#1B8E3E' },
+  { name: 'color', label: 'Color de la tarjeta', type: 'color', default: '#3D8B68' },
   { name: 'destacado', label: 'Mostrar como destacado', type: 'checkbox', checkboxLabel: 'Sí, destacarlo arriba de todo' },
 ]
 

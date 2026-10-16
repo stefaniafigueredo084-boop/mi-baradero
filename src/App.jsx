@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { Mic } from 'lucide-react'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import BottomNav from './components/BottomNav'
 import LectorPantalla from './components/LectorPantalla'
 import Tachin from './components/tachin/Tachin'
 import { TutorialProvider } from './context/TutorialContext'
@@ -100,7 +101,7 @@ function Layout() {
   }, [])
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className={`flex flex-col min-h-screen ${esPanelTrabajadores ? '' : 'pb-16 xl:pb-0'}`}>
       {!esPanelTrabajadores && <Header />}
       <main className="flex-1">
         <Routes>
@@ -118,11 +119,12 @@ function Layout() {
         </Routes>
       </main>
       {!esPanelTrabajadores && <Footer />}
+      {!esPanelTrabajadores && <BottomNav />}
       {!esPanelTrabajadores && <LectorPantalla />}
       {!esPanelTrabajadores && <Tachin />}
 
       {escuchandoSaludo && (
-        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-verde text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-xl animate-fade-in">
+        <div className="fixed bottom-20 xl:bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-primario text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-xl animate-fade-in">
           <Mic className="w-4 h-4 animate-pulse" /> Escuchando… decime a dónde querés ir
         </div>
       )}

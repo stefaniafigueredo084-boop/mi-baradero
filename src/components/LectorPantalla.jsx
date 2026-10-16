@@ -94,16 +94,16 @@ export default function LectorPantalla() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3 items-end">
+      <div className="fixed bottom-20 xl:bottom-5 right-5 z-40 flex flex-col gap-3 items-end">
         <button
           onClick={() => setAsistenteAbierto(true)}
           aria-label="Registrarme por voz"
           title={escuchandoActivacion ? 'Escuchando… decí "asistente" para activarme, o tocá acá' : 'Registrarme por voz'}
-          className={`relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 bg-azul text-white`}
+          className={`relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 bg-secundario text-white`}
         >
           <Mic className="w-6 h-6" />
           {escuchandoActivacion && (
-            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-verde border-2 border-white animate-pulse" />
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primario border-2 border-white animate-pulse" />
           )}
         </button>
       </div>

@@ -93,10 +93,10 @@ export default function CuentaVecino({ usuario }) {
 
   if (usuario) {
     return (
-      <div className="card p-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="card p-4 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-verde/15 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5 text-verde" />
+          <div className="w-10 h-10 rounded-xl bg-primario/15 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5 text-primario" />
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-gray-800 text-sm">Sesión iniciada</p>
@@ -114,9 +114,9 @@ export default function CuentaVecino({ usuario }) {
   }
 
   return (
-    <div className="card p-6">
+    <div className="card p-4">
       <h2 className="text-lg font-bold font-poppins flex items-center gap-2 mb-1">
-        <Mail className="w-5 h-5 text-verde" /> Mi cuenta
+        <Mail className="w-5 h-5 text-primario" /> Mi cuenta
       </h2>
       <p className="text-sm text-gray-500 mb-4">
         Iniciá sesión para completar tu perfil y notificaciones — quedan guardados en tu cuenta y los podés recuperar desde cualquier dispositivo.
@@ -161,7 +161,7 @@ export default function CuentaVecino({ usuario }) {
             type="button"
             onClick={() => setVerPass(v => !v)}
             aria-label={verPass ? 'Ocultar contraseña' : 'Ver contraseña'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-verde transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primario transition-colors"
           >
             {verPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
@@ -185,14 +185,14 @@ export default function CuentaVecino({ usuario }) {
             type="button"
             onClick={recuperarPassword}
             disabled={recuperando}
-            className="text-xs text-gray-400 hover:text-verde font-medium disabled:opacity-60"
+            className="text-xs text-gray-400 hover:text-primario font-medium disabled:opacity-60"
           >
             {recuperando ? 'Enviando...' : '¿Olvidaste tu contraseña?'}
           </button>
         )}
 
         {recuperado && (
-          <p className="text-verde text-sm flex items-center gap-1.5">
+          <p className="text-primario text-sm flex items-center gap-1.5">
             <CheckCircle className="w-4 h-4 shrink-0" /> Te enviamos un email para reestablecer tu contraseña.
           </p>
         )}
@@ -221,7 +221,7 @@ export default function CuentaVecino({ usuario }) {
           setError('')
           setPassword2('')
         }}
-        className="w-full text-center text-sm text-verde font-semibold mt-4 hover:text-verde-oscuro"
+        className="w-full text-center text-sm text-primario font-semibold mt-4 hover:text-primario-oscuro"
       >
         {modo === 'registro' ? '¿Ya tenés cuenta? Ingresá' : '¿No tenés cuenta? Creá una'}
       </button>

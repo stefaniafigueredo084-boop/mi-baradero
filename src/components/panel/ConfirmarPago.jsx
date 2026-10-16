@@ -43,7 +43,7 @@ export default function ConfirmarPago() {
   return (
     <div className="mb-10">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <Banknote className="w-5 h-5 text-verde" /> Confirmar pago de pasajes
+        <Banknote className="w-5 h-5 text-primario" /> Confirmar pago de pasajes
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         El pago se recibe como siempre (transferencia + comprobante). Acá confirmás que lo recibiste — recién ahí se le genera el QR al pasajero.
@@ -66,7 +66,7 @@ export default function ConfirmarPago() {
                   <p className="text-sm text-gray-600 mt-1">
                     {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
                   </p>
-                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-600' : 'text-azul'}`}>
+                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-600' : 'text-secundario'}`}>
                     {esEfectivo ? <Banknote className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
                     {esEfectivo
                       ? `Paga en efectivo — ${puntosPagoParaRuta(item.origen, item.destino).map(p => p.nombre).join(' o ')}`
@@ -79,11 +79,11 @@ export default function ConfirmarPago() {
                   )}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-bold text-verde-oscuro text-lg">{formatoPesos(item.importe)}</span>
+                  <span className="font-bold text-primario-oscuro text-lg">{formatoPesos(item.importe)}</span>
                   <button
                     onClick={() => confirmar(item)}
                     disabled={procesando === item.id}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-verde text-white hover:bg-verde-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primario text-white hover:bg-primario-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
                   >
                     {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                     Confirmar pago

@@ -113,7 +113,7 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
   return (
     <div>
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <MessageSquare className="w-5 h-5 text-verde" /> Reclamos y sugerencias
+        <MessageSquare className="w-5 h-5 text-primario" /> Reclamos y sugerencias
       </h3>
       <p className="text-gray-500 text-sm mb-5">
         {completa
@@ -128,7 +128,7 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
             key={e.id}
             onClick={() => setFiltroEstado(e.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-              filtroEstado === e.id ? 'bg-verde text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-verde'
+              filtroEstado === e.id ? 'bg-primario text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-primario'
             }`}
           >
             {e.label}
@@ -140,7 +140,7 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
         <button
           onClick={() => setFiltroEstado('')}
           className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-            filtroEstado === '' ? 'bg-verde text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-verde'
+            filtroEstado === '' ? 'bg-primario text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-primario'
           }`}
         >
           Todos
@@ -183,12 +183,12 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
             const borrador = respuestas[item.id] ?? item.respuesta ?? ''
             const sinCambios = borrador.trim() === (item.respuesta || '')
             return (
-              <div key={item.id} className="bg-white rounded-2xl shadow-md p-5">
+              <div key={item.id} className="bg-white rounded shadow-md p-5">
                 <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`badge text-xs font-semibold ${tipo.color}`}><tipo.icono className="w-3.5 h-3.5" /> {tipo.label}</span>
                     <span className="badge text-xs font-semibold bg-gray-100 text-gray-600">{areaReclamoPorId(item.area).label}</span>
-                    <span className="badge text-xs font-semibold bg-azul/10 text-azul"><Building2 className="w-3.5 h-3.5" /> {depto.label}</span>
+                    <span className="badge text-xs font-semibold bg-secundario/10 text-secundario"><Building2 className="w-3.5 h-3.5" /> {depto.label}</span>
                   </div>
                   <span className="text-xs text-gray-400">{codigoReclamo(item.id)} · {fechaReclamo(item.creadoEn)}</span>
                 </div>
@@ -265,7 +265,7 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
                     <button
                       onClick={() => guardarRespuesta(item)}
                       disabled={procesando === item.id || sinCambios}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-verde text-white hover:bg-verde-oscuro font-semibold text-sm transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primario text-white hover:bg-primario-oscuro font-semibold text-sm transition-colors disabled:opacity-50"
                     >
                       {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       {item.respuesta ? 'Actualizar respuesta' : 'Guardar respuesta'}
@@ -288,7 +288,7 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           aria-label="Cerrar la foto"
         >
-          <img src={fotoAbierta} alt="Foto adjunta al reclamo" className="max-w-full max-h-full rounded-2xl" />
+          <img src={fotoAbierta} alt="Foto adjunta al reclamo" className="max-w-full max-h-full rounded" />
         </button>
       )}
     </div>

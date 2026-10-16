@@ -1,18 +1,30 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Bus, Trash2, Calendar, MapPin, MessageSquare, UserCircle, HelpCircle } from 'lucide-react'
-import LogoMiBaradero from './LogoMiBaradero'
+import { Menu, X, Bus, Trash2, Calendar, MapPin, MessageSquare, UserCircle, HelpCircle, Home } from 'lucide-react'
 import { useTutorial } from '../context/TutorialContext'
 
 const navLinks = [
-  { to: '/', label: 'Inicio', short: 'Inicio', icon: null },
-  { to: '/combi', label: 'Combi Municipal', short: 'Combi', icon: Bus },
-  { to: '/residuos', label: 'Recolección de Residuos', short: 'Residuos', icon: Trash2 },
-  { to: '/eventos', label: 'Eventos y Noticias', short: 'Eventos', icon: Calendar },
-  { to: '/puntos-verdes', label: 'Puntos Verdes', short: 'Puntos Verdes', icon: MapPin },
-  { to: '/reclamos', label: 'Reclamos y Sugerencias', short: 'Reclamos', icon: MessageSquare },
-  { to: '/perfil', label: 'Mi Perfil', short: 'Perfil', icon: UserCircle },
+  { to: '/', label: 'Inicio', icon: Home },
+  { to: '/combi', label: 'Combi', icon: Bus },
+  { to: '/residuos', label: 'Residuos', icon: Trash2 },
+  { to: '/eventos', label: 'Eventos', icon: Calendar },
+  { to: '/puntos-verdes', label: 'Puntos Verdes', icon: MapPin },
+  { to: '/reclamos', label: 'Reclamos', icon: MessageSquare },
 ]
+
+// Logo del header: el pin solo + nombre y bajada, sin la caja blanca del
+// LogoMiBaradero (acá el fondo ya es blanco).
+function MarcaHeader() {
+  return (
+    <span className="flex items-center gap-2.5">
+      <img src="/favicon.png" alt="" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
+      <span className="flex flex-col leading-none">
+        <span className="font-poppins font-bold text-tinta text-lg sm:text-xl tracking-tight">Mi Baradero</span>
+        <span className="font-poppins text-[11px] sm:text-xs text-gray-500 mt-0.5">Servicios de tu ciudad</span>
+      </span>
+    </span>
+  )
+}
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -20,115 +32,108 @@ export default function Header() {
   const tutorial = useTutorial()
 
   return (
-    <header className="sticky top-0 z-50 shadow-md bg-white">
-      {/* Franja superior de identidad */}
-      <div className="bg-gradient-to-r from-verde-oscuro via-verde to-azul h-1" />
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
 
-      <div className="bg-white">
-        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-          <div className="flex items-center justify-between min-h-[68px] gap-4">
-
-            {/* Logo — lleva al inicio; si ya estás en la home, sube al tope de la página */}
-            <Link
-              to="/"
-              onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }) }}
-              className="flex items-center group shrink-0"
-              aria-label="Mi Baradero — ir al inicio"
-            >
-              <div className="transition-transform duration-200 group-hover:scale-105">
-                <LogoMiBaradero size="md" theme="color" />
-              </div>
-            </Link>
-
-            {/* Desktop nav — etiquetas cortas para que entre sin apretarse */}
-            <nav className="hidden xl:flex items-center gap-0.5">
-              {navLinks.map(({ to, short, icon: Icon }) => {
-                const active = location.pathname === to
-                return (
-                  <Link
-                    key={to}
-                    to={to}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 font-inter ${
-                      active
-                        ? 'bg-verde text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-verde/8 hover:text-verde'
-                    }`}
-                  >
-                    {Icon && <Icon className="w-4 h-4" />}
-                    {short}
-                  </Link>
-                )
-              })}
-              {/* Aparte de los links de navegación: no lleva a ningún lado,
-                  reabre a Tachín. Va acá arriba (no como botón flotante)
-                  para no mezclarse con los botones de accesibilidad/voz
-                  que ya están abajo a la derecha. */}
-              <button
-                onClick={tutorial?.abrirManualmente}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 font-inter text-gray-600 hover:bg-verde/8 hover:text-verde"
-              >
-                <HelpCircle className="w-4 h-4" /> Ayuda
-              </button>
-            </nav>
-
-            {/* Badge + Mobile button */}
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:flex items-center gap-1.5 bg-verde/10 text-verde text-xs font-semibold px-3 py-1.5 rounded-full border border-verde/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-verde animate-pulse" />
-                En línea
-              </span>
-              <button
-                className="xl:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Menú"
-              >
-                {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
+      {/* Franja institucional */}
+      <div className="bg-primario-oscuro text-white text-[12.5px] sm:text-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 h-8 sm:h-9">
+          <span className="truncate">Sitio oficial · Municipalidad de Baradero</span>
+          <div className="hidden md:flex items-center gap-6 shrink-0">
+            <Link to="/perfil#accesibilidad" className="hover:underline">Accesibilidad</Link>
+            <span>Atención: 147</span>
+            <Link to="/panel-trabajadores" className="hover:underline">Panel de trabajadores</Link>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="xl:hidden border-t border-gray-100 animate-fade-in">
-            {/* Logo grande en móvil */}
-            <div className="px-4 py-4 border-b border-gray-50 flex items-center gap-3 bg-gray-50/60">
-              <LogoMiBaradero size="sm" theme="color" />
-            </div>
-            <nav className="px-4 py-3 flex flex-col gap-1">
-              {navLinks.map(({ to, label, icon: Icon }) => {
-                const active = location.pathname === to
-                return (
-                  <Link
-                    key={to}
-                    to={to}
-                    onClick={() => setMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                      active
-                        ? 'bg-verde text-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-verde'
-                    }`}
-                  >
-                    {Icon && <Icon className="w-5 h-5" />}
-                    {label}
-                  </Link>
-                )
-              })}
-              <button
-                onClick={() => { setMenuOpen(false); tutorial?.abrirManualmente() }}
-                className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-verde"
-              >
-                <HelpCircle className="w-5 h-5" /> Ayuda
-              </button>
-            </nav>
-            <div className="px-4 pb-4">
-              <div className="bg-verde/5 border border-verde/15 rounded-xl p-3 text-xs text-verde-oscuro text-center">
-                Baradero, Buenos Aires
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Barra principal */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 h-16 sm:h-[72px]">
+        <Link
+          to="/"
+          onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }) }}
+          className="shrink-0"
+          aria-label="Mi Baradero — ir al inicio"
+        >
+          <MarcaHeader />
+        </Link>
+
+        <nav className="hidden xl:flex items-center gap-1 h-full">
+          {navLinks.map(({ to, label }) => {
+            const active = location.pathname === to
+            return (
+              <Link
+                key={to}
+                to={to}
+                aria-current={active ? 'page' : undefined}
+                className={`h-full flex items-center px-3 text-[15px] font-semibold whitespace-nowrap border-b-[3px] transition-colors ${
+                  active
+                    ? 'text-primario border-primario'
+                    : 'text-tinta border-transparent hover:text-primario'
+                }`}
+              >
+                {label}
+              </Link>
+            )
+          })}
+          <button
+            onClick={tutorial?.abrirManualmente}
+            className="h-full flex items-center gap-1 px-3 text-[15px] font-semibold text-tinta hover:text-primario border-b-[3px] border-transparent"
+          >
+            <HelpCircle className="w-4 h-4" /> Ayuda
+          </button>
+          <Link
+            to="/perfil"
+            className={`ml-3 px-4 py-2.5 rounded-lg text-[15px] font-semibold text-white transition-colors ${
+              location.pathname === '/perfil' ? 'bg-primario-oscuro' : 'bg-primario hover:bg-primario-oscuro'
+            }`}
+          >
+            Mi perfil
+          </Link>
+        </nav>
+
+        <button
+          className="xl:hidden p-2 rounded-lg text-tinta hover:bg-primario-suave transition-colors"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Menú"
+        >
+          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Menú en celular/tablet */}
+      {menuOpen && (
+        <div className="xl:hidden bg-white border-t border-gray-100 animate-fade-in">
+          <nav className="px-4 py-3 flex flex-col gap-1">
+            {[...navLinks, { to: '/perfil', label: 'Mi perfil', icon: UserCircle }].map(({ to, label, icon: Icon }) => {
+              const active = location.pathname === to
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
+                    active ? 'bg-primario text-white' : 'text-tinta hover:bg-primario-suave'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {label}
+                </Link>
+              )
+            })}
+            <button
+              onClick={() => { setMenuOpen(false); tutorial?.abrirManualmente() }}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-tinta hover:bg-primario-suave"
+            >
+              <HelpCircle className="w-5 h-5" /> Ayuda
+            </button>
+          </nav>
+          <div className="px-4 pb-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-500">
+            <Link to="/perfil#accesibilidad" onClick={() => setMenuOpen(false)} className="hover:underline">Accesibilidad</Link>
+            <span>Atención: 147</span>
+            <Link to="/panel-trabajadores" onClick={() => setMenuOpen(false)} className="hover:underline">Panel de trabajadores</Link>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

@@ -53,8 +53,8 @@ function useDocConfig(nombreDoc, valorInicial, extraer) {
 }
 
 const colorMap = {
-  verde: { bg: 'bg-verde/10', border: 'border-verde/30', text: 'text-verde', icon: 'bg-verde' },
-  azul: { bg: 'bg-azul/10', border: 'border-azul/30', text: 'text-azul', icon: 'bg-azul' },
+  verde: { bg: 'bg-secundario/10', border: 'border-secundario/30', text: 'text-secundario', icon: 'bg-secundario' },
+  azul: { bg: 'bg-primario/10', border: 'border-primario/30', text: 'text-primario', icon: 'bg-primario' },
   gris: { bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-400', icon: 'bg-gray-300' },
 }
 
@@ -106,44 +106,44 @@ export default function Residuos() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero amarillo */}
-      <div className="bg-amarillo text-gray-900 dark:text-white py-10 sm:py-12 px-4">
-        <div className="max-w-4xl mx-auto flex items-center gap-4 flex-wrap sm:flex-nowrap">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-black/10 flex items-center justify-center shrink-0">
-            <Trash2 className="w-7 h-7 sm:w-8 sm:h-8" />
+      <div className="bg-primario text-white py-5 sm:py-6 px-4">
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+            <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Recolección de Residuos</h1>
-            <p className="text-gray-700 dark:text-white/80 text-sm sm:text-base">Calendario, alertas y seguimiento GPS del camión</p>
+            <h1 className="text-xl sm:text-2xl font-bold font-poppins">Recolección de Residuos</h1>
+            <p className="text-white/80 text-sm sm:text-base">Calendario, alertas y seguimiento GPS del camión</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 py-5 space-y-6">
 
         {/* Estado camión + notificaciones */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className={`card p-5 border-l-4 ${estadoCamion === 'EN_SERVICIO' ? 'border-verde' : 'border-red-400'} lg:col-span-1`}>
+          <div className={`card p-4 border-l-4 ${estadoCamion === 'EN_SERVICIO' ? 'border-secundario' : 'border-red-400'} lg:col-span-1`}>
             <div className="flex items-center gap-3 mb-2">
-              <Truck className={`w-6 h-6 ${estadoCamion === 'EN_SERVICIO' ? 'text-verde' : 'text-red-400'}`} />
+              <Truck className={`w-6 h-6 ${estadoCamion === 'EN_SERVICIO' ? 'text-secundario' : 'text-red-400'}`} />
               <h3 className="font-bold font-poppins">Estado del Camión</h3>
             </div>
             <div className="flex items-center gap-2">
               {estadoCamion === 'EN_SERVICIO'
-                ? <CheckCircle className="w-5 h-5 text-verde" />
+                ? <CheckCircle className="w-5 h-5 text-secundario" />
                 : <XCircle className="w-5 h-5 text-red-400" />
               }
-              <span className={`font-semibold ${estadoCamion === 'EN_SERVICIO' ? 'text-verde' : 'text-red-500'}`}>
+              <span className={`font-semibold ${estadoCamion === 'EN_SERVICIO' ? 'text-secundario' : 'text-red-500'}`}>
                 {estadosCamion[estadoCamion]?.label}
               </span>
             </div>
             <p className="text-sm text-gray-500 mt-1">{estadosCamion[estadoCamion]?.descripcion}</p>
           </div>
 
-          <div className="card p-5 lg:col-span-2">
+          <div className="card p-4 lg:col-span-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold font-poppins flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-amarillo" />
+                  <Bell className="w-5 h-5 text-acento" />
                   Notificaciones de Recolección
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
@@ -156,8 +156,8 @@ export default function Residuos() {
                 onClick={() => setNotifActiva(!notifActiva)}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
                   notifActiva
-                    ? 'bg-verde/10 text-verde border border-verde/30 hover:bg-verde/20'
-                    : 'btn-amarillo'
+                    ? 'bg-secundario/10 text-secundario border border-secundario/30 hover:bg-secundario/20'
+                    : 'btn-acento'
                 }`}
               >
                 {notifActiva ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
@@ -165,13 +165,13 @@ export default function Residuos() {
               </button>
             </div>
             {notifActiva && (
-              <div className="mt-3 bg-verde/5 border border-verde/20 rounded-xl p-3 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-verde shrink-0" />
-                <p className="text-sm text-verde-oscuro">Notificaciones activadas. Te avisaremos 30 minutos antes de la recolección.</p>
+              <div className="mt-3 bg-secundario/5 border border-secundario/20 rounded p-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-secundario shrink-0" />
+                <p className="text-sm text-secundario-oscuro">Notificaciones activadas. Te avisaremos 30 minutos antes de la recolección.</p>
               </div>
             )}
             {avisoResiduos?.mensaje && (
-              <div className="mt-3 bg-amarillo/10 border border-amarillo/30 rounded-xl p-3 flex items-center gap-2">
+              <div className="mt-3 bg-acento/10 border border-acento/30 rounded p-3 flex items-center gap-2">
                 <Truck className="w-4 h-4 text-yellow-700 shrink-0" />
                 <p className="text-sm text-yellow-800">{avisoResiduos.mensaje}</p>
               </div>
@@ -180,11 +180,11 @@ export default function Residuos() {
         </div>
 
         {/* GPS Tracker */}
-        <div className={`card p-6 border-2 transition-all duration-300 ${cerca ? 'border-red-400 shadow-red-100 shadow-lg' : gpsActivo ? 'border-verde/40' : 'border-transparent'}`}>
+        <div className={`card p-4 border-2 transition-all duration-300 ${cerca ? 'border-red-400 shadow-red-100 shadow-lg' : gpsActivo ? 'border-primario/40' : 'border-transparent'}`}>
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-bold font-poppins flex items-center gap-2">
-                <Navigation className={`w-5 h-5 ${gpsActivo ? 'text-verde' : 'text-gray-400'}`} />
+                <Navigation className={`w-5 h-5 ${gpsActivo ? 'text-primario' : 'text-gray-400'}`} />
                 Seguimiento GPS del Camión
               </h2>
               <p className="text-sm text-gray-500 mt-1">
@@ -196,7 +196,7 @@ export default function Residuos() {
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 gpsActivo
                   ? 'bg-red-50 text-red-500 border border-red-200 hover:bg-red-100'
-                  : 'bg-verde text-white hover:bg-verde-oscuro shadow-md'
+                  : 'bg-primario text-white hover:bg-primario-oscuro shadow-md'
               }`}
             >
               <Navigation className="w-4 h-4" />
@@ -209,7 +209,7 @@ export default function Residuos() {
               {/* Distancia */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600">Distancia del camión</span>
-                <span className={`text-2xl font-bold font-poppins ${cerca ? 'text-red-500' : 'text-verde'}`}>
+                <span className={`text-2xl font-bold font-poppins ${cerca ? 'text-red-500' : 'text-primario'}`}>
                   {distancia === 0 ? '¡Llegó!' : `${distancia} m`}
                 </span>
               </div>
@@ -217,7 +217,7 @@ export default function Residuos() {
               {/* Barra de progreso */}
               <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                 <div
-                  className={`h-3 rounded-full transition-all duration-700 ${cerca ? 'bg-red-400' : 'bg-verde'}`}
+                  className={`h-3 rounded-full transition-all duration-700 ${cerca ? 'bg-red-400' : 'bg-primario'}`}
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -229,7 +229,7 @@ export default function Residuos() {
               </div>
 
               {cerca && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                <div className="bg-red-50 border border-red-200 rounded p-4 flex items-center gap-3">
                   <Truck className="w-7 h-7 text-red-500 shrink-0" />
                   <div>
                     <p className="font-bold text-red-600">¡El camión está muy cerca!</p>
@@ -261,9 +261,9 @@ export default function Residuos() {
               return (
                 <div
                   key={dia.dia}
-                  className={`card p-4 border-2 text-center ${esHoy ? 'border-amarillo ring-2 ring-amarillo/30' : c.border} ${c.bg} transition-all`}
+                  className={`card p-4 border-2 text-center ${esHoy ? 'border-acento ring-2 ring-acento/30' : c.border} ${c.bg} transition-all`}
                 >
-                  {esHoy && <span className="text-xs font-bold text-amarillo block mb-1">HOY</span>}
+                  {esHoy && <span className="text-xs font-bold text-acento block mb-1">HOY</span>}
                   <p className="text-xs font-semibold text-gray-600 mb-2">{dia.dia}</p>
                   <div className={`w-10 h-10 rounded-xl ${c.icon} flex items-center justify-center mx-auto mb-2`}>
                     <IconoDia className="w-5 h-5 text-white" />
@@ -278,31 +278,31 @@ export default function Residuos() {
         {/* Alertas por zona */}
         <div>
           <h2 className="text-xl font-bold font-poppins mb-5 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-verde" /> Alerta por Zona
+            <MapPin className="w-5 h-5 text-primario" /> Alerta por Zona
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {zonas.map(zona => (
               <button
                 key={zona.id}
                 onClick={() => setZonaSeleccionada(zonaSeleccionada?.id === zona.id ? null : zona)}
-                className={`card p-5 text-left transition-all border-2 ${
-                  zonaSeleccionada?.id === zona.id ? 'border-verde ring-2 ring-verde/20' : 'border-transparent'
+                className={`card p-4 text-left transition-all border-2 ${
+                  zonaSeleccionada?.id === zona.id ? 'border-primario ring-2 ring-primario/20' : 'border-transparent'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold font-poppins text-gray-800">{zona.nombre}</h3>
-                  <span className="badge bg-verde/10 text-verde text-xs">{zona.horario}</span>
+                  <span className="badge bg-primario/10 text-primario text-xs">{zona.horario}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amarillo" />
+                  <AlertTriangle className="w-4 h-4 text-acento" />
                   <p className="text-sm text-gray-600">
                     El camión estará en tu zona en{' '}
-                    <span className="font-bold text-amarillo">{zona.proximaRecoleccion} min</span>
+                    <span className="font-bold text-acento">{zona.proximaRecoleccion} min</span>
                   </p>
                 </div>
                 {zonaSeleccionada?.id === zona.id && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-verde font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
+                    <p className="text-xs text-primario font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
                   </div>
                 )}
               </button>
@@ -310,8 +310,8 @@ export default function Residuos() {
           </div>
 
           {zonaSeleccionada && (
-            <div className="mt-4 bg-amarillo/10 border border-amarillo/30 rounded-2xl p-5 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amarillo flex items-center justify-center shrink-0">
+            <div className="mt-4 bg-acento/10 border border-acento/30 rounded p-5 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-acento flex items-center justify-center shrink-0">
                 <Truck className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -319,7 +319,7 @@ export default function Residuos() {
                   El camión estará en {zonaSeleccionada.nombre} en {zonaSeleccionada.proximaRecoleccion} minutos
                 </p>
                 <p className="text-sm text-gray-600 mt-0.5">Horario de recolección: {zonaSeleccionada.horario}</p>
-                <p className="text-sm text-amarillo font-medium mt-1">¡Recordá sacar las bolsas al cordón!</p>
+                <p className="text-sm text-acento font-medium mt-1">¡Recordá sacar las bolsas al cordón!</p>
               </div>
             </div>
           )}
@@ -336,8 +336,8 @@ export default function Residuos() {
             {consejos.map(c => {
               const IconoConsejo = iconoConsejo(c.icono)
               return (
-              <div key={c.titulo} className="card p-5">
-                <div className="w-12 h-12 rounded-2xl bg-amarillo/25 text-yellow-700 flex items-center justify-center mb-3">
+              <div key={c.titulo} className="card p-4">
+                <div className="w-12 h-12 rounded-2xl bg-acento/25 text-acento-oscuro flex items-center justify-center mb-3">
                   <IconoConsejo className="w-6 h-6" />
                 </div>
                 <h3 className="font-semibold font-poppins text-gray-800 mb-1">{c.titulo}</h3>

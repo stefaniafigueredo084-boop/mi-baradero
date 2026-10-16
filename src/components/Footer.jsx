@@ -6,13 +6,10 @@ const INSTAGRAM_URL = 'https://www.instagram.com/mi.baradero?igsh=cGh2bzJvZGhxZG
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-[#073318] via-verde-oscuro to-[#0a3d1f] text-white">
-
-      {/* Franja de identidad */}
-      <div className="bg-gradient-to-r from-verde via-azul to-amarillo h-1" />
+    <footer className="bg-primario-oscuro text-white border-t-4 border-secundario">
 
       {/* Logo central grande */}
-      <div className="border-b border-white/10 py-10 px-4">
+      <div className="border-b border-white/10 py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-4 text-center">
           <Link
             to="/"
@@ -20,9 +17,9 @@ export default function Footer() {
             className="inline-block transition-transform duration-200 hover:scale-105"
             aria-label="Mi Baradero — ir al inicio"
           >
-            <LogoMiBaradero size="lg" theme="white" />
+            <LogoMiBaradero size="md" theme="white" />
           </Link>
-          <p className="text-green-200 text-sm max-w-md leading-relaxed mt-2">
+          <p className="text-white/80 text-sm max-w-md leading-relaxed mt-2">
             La plataforma digital que conecta a los vecinos de Baradero con los servicios, eventos y noticias de su ciudad — todo en un solo lugar.
           </p>
           {/* Redes */}
@@ -41,12 +38,12 @@ export default function Footer() {
       </div>
 
       {/* Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
           {/* Servicios */}
           <div>
-            <h3 className="font-bold font-poppins mb-4 text-amarillo text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
               Servicios
             </h3>
             <ul className="space-y-2.5 text-sm">
@@ -60,9 +57,9 @@ export default function Footer() {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-green-200 hover:text-white transition-colors flex items-center gap-1.5 group"
+                    className="text-white/80 hover:text-white transition-colors flex items-center gap-1.5 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-verde group-hover:bg-amarillo transition-colors" />
+                    <span className="w-1 h-1 rounded-full bg-white/50 group-hover:bg-acento transition-colors" />
                     {label}
                   </Link>
                 </li>
@@ -72,10 +69,10 @@ export default function Footer() {
 
           {/* Integrantes */}
           <div>
-            <h3 className="font-bold font-poppins mb-4 text-amarillo text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
               Integrantes del Proyecto
             </h3>
-            <ul className="space-y-2.5 text-sm text-green-200">
+            <ul className="space-y-2.5 text-sm text-white/80">
               {[
                 'Stefania Figueredo',
                 'Celeste Weiss',
@@ -83,7 +80,7 @@ export default function Footer() {
                 'Wanda Garcia',
               ].map(nombre => (
                 <li key={nombre} className="flex items-center gap-2.5">
-                  <Users className="w-3.5 h-3.5 shrink-0 text-verde" />
+                  <Users className="w-3.5 h-3.5 shrink-0 text-acento" />
                   <span>{nombre}</span>
                 </li>
               ))}
@@ -92,18 +89,18 @@ export default function Footer() {
 
           {/* Horarios */}
           <div>
-            <h3 className="font-bold font-poppins mb-4 text-amarillo text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
               Horarios
             </h3>
-            <div className="space-y-3 text-sm text-green-200">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+            <div className="space-y-3 text-sm text-white/80">
+              <div className="bg-white/5 border border-white/10 rounded p-3">
                 <p className="text-white font-semibold mb-1">Atención al Público</p>
                 <p>Lunes a Viernes</p>
                 <p className="text-white font-medium">08:00 - 14:00 hs</p>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+              <div className="bg-white/5 border border-white/10 rounded p-3">
                 <p className="text-white font-semibold mb-1">Emergencias</p>
-                <p className="text-amarillo font-bold text-base">100 · 101 · 107</p>
+                <p className="text-acento font-bold text-base">100 · 101 · 107</p>
               </div>
             </div>
           </div>
@@ -112,7 +109,7 @@ export default function Footer() {
 
       {/* Base */}
       <div className="border-t border-white/10 px-4 py-5">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-green-400">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/60">
           <Link
             to="/"
             onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}

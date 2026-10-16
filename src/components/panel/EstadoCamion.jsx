@@ -27,9 +27,9 @@ export default function EstadoCamion() {
   }
 
   return (
-    <div className="card p-6 mb-8">
+    <div className="card p-4 mb-8">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-4">
-        <Truck className="w-5 h-5 text-verde" /> Estado del camión de residuos
+        <Truck className="w-5 h-5 text-primario" /> Estado del camión de residuos
       </h3>
       <div className="flex flex-wrap gap-3">
         {estadosCamionOpciones.map(op => (
@@ -38,7 +38,7 @@ export default function EstadoCamion() {
             disabled={guardando}
             onClick={() => cambiar(op.id)}
             className={`px-5 py-3 rounded-2xl font-bold text-base transition-all disabled:opacity-50 ${
-              estado === op.id ? 'bg-verde text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-verde'
+              estado === op.id ? 'bg-primario text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-primario'
             }`}
           >
             {op.label}

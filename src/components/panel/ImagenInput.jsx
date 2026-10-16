@@ -24,7 +24,7 @@ export default function ImagenInput({ valor, onChange }) {
   return (
     <div>
       {valor && (
-        <div className="relative w-full h-40 rounded-2xl overflow-hidden mb-3 border-2 border-gray-200">
+        <div className="relative w-full h-40 rounded overflow-hidden mb-3 border-2 border-gray-200">
           <img src={valor} alt="Vista previa" className="w-full h-full object-cover" />
           <button
             type="button"

@@ -23,9 +23,9 @@ export default function EnviarAviso({ nombreDoc, seccion, presets, placeholder }
   }
 
   return (
-    <div className="card p-6 mb-8">
+    <div className="card p-4 mb-8">
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-1">
-        <Megaphone className="w-5 h-5 text-amarillo" /> Enviar aviso
+        <Megaphone className="w-5 h-5 text-acento" /> Enviar aviso
       </h3>
       <p className="text-gray-500 text-sm mb-4">
         Le llega como notificación a los vecinos que tengan activados los avisos de esta sección.
@@ -62,7 +62,7 @@ export default function EnviarAviso({ nombreDoc, seccion, presets, placeholder }
           Enviar
         </button>
       </div>
-      {enviado && <p className="text-verde text-sm font-semibold mt-3">Aviso enviado</p>}
+      {enviado && <p className="text-primario text-sm font-semibold mt-3">Aviso enviado</p>}
     </div>
   )
 }
