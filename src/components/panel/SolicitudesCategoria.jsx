@@ -5,6 +5,8 @@ import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
 import { categoriaPorId } from '../../utils/pase'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 // Cola de solicitudes de categoría (estudiante/jubilado/discapacidad)
 // pendientes de revisión, cargadas desde "Mi Pase". Aprobar/rechazar
@@ -65,9 +67,9 @@ export default function SolicitudesCategoria() {
       </p>
 
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : pendientes.length === 0 ? (
-        <p className="text-gray-400 text-sm">No hay solicitudes pendientes.</p>
+        <EstadoVacio compacto texto="No hay solicitudes pendientes." />
       ) : (
         <div className="space-y-4">
           {pendientes.map(item => {
@@ -77,7 +79,7 @@ export default function SolicitudesCategoria() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="min-w-0">
                     <p className="font-bold text-gray-800">{item.nombre}</p>
-                    <span className="badge bg-amber-100 text-amber-700 text-xs font-semibold mt-1 inline-flex items-center gap-1">
+                    <span className="badge bg-amber-100 text-amber-900 text-xs font-semibold mt-1 inline-flex items-center gap-1">
                       <Clock3 className="w-3 h-3" /> Pide: {cat.label}
                     </span>
                   </div>

@@ -4,6 +4,7 @@ import { Check, Loader2, CalendarDays } from 'lucide-react'
 import { db } from '../../firebase'
 import { calendarioResiduosDefault } from '../../data/panelCampos'
 import { registrarHistorial } from '../../utils/historial'
+import Esqueleto from '../Esqueleto'
 
 export default function CalendarioResiduos() {
   const [dias, setDias] = useState(null)
@@ -41,7 +42,7 @@ export default function CalendarioResiduos() {
     }
   }
 
-  if (!dias) return <p className="text-gray-400 text-sm">Cargando...</p>
+  if (!dias) return <div className="card p-4 mb-8"><Esqueleto filas={4} alto="h-10" /></div>
 
   return (
     <div className="card p-4 mb-8">

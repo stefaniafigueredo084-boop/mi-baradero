@@ -4,11 +4,12 @@ import { eventos as eventosFijos, categorias as categoriasBase } from '../data/e
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
+import EstadoVacio from '../components/EstadoVacio'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-primario/10 text-primario',
   'Cultura': 'bg-secundario/10 text-secundario',
-  'Comercio': 'bg-acento/20 text-acento-oscuro',
+  'Comercio': 'bg-acento/20 text-amber-900',
   'Deportes': 'bg-purple-100 text-purple-700',
   'Arte': 'bg-pink-100 text-pink-700',
   'Obras Públicas': 'bg-primario/10 text-primario',
@@ -66,7 +67,7 @@ export default function Eventos() {
       <div className="bg-primario text-white py-5 sm:py-6 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario text-tinta flex items-center justify-center shrink-0">
               <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
@@ -85,7 +86,7 @@ export default function Eventos() {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-4 h-4 text-acento fill-acento" />
-                <span className="text-acento text-xs font-bold uppercase tracking-wide">Evento destacado</span>
+                <span className="text-white text-xs font-bold uppercase tracking-wide">Evento destacado</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold font-poppins mb-1">{evento.titulo}</h2>
               <p className="text-white/80 text-sm mb-3 max-w-xl">{evento.descripcion}</p>
@@ -128,8 +129,8 @@ export default function Eventos() {
           )}
           {avisoEventos?.mensaje && (
             <div className="mt-3 flex items-center gap-2 bg-acento/10 border border-acento/30 rounded p-3">
-              <Bell className="w-4 h-4 text-yellow-700 shrink-0" />
-              <p className="text-xs text-yellow-800">{avisoEventos.mensaje}</p>
+              <Bell className="w-4 h-4 text-amber-900 shrink-0" />
+              <p className="text-xs text-amber-900">{avisoEventos.mensaje}</p>
             </div>
           )}
         </div>
@@ -149,7 +150,7 @@ export default function Eventos() {
                   className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ${
                     catActiva === cat
                       ? 'bg-primario-oscuro text-white'
-                      : 'bg-white text-gray-600 border border-gray-200 hover:border-primario hover:text-primario'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-primario hover:text-primario-oscuro'
                   }`}
                 >
                   {cat}
@@ -184,7 +185,7 @@ export default function Eventos() {
                   <span className={`badge text-xs mb-1.5 ${categoriaBadgeColor[evento.categoria] || 'bg-gray-100 text-gray-600'}`}>
                     {evento.categoria}
                   </span>
-                  <h3 className="font-bold font-poppins text-gray-800 mb-1 group-hover:text-primario transition-colors">
+                  <h3 className="font-bold font-poppins text-gray-800 mb-1 group-hover:text-primario-oscuro transition-colors">
                     {evento.titulo}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-2 mb-2">{evento.descripcion}</p>
@@ -204,10 +205,7 @@ export default function Eventos() {
           </div>
 
           {eventosFiltrados.length === 0 && (
-            <div className="text-center py-12 text-gray-400">
-              <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>No hay eventos en esta categoría</p>
-            </div>
+            <EstadoVacio texto="No hay eventos en esta categoría por ahora." />
           )}
         </div>
 

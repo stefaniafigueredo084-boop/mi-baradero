@@ -186,7 +186,7 @@ export default function CuentaVecino({ usuario }) {
             type="button"
             onClick={() => setVerPass(v => !v)}
             aria-label={verPass ? 'Ocultar contraseña' : 'Ver contraseña'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primario transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primario-oscuro transition-colors"
           >
             {verPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
@@ -210,7 +210,7 @@ export default function CuentaVecino({ usuario }) {
             type="button"
             onClick={recuperarPassword}
             disabled={recuperando}
-            className="text-xs text-gray-400 hover:text-primario font-medium disabled:opacity-60"
+            className="text-xs text-gray-400 hover:text-primario-oscuro font-medium disabled:opacity-60"
           >
             {recuperando ? 'Enviando...' : '¿Olvidaste tu contraseña?'}
           </button>
@@ -246,7 +246,7 @@ export default function CuentaVecino({ usuario }) {
           setError('')
           setPassword2('')
         }}
-        className="w-full text-center text-sm text-primario font-semibold mt-4 hover:text-primario-oscuro"
+        className="w-full text-center text-sm text-primario-oscuro font-semibold mt-4 hover:text-primario-oscuro"
       >
         {modo === 'registro' ? '¿Ya tenés cuenta? Ingresá' : '¿No tenés cuenta? Creá una'}
       </button>

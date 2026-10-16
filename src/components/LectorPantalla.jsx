@@ -99,7 +99,7 @@ export default function LectorPantalla() {
           onClick={() => setAsistenteAbierto(true)}
           aria-label="Registrarme por voz"
           title={escuchandoActivacion ? 'Escuchando… decí "asistente" para activarme, o tocá acá' : 'Registrarme por voz'}
-          className={`relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 bg-secundario text-white`}
+          className={`relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 bg-secundario text-tinta`}
         >
           <Mic className="w-6 h-6" />
           {escuchandoActivacion && (

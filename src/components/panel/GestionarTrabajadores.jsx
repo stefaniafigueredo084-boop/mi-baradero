@@ -5,6 +5,8 @@ import { auth, db } from '../../firebase'
 import { useTrabajadores } from '../../hooks/useTrabajadores'
 import { registrarHistorial } from '../../utils/historial'
 import { labelSector } from '../../data/sectores'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 // Lista de cuentas del panel, con dar de baja (reversible) y eliminar
 // definitivamente (para cargas de prueba o cuentas mal creadas).
@@ -61,9 +63,9 @@ export default function GestionarTrabajadores() {
       </p>
 
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : visibles.length === 0 ? (
-        <p className="text-gray-400 text-sm">Todavía no hay cuentas cargadas.</p>
+        <EstadoVacio compacto texto="Todavía no hay cuentas cargadas." />
       ) : (
         <div className="space-y-3">
           {visibles.map(t => {
@@ -92,7 +94,7 @@ export default function GestionarTrabajadores() {
                         onClick={() => alternarActivo(t)}
                         disabled={procesando === t.id}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs transition-colors disabled:opacity-60 ${
-                          activo ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-primario/10 text-primario hover:bg-primario/20'
+                          activo ? 'bg-amber-50 text-amber-900 hover:bg-amber-100' : 'bg-primario/10 text-primario-oscuro hover:bg-primario/20'
                         }`}
                       >
                         {procesando === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : activo ? <Ban className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}

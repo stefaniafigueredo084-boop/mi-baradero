@@ -15,6 +15,8 @@ import {
   fechaReclamo,
   tipoReclamoPorId,
 } from '../../data/reclamosData'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 // Bandeja de quejas, reclamos, sugerencias y felicitaciones que mandan
 // los vecinos desde /reclamos. El empleado cambia el estado, puede
@@ -195,9 +197,9 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error || errorAccion}</p>
       )}
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : visibles.length === 0 ? (
-        <p className="text-gray-400 text-sm">No hay mensajes en esta vista.</p>
+        <EstadoVacio compacto texto="No hay mensajes en esta vista." />
       ) : (
         <div className="space-y-4">
           {visibles.map(item => {

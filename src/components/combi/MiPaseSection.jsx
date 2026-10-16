@@ -15,7 +15,7 @@ import PaseQR from '../pase/PaseQR'
 
 const COLOR_CATEGORIA = {
   azul: 'border-secundario bg-secundario/5 text-secundario-oscuro',
-  amber: 'border-amber-400 bg-amber-50 text-amber-700',
+  amber: 'border-amber-400 bg-amber-50 text-amber-900',
   teal: 'border-teal-500 bg-teal-50 text-teal-700',
 }
 
@@ -203,7 +203,7 @@ export default function MiPaseSection() {
                       </label>
 
                       {bloqueada && pendienteEsta && (
-                        <p className="text-xs text-amber-600 mt-2 flex items-center gap-1.5 pl-6">
+                        <p className="text-xs text-amber-900 mt-2 flex items-center gap-1.5 pl-6">
                           <Clock className="w-3 h-3 shrink-0" /> Tu solicitud está en revisión.
                         </p>
                       )}
@@ -239,7 +239,7 @@ export default function MiPaseSection() {
                     </button>
                   </div>
                   {formaPago === 'efectivo' && (
-                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mt-2 leading-relaxed">
+                    <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded p-3 mt-2 leading-relaxed">
                       Se paga en persona en {puntosPagoParaRuta(horario.origen, horario.destino).map(p => p.nombre).join(' o ')},
                       {' '}{puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
                       Tenés que pagarlo antes de que salga tu combi ({horario.salida} hs) — si no, la reserva vence y vas a tener que generarla de nuevo.
@@ -454,7 +454,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
 
   return (
     <div className="max-w-sm bg-amber-50 border border-amber-200 rounded p-5">
-      <p className="text-xs font-bold text-amber-700 flex items-center gap-1.5 mb-3">
+      <p className="text-xs font-bold text-amber-900 flex items-center gap-1.5 mb-3">
         <Clock className="w-3.5 h-3.5" /> Estado: Pago pendiente
       </p>
       <div className="text-sm text-gray-700 space-y-1 mb-4">
@@ -476,7 +476,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
             ))}
           </ul>
           <p className="text-xs text-gray-500">{puntosPagoEfectivo.horarioAtencion}.</p>
-          <p className="text-xs font-bold text-amber-700 pt-1">
+          <p className="text-xs font-bold text-amber-900 pt-1">
             Pagalo antes de las {pasaje.salida} hs del {formatearFecha(pasaje.fecha)} (cuando sale tu combi) o la reserva vence.
           </p>
         </div>
@@ -493,7 +493,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
           >
             <MessageCircle className="w-4 h-4" /> Enviar comprobante por WhatsApp
           </a>
-          <p className="text-xs text-amber-600 pt-1">
+          <p className="text-xs text-amber-900 pt-1">
             Apenas se confirme el pago, tu QR va a aparecer acá — no hace falta que hagas nada más.
           </p>
         </div>

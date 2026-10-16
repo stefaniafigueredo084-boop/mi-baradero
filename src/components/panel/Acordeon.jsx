@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 const COLOR_ICONO = {
   azul: 'bg-primario/15 text-primario',
   verde: 'bg-secundario/15 text-secundario',
-  amarillo: 'bg-acento/25 text-acento-oscuro',
+  amarillo: 'bg-acento/25 text-amber-900',
 }
 
 // Agrupa varios AcordeonItem con separación consistente.

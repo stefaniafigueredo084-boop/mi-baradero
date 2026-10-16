@@ -20,7 +20,7 @@ function MarcaHeader() {
       <img src="/favicon.png" alt="" className="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
       <span className="flex flex-col leading-none">
         <span className="font-poppins font-bold text-tinta text-lg sm:text-xl tracking-tight">Mi Baradero</span>
-        <span className="font-poppins text-[11px] sm:text-xs text-gray-500 mt-0.5">Servicios de tu ciudad</span>
+        <span className="font-poppins text-xs text-gray-500 mt-0.5">Servicios de tu ciudad</span>
       </span>
     </span>
   )
@@ -35,7 +35,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white shadow-sm">
 
       {/* Franja institucional */}
-      <div className="bg-primario-oscuro text-white text-[12.5px] sm:text-sm">
+      <div className="bg-primario-oscuro text-white text-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 h-8 sm:h-9">
           <span className="truncate">Sitio oficial · Municipalidad de Baradero</span>
           <div className="hidden md:flex items-center gap-6 shrink-0">
@@ -67,8 +67,8 @@ export default function Header() {
                 aria-current={active ? 'page' : undefined}
                 className={`h-full flex items-center px-3 text-[15px] font-semibold whitespace-nowrap border-b-[3px] transition-colors ${
                   active
-                    ? 'text-primario border-primario'
-                    : 'text-tinta border-transparent hover:text-primario'
+                    ? 'text-primario-oscuro border-primario'
+                    : 'text-tinta border-transparent hover:text-primario-oscuro'
                 }`}
               >
                 {label}
@@ -77,7 +77,7 @@ export default function Header() {
           })}
           <button
             onClick={tutorial?.abrirManualmente}
-            className="h-full flex items-center gap-1 px-3 text-[15px] font-semibold text-tinta hover:text-primario border-b-[3px] border-transparent"
+            className="h-full flex items-center gap-1 px-3 text-[15px] font-semibold text-tinta hover:text-primario-oscuro border-b-[3px] border-transparent"
           >
             <HelpCircle className="w-4 h-4" /> Ayuda
           </button>

@@ -5,6 +5,8 @@ import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
 import CampoInput from './CampoInput'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 function valoresVacios(campos) {
   const v = {}
@@ -114,9 +116,9 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
       )}
 
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : items.length === 0 ? (
-        <p className="text-gray-400 text-sm">Todavía no hay registros cargados acá.</p>
+        <EstadoVacio compacto texto="Todavía no hay registros cargados acá." />
       ) : (
         <div className="space-y-3">
           {items.map(item => (

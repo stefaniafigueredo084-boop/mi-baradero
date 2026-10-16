@@ -83,7 +83,7 @@ export default function CombiMunicipal() {
       {/* Hero */}
       <div className="bg-primario text-white py-5 sm:py-6 px-4">
         <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario text-tinta flex items-center justify-center shrink-0">
             <Bus className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
@@ -101,7 +101,7 @@ export default function CombiMunicipal() {
       <nav className="sticky top-[59px] z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-2 grid grid-cols-5 gap-1.5 sm:flex sm:gap-2">
           {[
-            { href: '#en-vivo', label: 'En vivo' },
+            { href: '#en-vivo', label: 'Recorrido' },
             { href: '#alertas', label: 'Alertas' },
             { href: '#paradas', label: 'Paradas' },
             { href: '#horarios', label: 'Horarios' },
@@ -110,7 +110,7 @@ export default function CombiMunicipal() {
             <a
               key={s.href}
               href={s.href}
-              className="px-1 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-center whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-primario/10 hover:text-primario transition-colors"
+              className="min-h-[44px] inline-flex items-center justify-center px-1 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-center whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-primario/10 hover:text-primario-oscuro transition-colors"
             >
               {s.label}
             </a>
@@ -124,11 +124,17 @@ export default function CombiMunicipal() {
         <div id="en-vivo" className="card p-4 scroll-mt-32">
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             <Navigation className="w-6 h-6 text-primario" />
-            <h2 className="text-xl font-bold font-poppins">Seguimiento en Tiempo Real</h2>
-            <span className="badge bg-primario/10 text-primario">
-              <span className="w-2 h-2 rounded-full bg-primario animate-pulse inline-block mr-1" />
-              En vivo
-            </span>
+            {/* "En vivo" solo cuando un empleado marcó la parada actual;
+                si no, es la simulación del recorrido y se dice "estimado". */}
+            <h2 className="text-xl font-bold font-poppins">{enVivo ? 'Dónde está la combi' : 'Recorrido estimado'}</h2>
+            {enVivo ? (
+              <span className="badge bg-primario/10 text-primario-oscuro">
+                <span className="w-2 h-2 rounded-full bg-primario animate-pulse inline-block mr-1" />
+                Marcada por el municipio
+              </span>
+            ) : (
+              <span className="badge bg-gray-100 text-gray-600">Estimado</span>
+            )}
             <button
               onClick={activarNotif}
               className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
@@ -171,7 +177,7 @@ export default function CombiMunicipal() {
                     nunca ocupa más ancho que el que tiene disponible, sea cual sea
                     el tamaño de pantalla; el nombre completo sigue apareciendo en
                     la tarjeta de "Paradas Disponibles" más abajo. */}
-                <span className="absolute top-9 left-1/2 -translate-x-1/2 max-w-[64px] sm:max-w-[100px] truncate text-center text-[10px] sm:text-xs font-medium text-gray-700 bg-white/80 px-1.5 py-0.5 rounded-md">
+                <span className="absolute top-9 left-1/2 -translate-x-1/2 max-w-[64px] sm:max-w-[100px] truncate text-center text-xs font-medium text-gray-700 bg-white/80 px-1.5 py-0.5 rounded-md">
                   {p.nombre}
                 </span>
               </div>
@@ -189,7 +195,7 @@ export default function CombiMunicipal() {
             </div>
 
             <div className="absolute top-3 right-3 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded-lg">
-              Mapa simulado
+              Mapa ilustrativo
             </div>
           </div>
 
@@ -201,7 +207,7 @@ export default function CombiMunicipal() {
             <div>
               <p className="font-semibold text-primario-oscuro">{estadoActual}</p>
               <p className="text-sm text-gray-500">
-                {enVivo ? 'Posición confirmada por el municipio' : 'Actualización automática cada 2.5 segundos'}
+                {enVivo ? 'Última parada marcada por el municipio' : 'Estimado según el recorrido habitual: no es la posición real'}
               </p>
             </div>
             <div className="ml-auto text-right">
@@ -329,9 +335,9 @@ function LugaresConPase({ horario }) {
   return (
     <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-1.5 flex-wrap">
       <Ticket className="w-3 h-3 text-secundario shrink-0" />
-      <span className="text-[11px] text-gray-500">{libres} libres para comprar con pase QR</span>
+      <span className="text-xs text-gray-500">{libres} libres para comprar con pase QR</span>
       {!liberado && hayReservados && (
-        <span className="text-[11px] text-gray-400">
+        <span className="text-xs text-gray-400">
           (<Accessibility className="w-3 h-3 inline -mt-0.5" aria-label="Discapacidad" /> {prioritarios.discapacidad.libres}/{prioritarios.discapacidad.reservados} · Jubilados {prioritarios.jubilado.libres}/{prioritarios.jubilado.reservados})
         </span>
       )}

@@ -26,7 +26,7 @@ function useGpsCamion(activo) {
         const nueva = prev - 80
         if (nueva <= 500 && !notifEnviada) {
           mostrarNotificacion('Mi Baradero — Camión cerca', {
-            body: saludar('El camión de residuos está a menos de 500 metros. ¡Sacá las bolsas!'),
+            body: saludar('Según el recorrido estimado, el camión de residuos estaría a menos de 500 metros. ¡Sacá las bolsas!'),
             icon: '/logo-mibaradero.png',
           }, 'basura')
           setNotifEnviada(true)
@@ -112,12 +112,12 @@ export default function Residuos() {
       {/* Hero amarillo */}
       <div className="bg-primario text-white py-5 sm:py-6 px-4">
         <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario text-tinta flex items-center justify-center shrink-0">
             <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold font-poppins">Recolección de Residuos</h1>
-            <p className="text-white/80 text-sm sm:text-base">Calendario, alertas y seguimiento GPS del camión</p>
+            <p className="text-white/80 text-sm sm:text-base">Calendario, alertas y recorrido estimado del camión</p>
           </div>
         </div>
       </div>
@@ -176,23 +176,24 @@ export default function Residuos() {
             )}
             {avisoResiduos?.mensaje && (
               <div className="mt-3 bg-acento/10 border border-acento/30 rounded p-3 flex items-center gap-2">
-                <Truck className="w-4 h-4 text-yellow-700 shrink-0" />
-                <p className="text-sm text-yellow-800">{avisoResiduos.mensaje}</p>
+                <Truck className="w-4 h-4 text-amber-900 shrink-0" />
+                <p className="text-sm text-amber-900">{avisoResiduos.mensaje}</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* GPS Tracker */}
+        {/* Recorrido estimado del camión: es una estimación según el
+            recorrido habitual (no hay GPS en el camión), y así se dice. */}
         <div className={`card p-4 border-2 transition-all duration-300 ${cerca ? 'border-red-400 shadow-red-100 shadow-lg' : gpsActivo ? 'border-primario/40' : 'border-transparent'}`}>
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-bold font-poppins flex items-center gap-2">
                 <Navigation className={`w-5 h-5 ${gpsActivo ? 'text-primario' : 'text-gray-400'}`} />
-                Seguimiento GPS del Camión
+                Recorrido estimado del camión
               </h2>
               <p className="text-sm text-gray-500 mt-1">
-                Recibí una notificación cuando el camión esté a menos de 500 metros de tu casa
+                Una estimación de cuánto falta para que pase, según el recorrido habitual. No es la ubicación real del camión.
               </p>
             </div>
             <button
@@ -204,7 +205,7 @@ export default function Residuos() {
               }`}
             >
               <Navigation className="w-4 h-4" />
-              {gpsActivo ? 'Detener seguimiento' : 'Activar GPS'}
+              {gpsActivo ? 'Ocultar' : 'Ver recorrido estimado'}
             </button>
           </div>
 
@@ -212,9 +213,9 @@ export default function Residuos() {
             <div className="space-y-4">
               {/* Distancia */}
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">Distancia del camión</span>
+                <span className="text-sm font-medium text-gray-600">Distancia estimada</span>
                 <span className={`text-2xl font-bold font-poppins ${cerca ? 'text-red-500' : 'text-primario'}`}>
-                  {distancia === 0 ? '¡Llegó!' : `${distancia} m`}
+                  {distancia === 0 ? 'Debería estar pasando' : `≈ ${distancia} m`}
                 </span>
               </div>
 
@@ -236,8 +237,8 @@ export default function Residuos() {
                 <div className="bg-red-50 border border-red-200 rounded p-4 flex items-center gap-3">
                   <Truck className="w-7 h-7 text-red-500 shrink-0" />
                   <div>
-                    <p className="font-bold text-red-600">¡El camión está muy cerca!</p>
-                    <p className="text-sm text-red-500">Sacá las bolsas al cordón ahora.</p>
+                    <p className="font-bold text-red-600">El camión debería estar cerca</p>
+                    <p className="text-sm text-red-500">Según el recorrido estimado. Sacá las bolsas al cordón.</p>
                   </div>
                 </div>
               )}
@@ -245,7 +246,7 @@ export default function Residuos() {
           ) : (
             <div className="flex items-center justify-center py-8 text-gray-300 flex-col gap-2">
               <Truck className="w-12 h-12" />
-              <p className="text-sm text-gray-400">Activá el GPS para ver la ubicación del camión</p>
+              <p className="text-sm text-gray-400">Tocá "Ver recorrido estimado" para saber cuánto falta, aproximadamente</p>
             </div>
           )}
         </div>
@@ -267,7 +268,7 @@ export default function Residuos() {
                   key={dia.dia}
                   className={`card p-4 border-2 text-center ${esHoy ? 'border-acento ring-2 ring-acento/30' : c.border} ${c.bg} transition-all`}
                 >
-                  {esHoy && <span className="text-xs font-bold text-acento block mb-1">HOY</span>}
+                  {esHoy && <span className="inline-block bg-acento text-tinta text-xs font-bold px-2 py-0.5 rounded mb-1">HOY</span>}
                   <p className="text-xs font-semibold text-gray-600 mb-2">{dia.dia}</p>
                   <div className={`w-10 h-10 rounded-xl ${c.icon} flex items-center justify-center mx-auto mb-2`}>
                     <IconoDia className="w-5 h-5 text-white" />
@@ -301,7 +302,7 @@ export default function Residuos() {
                   <AlertTriangle className="w-4 h-4 text-acento" />
                   <p className="text-sm text-gray-600">
                     El camión estará en tu zona en{' '}
-                    <span className="font-bold text-acento">{zona.proximaRecoleccion} min</span>
+                    <span className="font-bold text-amber-900">{zona.proximaRecoleccion} min</span>
                   </p>
                 </div>
                 {zonaSeleccionada?.id === zona.id && (
@@ -323,7 +324,7 @@ export default function Residuos() {
                   El camión estará en {zonaSeleccionada.nombre} en {zonaSeleccionada.proximaRecoleccion} minutos
                 </p>
                 <p className="text-sm text-gray-600 mt-0.5">Horario de recolección: {zonaSeleccionada.horario}</p>
-                <p className="text-sm text-acento font-medium mt-1">¡Recordá sacar las bolsas al cordón!</p>
+                <p className="text-sm text-amber-900 font-medium mt-1">¡Recordá sacar las bolsas al cordón!</p>
               </div>
             </div>
           )}
@@ -341,7 +342,7 @@ export default function Residuos() {
               const IconoConsejo = iconoConsejo(c.icono)
               return (
               <div key={c.titulo} className="card p-4">
-                <div className="w-12 h-12 rounded-2xl bg-acento/25 text-acento-oscuro flex items-center justify-center mb-3">
+                <div className="w-12 h-12 rounded-2xl bg-acento/25 text-amber-900 flex items-center justify-center mb-3">
                   <IconoConsejo className="w-6 h-6" />
                 </div>
                 <h3 className="font-semibold font-poppins text-gray-800 mb-1">{c.titulo}</h3>

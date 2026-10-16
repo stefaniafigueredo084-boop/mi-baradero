@@ -4,14 +4,15 @@ import { Link } from 'react-router-dom'
 import { galeriaEventos, tiposEvento } from '../data/galeriaEventos'
 import { nombreVecino } from '../utils/perfilLocal'
 import { useTutorial } from '../context/TutorialContext'
+import EstadoVacio from '../components/EstadoVacio'
 
 const servicios = [
-  { to: '/combi', icon: Bus, titulo: 'Combi Municipal', detalle: 'Pasajes y recorrido en vivo', color: 'bg-primario', claves: 'pasaje colectivo micro pase horarios viaje' },
-  { to: '/residuos', icon: Trash2, titulo: 'Residuos', detalle: 'Calendario de recolección', color: 'bg-secundario', claves: 'basura camion recoleccion reciclables' },
-  { to: '/eventos', icon: Calendar, titulo: 'Eventos y Noticias', detalle: 'Agenda de la ciudad', color: 'bg-primario-oscuro', claves: 'agenda festival feria novedades' },
-  { to: '/puntos-verdes', icon: MapPin, titulo: 'Puntos Verdes', detalle: 'Dónde reciclar', color: 'bg-secundario', claves: 'reciclaje reciclar mapa' },
-  { to: '/reclamos', icon: MessageSquare, titulo: 'Reclamos', detalle: 'Escribile al municipio', color: 'bg-primario-oscuro', claves: 'sugerencias queja reclamo' },
-  { to: '/perfil', icon: UserCircle, titulo: 'Mi Perfil', detalle: 'Tus datos y tu pase', color: 'bg-primario', claves: 'cuenta datos usuario' },
+  { to: '/combi', icon: Bus, titulo: 'Combi Municipal', detalle: 'Pasajes, horarios y recorrido', color: 'bg-primario text-white', claves: 'pasaje colectivo micro pase horarios viaje' },
+  { to: '/residuos', icon: Trash2, titulo: 'Residuos', detalle: 'Calendario de recolección', color: 'bg-secundario text-tinta', claves: 'basura camion recoleccion reciclables' },
+  { to: '/eventos', icon: Calendar, titulo: 'Eventos y Noticias', detalle: 'Agenda de la ciudad', color: 'bg-primario-oscuro text-white', claves: 'agenda festival feria novedades' },
+  { to: '/puntos-verdes', icon: MapPin, titulo: 'Puntos Verdes', detalle: 'Dónde reciclar', color: 'bg-secundario text-tinta', claves: 'reciclaje reciclar mapa' },
+  { to: '/reclamos', icon: MessageSquare, titulo: 'Reclamos', detalle: 'Escribile al municipio', color: 'bg-primario-oscuro text-white', claves: 'sugerencias queja reclamo' },
+  { to: '/perfil', icon: UserCircle, titulo: 'Mi Perfil', detalle: 'Tus datos y tu pase', color: 'bg-primario text-white', claves: 'cuenta datos usuario' },
 ]
 
 const atajos = [
@@ -42,7 +43,7 @@ function EventoCard({ evento }) {
         <span className="absolute top-2 left-2 bg-white text-primario-oscuro text-xs font-bold font-poppins px-2 py-1 rounded-sm">
           {evento.fecha}
         </span>
-        <span className="absolute top-2 right-2 bg-acento text-[#3B2A00] text-[10.5px] font-bold uppercase tracking-wide px-2 py-1 rounded-md">
+        <span className="absolute top-2 right-2 bg-acento text-[#3B2A00] text-xs font-bold uppercase tracking-wide px-2 py-1 rounded-md">
           {evento.tag}
         </span>
       </div>
@@ -76,10 +77,10 @@ export default function Home() {
     <div className="min-h-screen bg-fondo-app">
 
       {/* ── HERO ───────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-b from-[#E2EFE7] to-fondo-app">
+      <section className="hero-portada">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-10 lg:pt-14 lg:pb-16 grid lg:grid-cols-[1.45fr_1fr] gap-8 lg:gap-12 items-center">
           <div>
-            <span className="inline-block bg-acento text-tinta text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] px-3.5 py-1.5 rounded-full">
+            <span className="inline-block bg-acento text-tinta text-xs font-bold uppercase tracking-[0.12em] px-3.5 py-1.5 rounded-full">
               Baradero, Buenos Aires
             </span>
             <h1 className="mt-4 text-[34px] sm:text-5xl lg:text-[58px] font-extrabold font-poppins text-tinta leading-[1.05] tracking-tight">
@@ -117,7 +118,7 @@ export default function Home() {
                 <Link
                   key={label}
                   to={to}
-                  className="bg-white border border-gray-200 text-primario-oscuro text-sm font-semibold px-4 py-2 rounded-full hover:border-primario transition-colors"
+                  className="inline-flex items-center min-h-[44px] bg-white border border-gray-200 text-primario-oscuro text-sm font-semibold px-4 py-2 rounded-full hover:border-primario transition-colors"
                 >
                   {label}
                 </Link>
@@ -129,10 +130,10 @@ export default function Home() {
             <img src="/eventos/festival-baradero.jpg" alt="Festival de Baradero" className="absolute inset-0 w-full h-full object-cover" />
             <Link
               to="/combi"
-              className="absolute left-3 right-3 sm:left-4 sm:right-auto bottom-3 sm:bottom-4 flex items-center gap-2 bg-white rounded-full px-4 py-2 text-[13px] sm:text-sm font-semibold text-tinta shadow-md hover:text-primario"
+              className="absolute left-3 right-3 sm:left-4 sm:right-auto bottom-3 sm:bottom-4 flex items-center gap-2 min-h-[44px] bg-white rounded-full px-4 py-2 text-sm font-semibold text-tinta shadow-md hover:text-primario-oscuro"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-secundario shrink-0" />
-              Combi municipal · seguí el recorrido en vivo
+              Combi municipal · horarios y recorrido
             </Link>
           </div>
         </div>
@@ -141,9 +142,10 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
 
         {sinResultados && (
-          <p className="text-center text-gray-500 text-sm py-10">
-            No encontramos nada con “{busqueda.trim()}”.
-          </p>
+          <EstadoVacio
+            titulo={`No encontramos nada con “${busqueda.trim()}”`}
+            texto="Probá con otra palabra, como “pasaje”, “basura” o “reclamo”."
+          />
         )}
 
         {/* ── SERVICIOS ────────────────────────────────────────────── */}
@@ -158,10 +160,10 @@ export default function Home() {
                   to={to}
                   className="bg-white border border-gray-200 rounded px-1.5 pt-2.5 pb-2 flex flex-col items-center gap-1.5 text-center hover:border-primario transition-colors"
                 >
-                  <span className={`w-[42px] h-[42px] rounded-xl ${color} text-white flex items-center justify-center`}>
+                  <span className={`w-[42px] h-[42px] rounded-xl ${color} flex items-center justify-center`}>
                     <Icon className="w-[21px] h-[21px]" />
                   </span>
-                  <span className="text-[12.5px] sm:text-sm font-semibold text-tinta leading-tight">{titulo}</span>
+                  <span className="text-sm font-semibold text-tinta leading-tight">{titulo}</span>
                   <span className="hidden sm:block text-xs text-gray-500 leading-tight">{detalle}</span>
                 </Link>
               ))}
@@ -174,7 +176,7 @@ export default function Home() {
           <section id="eventos-baradero" className="pt-5">
             <div className="flex items-baseline justify-between mb-2">
               <h2 className="text-base sm:text-lg font-bold font-poppins text-tinta">Eventos y noticias</h2>
-              <Link to="/eventos" className="text-[13px] font-semibold text-primario hover:underline">Ver todo</Link>
+              <Link to="/eventos" className="inline-flex items-center min-h-[44px] text-sm font-semibold text-primario-oscuro hover:underline">Ver todo</Link>
             </div>
 
             <div className="flex gap-1.5 overflow-x-auto mb-3">
@@ -182,7 +184,7 @@ export default function Home() {
                 <button
                   key={tipo.id}
                   onClick={() => setFiltroEvento(tipo.id)}
-                  className={`shrink-0 px-3 py-1 rounded-full text-[12.5px] font-semibold border transition-colors ${
+                  className={`shrink-0 px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
                     filtroEvento === tipo.id
                       ? 'bg-primario-oscuro border-primario-oscuro text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-primario'
@@ -199,7 +201,7 @@ export default function Home() {
             </div>
 
             {eventosVisibles.length === 0 && (
-              <p className="text-center text-gray-500 text-sm py-8">No hay eventos en esta categoría.</p>
+              <EstadoVacio compacto texto="No hay eventos en esta categoría por ahora." />
             )}
           </section>
         )}
@@ -208,12 +210,12 @@ export default function Home() {
         {!q && (
           <section className="mt-5 bg-secundario-suave rounded flex items-center gap-3 px-3 py-2.5">
             <img src="/tachin.png" alt="" className="h-12 w-12 object-contain shrink-0" />
-            <p className="flex-1 min-w-0 text-[13px] sm:text-sm text-secundario-oscuro leading-snug">
+            <p className="flex-1 min-w-0 text-sm text-secundario-oscuro leading-snug">
               <b className="font-poppins">¿Primera vez acá?</b> Tachín te muestra cómo se usa la app.
             </p>
             <button
               onClick={tutorial?.abrirManualmente}
-              className="shrink-0 bg-secundario hover:bg-secundario-oscuro text-white text-[13px] font-bold px-3.5 py-2 rounded-[10px] transition-colors"
+              className="shrink-0 bg-secundario hover:brightness-95 text-tinta text-sm font-bold px-4 min-h-[44px] rounded-[10px] transition-colors"
             >
               Ver recorrido
             </button>

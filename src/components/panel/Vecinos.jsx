@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { Bus, Trash2, Calendar, Recycle, Users } from 'lucide-react'
 import { useColeccion } from '../../hooks/useColeccion'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 const NOTIF_INFO = {
-  basura: { label: 'Residuos', icon: Trash2, color: 'text-acento bg-acento/10' },
+  basura: { label: 'Residuos', icon: Trash2, color: 'text-amber-900 bg-acento/20' },
   eventos: { label: 'Eventos', icon: Calendar, color: 'text-primario bg-primario/10' },
   puntosVerdes: { label: 'Puntos Verdes', icon: Recycle, color: 'text-primario bg-primario/10' },
   combi: { label: 'Combi Municipal', icon: Bus, color: 'text-secundario bg-secundario/10' },
@@ -36,9 +38,9 @@ export default function Vecinos() {
       </div>
 
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : items.length === 0 ? (
-        <p className="text-gray-400 text-sm">Todavía no hay vecinos registrados.</p>
+        <EstadoVacio compacto texto="Todavía no hay vecinos registrados." />
       ) : (
         <div className="space-y-2">
           {items.map(v => (

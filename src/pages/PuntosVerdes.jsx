@@ -74,7 +74,7 @@ export default function PuntosVerdes() {
       {/* Hero azul */}
       <div className="bg-primario text-white py-5 sm:py-6 px-4">
         <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario text-tinta flex items-center justify-center shrink-0">
             <Recycle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
@@ -261,7 +261,7 @@ export default function PuntosVerdes() {
                   href={linkComoLlegar(puntoSeleccionado)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 bg-secundario text-white text-sm font-semibold px-3.5 py-2 rounded-xl hover:bg-secundario-oscuro transition-colors shrink-0"
+                  className="flex items-center gap-1.5 bg-secundario text-tinta text-sm font-semibold px-3.5 py-2 rounded-xl hover:brightness-95 transition-colors shrink-0"
                 >
                   <Navigation className="w-4 h-4" /> Cómo llegar
                 </a>

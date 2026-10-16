@@ -247,7 +247,7 @@ export default function Perfil() {
                 <p className="font-bold font-poppins text-gray-800">Mi Pase de la combi</p>
                 <p className="text-sm text-gray-500">Pedí tu categoría (estudiante, jubilado, discapacidad) y generá tu QR para viajar.</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primario transition-colors shrink-0" />
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primario-oscuro transition-colors shrink-0" />
             </Link>
 
         {/* Datos personales */}
@@ -258,7 +258,7 @@ export default function Perfil() {
             </h2>
             <button
               onClick={() => setEditando(!editando)}
-              className="flex items-center gap-1.5 text-sm font-semibold text-primario hover:text-primario-oscuro transition-colors"
+              className="flex items-center gap-1.5 text-sm font-semibold text-primario-oscuro hover:underline transition-colors"
             >
               <Edit3 className="w-4 h-4" />
               {editando ? 'Cancelar' : 'Editar'}
@@ -413,7 +413,7 @@ export default function Perfil() {
               </div>
               <button
                 onClick={() => setLector(!lector)}
-                className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${lector ? 'bg-primario' : 'bg-gray-300'}`}
+                className={`area-toque relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${lector ? 'bg-primario' : 'bg-gray-300'}`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300 ${lector ? 'left-6' : 'left-0.5'}`} />
               </button>
@@ -452,7 +452,7 @@ export default function Perfil() {
                       }`}>
                         <Icon className={`w-5 h-5 ${
                           perfil.notif[key]
-                            ? color === 'amarillo' ? 'text-yellow-600' : color === 'azul' ? 'text-secundario' : 'text-primario'
+                            ? color === 'amarillo' ? 'text-amber-900' : color === 'azul' ? 'text-secundario' : 'text-primario'
                             : 'text-gray-400'
                         }`} />
                       </div>
@@ -463,7 +463,7 @@ export default function Perfil() {
                     </div>
                     <button
                       onClick={() => setNotif(key, !perfil.notif[key])}
-                      className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
+                      className={`area-toque relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
                         perfil.notif[key] ? 'bg-primario' : 'bg-gray-300'
                       }`}
                     >
@@ -491,7 +491,7 @@ export default function Perfil() {
                       </div>
                       <button
                         onClick={() => setNotifVoz(key, !perfil.notifVoz[key])}
-                        className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
+                        className={`area-toque relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
                           perfil.notifVoz[key] ? 'bg-primario' : 'bg-gray-300'
                         }`}
                       >

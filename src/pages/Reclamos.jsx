@@ -17,6 +17,8 @@ import {
   fechaReclamo,
   tipoReclamoPorId,
 } from '../data/reclamosData'
+import EstadoVacio from '../components/EstadoVacio'
+import Esqueleto from '../components/Esqueleto'
 
 const MAX_MENSAJE = 1000
 
@@ -116,7 +118,7 @@ export default function Reclamos() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-primario text-white py-5 sm:py-6 px-4">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secundario text-tinta flex items-center justify-center shrink-0">
             <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
@@ -191,7 +193,7 @@ export default function Reclamos() {
                     className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
                       area === a.id
                         ? 'bg-primario text-white border-primario shadow-md shadow-primario/20'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-primario hover:text-primario'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-primario hover:text-primario-oscuro'
                     }`}
                   >
                     {a.label}
@@ -252,7 +254,7 @@ export default function Reclamos() {
                     </button>
                   </div>
                 )}
-                <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded border-2 border-gray-200 text-gray-600 hover:border-primario hover:text-primario font-semibold text-sm transition-colors">
+                <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded border-2 border-gray-200 text-gray-600 hover:border-primario hover:text-primario-oscuro font-semibold text-sm transition-colors">
                   {procesandoFoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                   {foto ? 'Cambiar foto' : 'Agregar una foto'}
                   <input type="file" accept="image/*" className="hidden" onChange={manejarFoto} disabled={procesandoFoto} />
@@ -304,9 +306,9 @@ export default function Reclamos() {
           {ids.length === 0 ? (
             <p className="text-gray-400 text-sm">Todavía no enviaste nada desde este dispositivo.</p>
           ) : cargando && reclamos.length === 0 ? (
-            <p className="text-gray-400 text-sm">Cargando...</p>
+            <Esqueleto filas={3} />
           ) : reclamos.length === 0 ? (
-            <p className="text-gray-400 text-sm">No hay reclamos para mostrar.</p>
+            <EstadoVacio compacto texto="No hay reclamos para mostrar." />
           ) : (
             <div className="space-y-4">
               {reclamos.map(r => <MiReclamo key={r.id} reclamo={r} />)}

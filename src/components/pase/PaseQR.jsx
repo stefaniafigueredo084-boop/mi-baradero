@@ -19,7 +19,7 @@ export default function PaseQR({ codigo }) {
           al conductor de viva voz si falla la cámara o no hay señal. */}
       {codigo && (
         <div className="mt-3 bg-primario/5 border border-primario/20 rounded py-2.5 text-center">
-          <p className="text-[11px] text-gray-500 uppercase tracking-wide">Código para dictar</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Código para dictar</p>
           <p className="text-2xl font-bold font-poppins text-primario-oscuro tracking-[0.3em]">{codigo}</p>
         </div>
       )}

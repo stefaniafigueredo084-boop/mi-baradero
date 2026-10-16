@@ -6,7 +6,7 @@ import { Lightbulb, ThumbsDown, ThumbsUp, Wrench } from 'lucide-react'
 
 export const TIPOS_RECLAMO = [
   { id: 'queja', label: 'Queja', icono: ThumbsDown, color: 'bg-red-50 text-red-500', desc: 'Algo te molestó o no funcionó bien' },
-  { id: 'reclamo', label: 'Reclamo', icono: Wrench, color: 'bg-amber-100 text-amber-700', desc: 'Algo que hay que arreglar o resolver' },
+  { id: 'reclamo', label: 'Reclamo', icono: Wrench, color: 'bg-amber-100 text-amber-900', desc: 'Algo que hay que arreglar o resolver' },
   { id: 'sugerencia', label: 'Sugerencia', icono: Lightbulb, color: 'bg-secundario/10 text-secundario', desc: 'Una idea para mejorar' },
   { id: 'felicitacion', label: 'Felicitación', icono: ThumbsUp, color: 'bg-primario/10 text-primario', desc: 'Algo que salió bien' },
 ]
@@ -46,7 +46,7 @@ export const AREAS_RECLAMO = [
 // "nuevo" lo pone siempre el vecino al enviar; los otros dos solo los
 // puede poner un trabajador desde el panel (ver firestore.rules).
 export const ESTADOS_RECLAMO = [
-  { id: 'nuevo', label: 'Recibido', color: 'bg-amber-100 text-amber-700' },
+  { id: 'nuevo', label: 'Recibido', color: 'bg-amber-100 text-amber-900' },
   { id: 'en_proceso', label: 'En proceso', color: 'bg-secundario/10 text-secundario' },
   { id: 'resuelto', label: 'Resuelto', color: 'bg-primario/10 text-primario' },
 ]

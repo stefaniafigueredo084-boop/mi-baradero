@@ -5,6 +5,8 @@ import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
 import { aMilisegundos, calcularImporte, categoriaPorId, generarCodigo, idViaje, puntosPagoParaRuta } from '../../utils/pase'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 const formatoPesos = n => `$${Number(n || 0).toLocaleString('es-AR')}`
 const formatearFecha = fecha => {
@@ -66,9 +68,9 @@ export default function ConfirmarPago() {
         <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error}</p>
       )}
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : pendientes.length === 0 ? (
-        <p className="text-gray-400 text-sm">No hay pasajes esperando confirmación de pago.</p>
+        <EstadoVacio compacto texto="No hay pasajes esperando confirmación de pago." />
       ) : (
         <div className="space-y-3">
           {pendientes.map(item => {
@@ -87,7 +89,7 @@ export default function ConfirmarPago() {
                   <p className="text-sm text-gray-600 mt-1">
                     {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
                   </p>
-                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-600' : 'text-secundario'}`}>
+                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-900' : 'text-secundario'}`}>
                     {esEfectivo ? <Banknote className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
                     {esEfectivo
                       ? `Paga en efectivo — ${puntosPagoParaRuta(item.origen, item.destino).map(p => p.nombre).join(' o ')}`

@@ -28,8 +28,8 @@ export default function BottomNav() {
             key={to}
             to={to}
             aria-current={active ? 'page' : undefined}
-            className={`flex-1 flex flex-col items-center gap-0.5 pt-2 pb-2 text-[11px] font-semibold border-t-[3px] -mt-px transition-colors ${
-              active ? 'text-primario border-primario' : 'text-gray-500 border-transparent hover:text-primario'
+            className={`flex-1 flex flex-col items-center gap-0.5 pt-2 pb-2 text-xs font-semibold border-t-[3px] -mt-px transition-colors ${
+              active ? 'text-primario-oscuro border-primario' : 'text-gray-500 border-transparent hover:text-primario-oscuro'
             }`}
           >
             <Icon className="w-[22px] h-[22px]" />

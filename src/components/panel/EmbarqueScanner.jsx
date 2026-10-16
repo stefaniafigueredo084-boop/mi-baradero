@@ -207,7 +207,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           {soloHorarios?.length ? 'Tu horario (hoy)' : 'Horario del viaje (hoy)'}
         </label>
         {soloHorarios?.length === 0 && (
-          <p className="text-xs text-amber-600 mb-2">Todavía no tenés horarios asignados — pedile a un administrador que te asigne alguno.</p>
+          <p className="text-xs text-amber-900 mb-2">Todavía no tenés horarios asignados — pedile a un administrador que te asigne alguno.</p>
         )}
         {/* Con la cámara prendida no se puede cambiar de horario: lo que
             se escanea se cuenta en ESTE viaje, y cambiarlo a mitad de
@@ -239,7 +239,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
               <span>Jubilados: {viaje.asientos.prioritarios.jubilado.libres}/{viaje.asientos.prioritarios.jubilado.reservados} reservados libres</span>
             </div>
             {viaje.asientos.liberado && (
-              <span className="badge bg-amber-100 text-amber-700 text-xs ml-auto">Reservas ya liberadas</span>
+              <span className="badge bg-amber-100 text-amber-900 text-xs ml-auto">Reservas ya liberadas</span>
             )}
           </div>
         )}

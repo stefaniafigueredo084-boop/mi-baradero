@@ -13,6 +13,27 @@
     scroll-behavior: smooth;
   }
 
+  /* Botones de al menos 44 px de alto en el celular (pantalla táctil o
+     angosta): es el mínimo recomendado para tocar con el dedo sin errarle.
+     Los links que se ven como botón llevan su propio min-h-[44px]. */
+  @media (pointer: coarse), (max-width: 1023px) {
+    button,
+    select,
+    input:not([type='checkbox']):not([type='radio']):not([type='range']) {
+      min-height: 44px;
+    }
+    /* Controles chicos a propósito (interruptores): mantienen su tamaño
+       visible y ganan zona de toque invisible alrededor. */
+    button.area-toque {
+      min-height: 0;
+    }
+  }
+  .area-toque::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
+
   body {
     font-family: 'Inter', 'Poppins', sans-serif;
     background-color: #f8fafc;
@@ -25,8 +46,9 @@
     @apply bg-primario hover:bg-primario-oscuro text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
   }
 
+  /* El verde secundario es claro: el texto va oscuro (tinta), nunca blanco. */
   .btn-secondary {
-    @apply bg-secundario hover:bg-secundario-oscuro text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
+    @apply bg-secundario hover:brightness-95 text-tinta font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
   }
 
   .btn-acento {
@@ -42,7 +64,7 @@
   }
 
   .card-secundario {
-    @apply bg-gradient-to-br from-secundario to-secundario-oscuro text-white rounded;
+    @apply bg-gradient-to-br from-secundario to-secundario-oscuro text-tinta rounded;
   }
 
   .card-acento {
@@ -100,7 +122,7 @@
   }
 
   .tachin-icon-btn {
-    @apply w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 transition-colors hover:bg-red-50 hover:text-red-600;
+    @apply w-11 h-11 lg:w-8 lg:h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 transition-colors hover:bg-red-50 hover:text-red-600;
   }
 
   .tachin-progress-row {
@@ -121,7 +143,7 @@
   }
 
   .tachin-listening-pill span {
-    @apply text-[11px] font-bold tracking-wide text-primario;
+    @apply text-xs font-bold tracking-wide text-primario;
   }
 
   .tachin-bars {
@@ -298,13 +320,22 @@
   color: #e2e8f0;
 }
 
+/* Fondo del hero de la portada (Home): verde muy clarito que se funde
+   con el fondo; en modo oscuro, verde muy oscuro que se funde con el
+   fondo oscuro (si no, el título claro quedaba sobre fondo claro). */
+.hero-portada { background-image: linear-gradient(to bottom, #E2EFE7, theme('colors.fondo-app')); }
+.dark .hero-portada { background-image: linear-gradient(to bottom, #132a20, #0f172a); }
+
 .dark .bg-white   { background-color: #1e293b; }
 .dark .bg-fondo-app { background-color: #0f172a; }
-.dark .bg-primario-suave { background-color: #1e3a5f; }
+.dark .bg-primario-suave { background-color: #1d3a2e; }
 .dark .bg-secundario-suave { background-color: #14532d; }
 .dark .text-tinta { color: #f1f5f9; }
-.dark .text-primario-oscuro { color: #93c5fd; }
-.dark .text-primario { color: #7cc3f7; }
+/* Sobre el verde secundario (claro también en modo oscuro) el texto
+   sigue oscuro: si no, quedaría claro sobre claro. */
+.dark .bg-secundario.text-tinta { color: #1D3328; }
+.dark .text-primario-oscuro { color: #a7e3c4; }
+.dark .text-primario { color: #7fd1a8; }
 .dark .text-secundario-oscuro { color: #86efac; }
 .dark .bg-gray-50 { background-color: #0f172a; }
 .dark .bg-gray-100{ background-color: #334155; }
@@ -445,8 +476,8 @@
 .dark .bg-green-50    { background-color: #14532d; }
 .dark .border-green-200{ border-color: #1c6b3a; }
 
-.dark .bg-emerald-50     { background-color: #1e3a5f; }
-.dark .border-emerald-200{ border-color: #2b527f; }
+.dark .bg-emerald-50     { background-color: #16352a; }
+.dark .border-emerald-200{ border-color: #24553f; }
 
 .dark .bg-yellow-50 { background-color: #4d3b00; }
 .dark .bg-orange-100  { background-color: #6b3a12; }
@@ -458,8 +489,7 @@
 .dark .bg-amber-50    { background-color: #4d3300; }
 .dark .bg-amber-100   { background-color: #5c3d00; }
 .dark .border-amber-200{ border-color: #7a5200; }
-.dark .text-amber-600 { color: #fbbf24; }
-.dark .text-amber-700 { color: #fbbf24; }
+.dark .text-amber-900 { color: #fef3c7; }
 
 .dark .bg-purple-100  { background-color: #4c1d6b; }
 .dark .text-purple-700{ color: #d8b4fe; }
@@ -480,9 +510,4 @@
 .dark .from-acento   { --tw-gradient-from: #a16207 var(--tw-gradient-from-position); --tw-gradient-to: rgb(161 98 7 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 .dark .to-yellow-500    { --tw-gradient-to: #713f12 var(--tw-gradient-to-position); }
 .dark .to-acento-oscuro{ --tw-gradient-to: #713f12 var(--tw-gradient-to-position); }
-.dark .to-\[\#3DBB8C\]  { --tw-gradient-to: #0a4d8f var(--tw-gradient-to-position); }
-.dark .to-\[\#5560D6\]  { --tw-gradient-to: #0f4d27 var(--tw-gradient-to-position); }
-.dark .via-secundario         { --tw-gradient-to: rgb(29 143 225 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #023466 var(--tw-gradient-via-position), var(--tw-gradient-to); }
 .dark .via-primario        { --tw-gradient-to: rgb(27 142 62 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #0b3d1f var(--tw-gradient-via-position), var(--tw-gradient-to); }
-.dark .from-secundario-oscuro { --tw-gradient-from: #001a3d var(--tw-gradient-from-position); --tw-gradient-to: rgb(0 26 61 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-.dark .to-secundario          { --tw-gradient-to: #023466 var(--tw-gradient-to-position); }

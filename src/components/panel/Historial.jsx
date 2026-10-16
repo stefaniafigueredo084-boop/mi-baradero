@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { LogIn, LogOut, Plus, Pencil, Trash2, History } from 'lucide-react'
 import { useColeccion } from '../../hooks/useColeccion'
 import { labelSector } from '../../data/sectores'
+import EstadoVacio from '../EstadoVacio'
+import Esqueleto from '../Esqueleto'
 
 const TIPOS = {
   login:  { label: 'Inició sesión', icon: LogIn,   color: 'text-primario bg-primario/10' },
@@ -50,9 +52,9 @@ export default function Historial() {
       </div>
 
       {cargando ? (
-        <p className="text-gray-400 text-sm">Cargando...</p>
+        <Esqueleto filas={3} />
       ) : filtrados.length === 0 ? (
-        <p className="text-gray-400 text-sm">Todavía no hay actividad registrada.</p>
+        <EstadoVacio compacto texto="Todavía no hay actividad registrada." />
       ) : (
         <div className="space-y-2">
           {filtrados.map(item => {

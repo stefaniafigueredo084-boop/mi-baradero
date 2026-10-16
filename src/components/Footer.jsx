@@ -43,7 +43,7 @@ export default function Footer() {
 
           {/* Servicios */}
           <div>
-            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-white text-sm uppercase tracking-wider">
               Servicios
             </h3>
             <ul className="space-y-2.5 text-sm">
@@ -69,7 +69,7 @@ export default function Footer() {
 
           {/* Integrantes */}
           <div>
-            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-white text-sm uppercase tracking-wider">
               Integrantes del Proyecto
             </h3>
             <ul className="space-y-2.5 text-sm text-white/80">
@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* Horarios */}
           <div>
-            <h3 className="font-bold font-poppins mb-3 text-acento text-sm uppercase tracking-wider">
+            <h3 className="font-bold font-poppins mb-3 text-white text-sm uppercase tracking-wider">
               Horarios
             </h3>
             <div className="space-y-3 text-sm text-white/80">
@@ -100,7 +100,7 @@ export default function Footer() {
               </div>
               <div className="bg-white/5 border border-white/10 rounded p-3">
                 <p className="text-white font-semibold mb-1">Emergencias</p>
-                <p className="text-acento font-bold text-base">100 · 101 · 107</p>
+                <p className="text-white font-bold text-base">100 · 101 · 107</p>
               </div>
             </div>
           </div>
