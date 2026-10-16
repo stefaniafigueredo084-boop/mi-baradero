@@ -38,43 +38,74 @@ const FRASES = [/\bconcha (de )?(tu|tus|su|sus|la lora)\b/]
 
 const DISFRACES = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', '@': 'a', $: 's' }
 
+// Cambios de letra que suenan igual ("kagada", "volud", "sorra",
+// "ijo de..."): se aplican tanto a lo que escribe el vecino como a las
+// listas, así una sola entrada cubre todas las variantes.
+function fonetica(palabra) {
+  return palabra
+    .replace(/k/g, 'c')
+    .replace(/v/g, 'b')
+    .replace(/z/g, 's')
+    .replace(/^h(?=[aeiou])/, '')
+}
+
+const EXACTAS_F = new Set([...EXACTAS].map(fonetica))
+const PREFIJOS_F = PREFIJOS.map(fonetica)
+
 function limpiar(texto) {
   return String(texto || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '') // saca acentos
     .replace(/[013457@$]/g, c => DISFRACES[c])
-    .replace(/[^a-z]+/g, ' ') // todo lo que no es letra separa palabras
+    .replace(/[^a-z*]+/g, ' ') // todo lo que no es letra (ni *) separa palabras
     .replace(/([aeiou])\1+/g, '$1') // "putaaaa" -> "puta"
-    .replace(/([^aeiou ])\1{2,}/g, '$1') // "pppputo" -> "puto"
+    .replace(/([^aeiou* ])\1{2,}/g, '$1') // "pppputo" -> "puto"
     .trim()
 }
 
-// "p u t a" -> "puta": une las letras sueltas seguidas en una palabra.
-function unirLetrasSueltas(palabras) {
-  const resultado = []
-  let suelta = ''
-  for (const palabra of palabras) {
-    if (palabra.length === 1) {
-      suelta += palabra
-      continue
-    }
-    if (suelta) resultado.push(suelta)
-    suelta = ''
-    resultado.push(palabra)
+// "p*ta", "m**rda": cada asterisco puede tapar cualquier vocal. Se
+// prueban todas las combinaciones (hasta 2 asteriscos por palabra).
+function variantesAsterisco(palabra) {
+  if (!palabra.includes('*')) return [palabra]
+  if ((palabra.match(/\*/g) || []).length > 2) return [palabra.replace(/\*/g, '')]
+  let variantes = ['']
+  for (const letra of palabra) {
+    variantes = letra === '*'
+      ? variantes.flatMap(v => [...'aeiou'].map(vocal => v + vocal))
+      : variantes.map(v => v + letra)
   }
-  if (suelta) resultado.push(suelta)
+  return variantes
+}
+
+// "p u t a" -> "puta" y "pu.ta" / "mi-er-da" -> "puta" / "mierda": une
+// pedazos cortos seguidos (de hasta 3 letras, de a 2 a 4 pedazos). Solo
+// pedazos cortos, para no armar insultos juntando palabras normales.
+function unirPedazos(palabras) {
+  const resultado = []
+  for (let i = 0; i < palabras.length; i++) {
+    let unida = palabras[i]
+    if (unida.length > 3) continue
+    for (let j = i + 1; j < Math.min(palabras.length, i + 4); j++) {
+      if (palabras[j].length > 3) break
+      unida += palabras[j]
+      resultado.push(unida)
+    }
+  }
   return resultado
+}
+
+function esInsulto(palabra) {
+  const f = fonetica(palabra)
+  return EXACTAS_F.has(f) || PREFIJOS_F.some(prefijo => f.startsWith(prefijo))
 }
 
 export function tieneMalasPalabras(texto) {
   const limpio = limpiar(texto)
   if (!limpio) return false
-  if (FRASES.some(frase => frase.test(limpio))) return true
-  const palabras = limpio.split(' ')
-  return [...palabras, ...unirLetrasSueltas(palabras)].some(
-    palabra => EXACTAS.has(palabra) || PREFIJOS.some(prefijo => palabra.startsWith(prefijo))
-  )
+  if (FRASES.some(frase => frase.test(limpio.replace(/\*/g, '')))) return true
+  const palabras = limpio.split(' ').flatMap(variantesAsterisco)
+  return [...palabras, ...unirPedazos(palabras)].some(esInsulto)
 }
 
 export const MENSAJE_MALAS_PALABRAS =

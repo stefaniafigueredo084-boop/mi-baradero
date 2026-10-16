@@ -66,13 +66,8 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
   const [resultado, setResultado] = useState(null) // { ok, mensaje, detalle }
   const [procesando, setProcesando] = useState(false)
   const [contador, setContador] = useState(() => leerContador(auth.currentUser?.uid))
-  // Diagnóstico visible en pantalla: mientras no logremos que escanee
-  // en un celular real, esto muestra qué está pasando de verdad adentro
-  // (antes fallaba en silencio, sin ninguna pista de qué probar).
-  const [debug, setDebug] = useState(null)
 
   const scannerRef = useRef(null)
-  const intentosRef = useRef(0)
 
   // Punto común: confirma el embarque de un pasaje puntual (ya
   // identificado, sea por cámara o por código dictado) y actualiza
@@ -124,7 +119,6 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
       }
       await confirmarYRegistrar(snap.docs[0].id, codigo)
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Error al procesar código de embarque:', err)
       setResultado({ ok: false, mensaje: MOTIVO_RECHAZO.error })
     } finally {
@@ -135,20 +129,6 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
   const iniciarCamara = async () => {
     setErrorCamara('')
     setResultado(null)
-    intentosRef.current = 0
-    // Chequeo manual (no de la librería) de si este navegador tiene
-    // lector de QR nativo — para saber, con certeza, qué motor de
-    // lectura se está usando en este celular puntual.
-    let nativo = false
-    try {
-      if ('BarcodeDetector' in window) {
-        const formatos = await window.BarcodeDetector.getSupportedFormats?.()
-        nativo = !formatos || formatos.includes('qr_code')
-      }
-    } catch {
-      nativo = false
-    }
-    setDebug({ nativo, intentos: 0, ultimoError: '', videoListo: false })
     // Mostramos el contenedor ANTES de arrancar la cámara: html5-qrcode
     // necesita que el div ya tenga tamaño real en pantalla para poder
     // calcular y dibujar el video adentro — con el contenedor todavía
@@ -184,21 +164,10 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
             setTimeout(() => scannerRef.current?.resume(), 1500)
           })
         },
-        errorMsg => {
-          // Antes se ignoraban del todo (son constantes, una por
-          // frame sin detectar nada) — ahora se cuentan y se muestra
-          // la última, para saber si el lector está siquiera
-          // intentando algo o si quedó completamente trabado.
-          intentosRef.current += 1
-          if (intentosRef.current % 10 === 0) {
-            setDebug(d => d && { ...d, intentos: intentosRef.current, ultimoError: String(errorMsg) })
-          }
-        }
+        // Un aviso por cada cuadro sin QR: es lo normal, no un error.
+        () => {}
       )
-      setDebug(d => d && { ...d, videoListo: true })
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error al iniciar la cámara:', err)
+    } catch {
       setEscaneando(false)
       setErrorCamara('No se pudo acceder a la cámara. Podés pegar el código manualmente más abajo.')
     }
@@ -213,7 +182,6 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
     }
     scannerRef.current = null
     setEscaneando(false)
-    setDebug(null)
   }
 
   useEffect(() => () => { scannerRef.current?.stop().catch(() => {}) }, [])
@@ -241,19 +209,30 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         {soloHorarios?.length === 0 && (
           <p className="text-xs text-amber-600 mb-2">Todavía no tenés horarios asignados — pedile a un administrador que te asigne alguno.</p>
         )}
-        <select className="select-field" value={horarioId} onChange={e => { setHorarioId(e.target.value); setResultado(null) }}>
+        {/* Con la cámara prendida no se puede cambiar de horario: lo que
+            se escanea se cuenta en ESTE viaje, y cambiarlo a mitad de
+            camino mezclaría pasajeros de dos viajes. */}
+        <select
+          className="select-field disabled:opacity-60 disabled:cursor-not-allowed"
+          value={horarioId}
+          disabled={escaneando}
+          onChange={e => { setHorarioId(e.target.value); setResultado(null) }}
+        >
           <option value="">Seleccioná un horario...</option>
           {horarios.map(h => (
             <option key={h.id} value={h.id}>{h.salida} — {h.origen} → {h.destino}</option>
           ))}
         </select>
+        {escaneando && (
+          <p className="text-xs text-gray-500 mt-1.5">Apagá la cámara para cambiar de horario.</p>
+        )}
 
         {horario && viaje && !viaje.cargando && (
           <div className="mt-4 bg-primario/5 border border-primario/20 rounded p-4 flex items-center gap-4 flex-wrap">
             <Users className="w-5 h-5 text-primario shrink-0" />
             <div>
-              <p className="font-bold text-primario-oscuro text-lg">{viaje.asientos.libres} libres</p>
-              <p className="text-xs text-gray-500">de {viaje.asientos.capacidadTotal} totales</p>
+              <p className="font-bold text-primario-oscuro text-lg">{viaje.asientos.libresVenta} libres para vender</p>
+              <p className="text-xs text-gray-500">de {viaje.asientos.capacidadTotal} totales · {viaje.asientos.libres} lugares arriba de la combi</p>
             </div>
             <div className="text-xs text-gray-500 flex flex-col gap-0.5">
               <span>Discapacidad: {viaje.asientos.prioritarios.discapacidad.libres}/{viaje.asientos.prioritarios.discapacidad.reservados} reservados libres</span>
@@ -299,19 +278,6 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           </button>
         )}
         {errorCamara && <p className="text-red-500 text-sm mt-2">{errorCamara}</p>}
-
-        {/* Diagnóstico temporal: mientras no confirmemos que escanea
-            bien en un celular real, esto muestra qué está pasando
-            adentro en vez de fallar en silencio. Sacarlo una vez que
-            ande. */}
-        {debug && (
-          <div className="mt-3 bg-gray-50 border border-gray-200 rounded p-3 text-xs text-gray-600 space-y-0.5 font-mono">
-            <p>Lector nativo del celular: <strong>{debug.nativo ? 'sí' : 'no'}</strong></p>
-            <p>Video de la cámara arrancó: <strong>{debug.videoListo ? 'sí' : 'todavía no'}</strong></p>
-            <p>Cuadros analizados sin detectar nada: <strong>{debug.intentos}</strong></p>
-            {debug.ultimoError && <p className="truncate">Último aviso: {debug.ultimoError}</p>}
-          </div>
-        )}
 
         <div className={escaneando ? 'relative mt-4' : 'hidden'}>
           <div id="lector-qr-embarque" className="rounded overflow-hidden min-h-[240px]" />
@@ -401,28 +367,31 @@ async function confirmarEmbarque(horario, pasajeId, codigo, conductor) {
 
     const categoria = pasaje.categoria || 'comun'
 
-    const viajeExiste = viajeSnap.exists()
-    const base = viajeExiste
-      ? viajeSnap.data()
-      : {
-          salida: horario.salida || '',
-          origen: horario.origen || '',
-          destino: horario.destino || '',
-          capacidadTotal: horario.capacidadTotal ?? PLANTILLA_VIAJE_DEFAULT.capacidadTotal,
-          asientosReservadosDiscapacidad: horario.asientosReservadosDiscapacidad ?? PLANTILLA_VIAJE_DEFAULT.asientosReservadosDiscapacidad,
-          asientosReservadosJubilados: horario.asientosReservadosJubilados ?? PLANTILLA_VIAJE_DEFAULT.asientosReservadosJubilados,
-          minutosLiberacionReserva: horario.minutosLiberacionReserva ?? PLANTILLA_VIAJE_DEFAULT.minutosLiberacionReserva,
-          horarioSalidaTs: salidaTimestamp(fecha, horario.salida),
-          embarcadosGeneral: 0,
-          embarcadosDiscapacidad: 0,
-          embarcadosJubilado: 0,
-        }
+    // El viaje puede no existir todavía, o existir solo con el contador
+    // "vendidos" (lo crea ConfirmarPago al confirmar un pago): en los dos
+    // casos se completa con la plantilla del horario.
+    const datosViaje = viajeSnap.exists() ? viajeSnap.data() : {}
+    const viajeCompleto = 'capacidadTotal' in datosViaje
+    const plantilla = {
+      salida: horario.salida || '',
+      origen: horario.origen || '',
+      destino: horario.destino || '',
+      capacidadTotal: horario.capacidadTotal ?? PLANTILLA_VIAJE_DEFAULT.capacidadTotal,
+      asientosReservadosDiscapacidad: horario.asientosReservadosDiscapacidad ?? PLANTILLA_VIAJE_DEFAULT.asientosReservadosDiscapacidad,
+      asientosReservadosJubilados: horario.asientosReservadosJubilados ?? PLANTILLA_VIAJE_DEFAULT.asientosReservadosJubilados,
+      minutosLiberacionReserva: horario.minutosLiberacionReserva ?? PLANTILLA_VIAJE_DEFAULT.minutosLiberacionReserva,
+      horarioSalidaTs: salidaTimestamp(fecha, horario.salida),
+      embarcadosGeneral: 0,
+      embarcadosDiscapacidad: 0,
+      embarcadosJubilado: 0,
+    }
+    const base = viajeCompleto ? datosViaje : { ...plantilla, ...datosViaje }
 
     const evaluacion = evaluarEmbarque(categoria, base, base)
     if (!evaluacion.ok) return { ok: false, mensaje: MOTIVO_RECHAZO[evaluacion.motivo] || MOTIVO_RECHAZO.error }
 
     tx.set(viajeRef, {
-      ...(viajeExiste ? {} : { ...base, creadoEn: serverTimestamp() }),
+      ...(viajeCompleto ? {} : { ...base, creadoEn: serverTimestamp() }),
       [evaluacion.contador]: (base[evaluacion.contador] || 0) + 1,
       actualizadoEn: serverTimestamp(),
     }, { merge: true })

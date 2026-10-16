@@ -52,7 +52,7 @@ export default function MiPaseSection() {
   const viajeHorarioElegido = useViaje(horario)
   const horarioYaNoDisponible = horario && (
     salidaTimestamp(fecha, horario.salida).getTime() < Date.now() + MINUTOS_CORTE_VENTA * 60_000
-    || (viajeHorarioElegido && !viajeHorarioElegido.cargando && viajeHorarioElegido.asientos.libres <= 0)
+    || (viajeHorarioElegido && !viajeHorarioElegido.cargando && viajeHorarioElegido.asientos.libresVenta <= 0)
   )
 
   const guardarNombre = e => {
@@ -271,7 +271,7 @@ export default function MiPaseSection() {
 function HorarioOption({ horario, fecha, seleccionado, onSeleccionar }) {
   const viaje = useViaje(horario)
   const faltaPoco = salidaTimestamp(fecha, horario.salida).getTime() < Date.now() + MINUTOS_CORTE_VENTA * 60_000
-  const sinLugar = viaje && !viaje.cargando && viaje.asientos.libres <= 0
+  const sinLugar = viaje && !viaje.cargando && viaje.asientos.libresVenta <= 0
   const deshabilitado = faltaPoco || sinLugar
 
   return (
@@ -305,7 +305,7 @@ function HorarioOption({ horario, fecha, seleccionado, onSeleccionar }) {
           ? <span className="text-gray-300">...</span>
           : sinLugar
           ? <span className="text-red-500">Sin lugar</span>
-          : <span className="text-primario">{viaje.asientos.libres} libres</span>}
+          : <span className="text-primario">{viaje.asientos.libresVenta} libres</span>}
       </span>
     </label>
   )

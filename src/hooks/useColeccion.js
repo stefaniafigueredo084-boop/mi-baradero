@@ -8,6 +8,7 @@ import { db } from '../firebase'
 export function useColeccion(nombreColeccion) {
   const [items, setItems] = useState([])
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, nombreColeccion), orderBy('creadoEn', 'desc'))
@@ -16,10 +17,11 @@ export function useColeccion(nombreColeccion) {
       snap => {
         setItems(snap.docs.map(d => ({ id: d.id, ...d.data() })))
         setCargando(false)
+        setError(false)
       },
-      () => setCargando(false)
+      () => { setCargando(false); setError(true) }
     )
   }, [nombreColeccion])
 
-  return { items, cargando }
+  return { items, cargando, error }
 }

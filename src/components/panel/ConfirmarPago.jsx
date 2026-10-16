@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { doc, increment, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { AlertTriangle, Banknote, CheckCircle, CreditCard, Loader2 } from 'lucide-react'
 import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
-import { aMilisegundos, calcularImporte, categoriaPorId, generarCodigo, puntosPagoParaRuta } from '../../utils/pase'
+import { aMilisegundos, calcularImporte, categoriaPorId, generarCodigo, idViaje, puntosPagoParaRuta } from '../../utils/pase'
 
 const formatoPesos = n => `$${Number(n || 0).toLocaleString('es-AR')}`
 const formatearFecha = fecha => {
@@ -17,24 +17,34 @@ const formatearFecha = fecha => {
 // comprobante por WhatsApp, como ya funciona hoy); acá el empleado deja
 // constancia de que lo recibió, y recién ahí se genera el QR.
 export default function ConfirmarPago() {
-  const { items, cargando } = useColeccion('pasajes')
+  const { items, cargando, error: errorCarga } = useColeccion('pasajes')
   const pendientes = useMemo(() => items.filter(p => p.estado === 'pendiente'), [items])
 
   const [procesando, setProcesando] = useState(null)
+  const [error, setError] = useState('')
 
   const confirmar = async item => {
     setProcesando(item.id)
+    setError('')
     try {
-      await updateDoc(doc(db, 'pasajes', item.id), {
+      // Confirmar el pago y sumar el pasaje a "vendidos" del viaje van
+      // juntos (o se guardan los dos o ninguno): con ese contador se
+      // calculan los lugares libres que ven los vecinos.
+      const lote = writeBatch(db)
+      lote.update(doc(db, 'pasajes', item.id), {
         estado: 'confirmado',
         codigo: generarCodigo(),
         actualizadoEn: serverTimestamp(),
       })
+      lote.set(doc(db, 'viajes', idViaje(item.horarioId, item.fecha)), { vendidos: increment(1) }, { merge: true })
+      await lote.commit()
       registrarHistorial({
         tipo: 'editar',
         seccion: 'combi',
         detalle: `Pago confirmado: ${item.nombre} — ${categoriaPorId(item.categoria).label} ${item.origen}→${item.destino} ${formatearFecha(item.fecha)} ${item.salida}hs (${formatoPesos(item.importe)})`,
       })
+    } catch {
+      setError(`No se pudo confirmar el pago de ${item.nombre}. Revisá tu conexión y probá de nuevo.`)
     } finally {
       setProcesando(null)
     }
@@ -49,6 +59,12 @@ export default function ConfirmarPago() {
         El pago se recibe como siempre (transferencia + comprobante). Acá confirmás que lo recibiste — recién ahí se le genera el QR al pasajero.
       </p>
 
+      {errorCarga && (
+        <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">No se pudieron cargar los pasajes. Revisá tu conexión y recargá la página.</p>
+      )}
+      {error && (
+        <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error}</p>
+      )}
       {cargando ? (
         <p className="text-gray-400 text-sm">Cargando...</p>
       ) : pendientes.length === 0 ? (

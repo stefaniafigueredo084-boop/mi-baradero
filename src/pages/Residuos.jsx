@@ -44,9 +44,13 @@ function useGpsCamion(activo) {
 // en documentos config/estadoCamion y config/calendarioResiduos.
 function useDocConfig(nombreDoc, valorInicial, extraer) {
   const [valor, setValor] = useState(valorInicial)
+  const extraerRef = useRef(extraer)
+  extraerRef.current = extraer
   useEffect(() => {
     return onSnapshot(doc(db, 'config', nombreDoc), snap => {
-      if (snap.exists()) setValor(extraer(snap.data()))
+      if (snap.exists()) setValor(extraerRef.current(snap.data()))
+    }, () => {
+      // Sin conexión: se queda con el valor por defecto.
     })
   }, [nombreDoc])
   return valor

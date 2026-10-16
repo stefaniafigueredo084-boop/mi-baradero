@@ -10,7 +10,7 @@ import { hablarTachin, detenerVoz, escuchar, soportaReconocimientoVoz, esAfirmat
 // correspondiente de cada paso — para alguien que no ve bien la
 // pantalla, la voz tiene que poder hacer exactamente lo mismo que el
 // dedo. Devuelve true si entendió algo (para no reintentar de más).
-function despacharRespuestaVoz(paso, texto, tutorial, sectorActual) {
+function despacharRespuestaVoz(paso, texto, tutorial) {
   if (paso === 'saludo') {
     if (esAfirmativo(texto)) return tutorial.decirSi()
     if (esNegativo(texto)) return tutorial.decirNo()
@@ -146,7 +146,7 @@ export default function Tachin() {
       try {
         const dicho = await escuchar()
         if (cancelado) return
-        despacharRespuestaVoz(tutorial.paso, dicho, tutorial, sectorActual)
+        despacharRespuestaVoz(tutorial.paso, dicho, tutorial)
       } catch {
         // No dijo nada, o hubo un error escuchando — no insiste, los
         // botones siguen disponibles para seguir de esa forma.

@@ -316,19 +316,20 @@ export default function CombiMunicipal() {
   )
 }
 
-// Lugares que quedan hoy contando embarques reales confirmados con el
-// pase QR (independiente del contador manual "disponibles" de arriba,
-// que sigue siendo el que usa la compra de pasaje por WhatsApp).
+// Lugares que quedan hoy descontando los pasajes ya vendidos (pago
+// confirmado), aunque esa gente todavía no haya subido (independiente
+// del contador manual "disponibles" de arriba, que sigue siendo el que
+// usa la compra de pasaje por WhatsApp).
 function LugaresConPase({ horario }) {
   const viaje = useViaje(horario)
   if (!viaje || viaje.cargando) return null
-  const { libres, prioritarios, liberado } = viaje.asientos
+  const { libresVenta: libres, prioritarios, liberado } = viaje.asientos
   const hayReservados = prioritarios.discapacidad.reservados > 0 || prioritarios.jubilado.reservados > 0
 
   return (
     <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-1.5 flex-wrap">
       <Ticket className="w-3 h-3 text-secundario shrink-0" />
-      <span className="text-[11px] text-gray-500">{libres} con pase QR</span>
+      <span className="text-[11px] text-gray-500">{libres} libres para comprar con pase QR</span>
       {!liberado && hayReservados && (
         <span className="text-[11px] text-gray-400">
           (<Accessibility className="w-3 h-3 inline -mt-0.5" aria-label="Discapacidad" /> {prioritarios.discapacidad.libres}/{prioritarios.discapacidad.reservados} · Jubilados {prioritarios.jubilado.libres}/{prioritarios.jubilado.reservados})

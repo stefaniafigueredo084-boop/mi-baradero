@@ -9,10 +9,16 @@ export default function CalendarioResiduos() {
   const [dias, setDias] = useState(null)
   const [guardando, setGuardando] = useState(false)
   const [guardado, setGuardado] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     return onSnapshot(doc(db, 'config', 'calendarioResiduos'), snap => {
       setDias(snap.exists() ? snap.data().dias : calendarioResiduosDefault)
+    }, () => {
+      // Sin conexión o sin permiso: se muestra el calendario por defecto
+      // en vez de quedarse en "Cargando..." para siempre.
+      setDias(d => d ?? calendarioResiduosDefault)
+      setError('No se pudo cargar el calendario guardado. Revisá tu conexión y recargá la página.')
     })
   }, [])
 
@@ -22,11 +28,17 @@ export default function CalendarioResiduos() {
 
   const guardar = async () => {
     setGuardando(true)
-    await setDoc(doc(db, 'config', 'calendarioResiduos'), { dias })
-    registrarHistorial({ tipo: 'editar', seccion: 'residuos', detalle: 'Calendario de recolección actualizado' })
-    setGuardando(false)
-    setGuardado(true)
-    setTimeout(() => setGuardado(false), 2500)
+    setError('')
+    try {
+      await setDoc(doc(db, 'config', 'calendarioResiduos'), { dias })
+      registrarHistorial({ tipo: 'editar', seccion: 'residuos', detalle: 'Calendario de recolección actualizado' })
+      setGuardado(true)
+      setTimeout(() => setGuardado(false), 2500)
+    } catch {
+      setError('No se pudo guardar el calendario. Probá de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
   }
 
   if (!dias) return <p className="text-gray-400 text-sm">Cargando...</p>
@@ -62,6 +74,7 @@ export default function CalendarioResiduos() {
         {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
         {guardado ? 'Guardado' : 'Guardar calendario'}
       </button>
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mt-3">{error}</p>}
     </div>
   )
 }

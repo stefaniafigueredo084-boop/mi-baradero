@@ -30,6 +30,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
   const [filtroDepto, setFiltroDepto] = useState('')
   const [procesando, setProcesando] = useState(null) // id en curso
   const [respuestas, setRespuestas] = useState({}) // borradores por id
+  const [errorAccion, setErrorAccion] = useState('')
   const [fotoAbierta, setFotoAbierta] = useState(null)
 
   const cantidadPorEstado = useMemo(
@@ -46,9 +47,13 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
     [items, filtroEstado, filtroTipo, filtroDepto]
   )
 
+  const avisarError = (accion, item) =>
+    setErrorAccion(`No se pudo ${accion} ${codigoReclamo(item.id)}. Revisá tu conexión y probá de nuevo.`)
+
   const cambiarEstado = async (item, estado) => {
     if ((item.estado || 'nuevo') === estado) return
     setProcesando(item.id)
+    setErrorAccion('')
     try {
       await updateDoc(doc(db, 'reclamos', item.id), { estado, actualizadoEn: serverTimestamp() })
       registrarHistorial({
@@ -56,6 +61,8 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         seccion: 'reclamos',
         detalle: `${tipoReclamoPorId(item.tipo).label} ${codigoReclamo(item.id)} → ${estadoReclamoPorId(estado).label}`,
       })
+    } catch {
+      avisarError('cambiar el estado de', item)
     } finally {
       setProcesando(null)
     }
@@ -64,6 +71,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
   const derivar = async (item, departamento) => {
     if (departamentoDeReclamo(item).id === departamento) return
     setProcesando(item.id)
+    setErrorAccion('')
     try {
       await updateDoc(doc(db, 'reclamos', item.id), { departamento, actualizadoEn: serverTimestamp() })
       registrarHistorial({
@@ -71,6 +79,8 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         seccion: 'reclamos',
         detalle: `${tipoReclamoPorId(item.tipo).label} ${codigoReclamo(item.id)} derivado a ${departamentoPorId(departamento).label}`,
       })
+    } catch {
+      avisarError('derivar', item)
     } finally {
       setProcesando(null)
     }
@@ -79,6 +89,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
   const guardarRespuesta = async item => {
     const respuesta = (respuestas[item.id] ?? item.respuesta ?? '').trim()
     setProcesando(item.id)
+    setErrorAccion('')
     try {
       await updateDoc(doc(db, 'reclamos', item.id), {
         respuesta,
@@ -95,6 +106,8 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         const { [item.id]: _, ...resto } = previo
         return resto
       })
+    } catch {
+      avisarError('guardar la respuesta de', item)
     } finally {
       setProcesando(null)
     }
@@ -102,12 +115,20 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
 
   const eliminar = async item => {
     if (!confirm('¿Seguro que querés eliminar este mensaje? El vecino también deja de verlo.')) return
-    await deleteDoc(doc(db, 'reclamos', item.id))
-    registrarHistorial({
-      tipo: 'eliminar',
-      seccion: 'reclamos',
-      detalle: `${tipoReclamoPorId(item.tipo).label} ${codigoReclamo(item.id)}`,
-    })
+    setProcesando(item.id)
+    setErrorAccion('')
+    try {
+      await deleteDoc(doc(db, 'reclamos', item.id))
+      registrarHistorial({
+        tipo: 'eliminar',
+        seccion: 'reclamos',
+        detalle: `${tipoReclamoPorId(item.tipo).label} ${codigoReclamo(item.id)}`,
+      })
+    } catch {
+      avisarError('eliminar', item)
+    } finally {
+      setProcesando(null)
+    }
   }
 
   return (
@@ -170,8 +191,8 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         )}
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error}</p>
+      {(error || errorAccion) && (
+        <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error || errorAccion}</p>
       )}
       {cargando ? (
         <p className="text-gray-400 text-sm">Cargando...</p>

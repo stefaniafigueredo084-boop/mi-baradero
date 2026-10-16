@@ -12,7 +12,7 @@ export function useCombiEnVivo() {
   useEffect(() => {
     return onSnapshot(doc(db, 'config', 'combiEnVivo'), snap => {
       setParadaId(snap.exists() ? snap.data().paradaId : null)
-    })
+    }, () => setParadaId(null))
   }, [])
 
   if (!paradaId) return null

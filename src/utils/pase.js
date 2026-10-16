@@ -170,13 +170,22 @@ export const PLANTILLA_VIAJE_DEFAULT = {
 
 // --- Cupos de asientos ---------------------------------------------------
 
-// contadores: { embarcadosGeneral, embarcadosDiscapacidad, embarcadosJubilado }
+// contadores: { embarcadosGeneral, embarcadosDiscapacidad, embarcadosJubilado, vendidos }
+//
+// Dos números de "libres":
+//   libresVenta: lo que se le muestra al vecino y lo que se puede vender
+//     — descuenta los pasajes ya vendidos (pago confirmado), aunque esa
+//     gente todavía no haya subido.
+//   libres: lugares físicos que quedan arriba de la combi (capacidad −
+//     embarcados). Es lo que usa el escáner para dejar subir: alguien con
+//     pasaje pago tiene que poder embarcar aunque esté todo vendido.
 export function calcularAsientos(viajeConfig, contadores, ahora = Date.now()) {
   const cfg = { ...PLANTILLA_VIAJE_DEFAULT, ...viajeConfig }
-  const cont = { embarcadosGeneral: 0, embarcadosDiscapacidad: 0, embarcadosJubilado: 0, ...contadores }
+  const cont = { embarcadosGeneral: 0, embarcadosDiscapacidad: 0, embarcadosJubilado: 0, vendidos: 0, ...contadores }
 
   const totalEmbarcados = cont.embarcadosGeneral + cont.embarcadosDiscapacidad + cont.embarcadosJubilado
   const libres = Math.max(0, cfg.capacidadTotal - totalEmbarcados)
+  const libresVenta = Math.max(0, cfg.capacidadTotal - Math.max(cont.vendidos, totalEmbarcados))
 
   // horarioSalidaTs puede llegar como Timestamp de Firestore (recién
   // leído de un doc "viajes" existente), como Date, o como milisegundos
@@ -196,6 +205,8 @@ export function calcularAsientos(viajeConfig, contadores, ahora = Date.now()) {
   return {
     capacidadTotal: cfg.capacidadTotal,
     libres,
+    libresVenta,
+    vendidos: cont.vendidos,
     libresGeneral,
     liberado,
     prioritarios: {

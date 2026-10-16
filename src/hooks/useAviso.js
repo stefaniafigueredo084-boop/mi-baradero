@@ -17,6 +17,12 @@ export function useAviso(nombreDoc, activo, formatear, sector) {
   const [aviso, setAviso] = useState(null)
   const activoRef = useRef(activo)
   activoRef.current = activo
+  // formatear suele ser una función nueva en cada render: va por ref para
+  // no reabrir la escucha de Firestore cada vez.
+  const formatearRef = useRef(formatear)
+  formatearRef.current = formatear
+  const sectorRef = useRef(sector)
+  sectorRef.current = sector
   const ultimoEnviadoEn = useRef(undefined)
 
   useEffect(() => {
@@ -30,11 +36,11 @@ export function useAviso(nombreDoc, activo, formatear, sector) {
       if (datos && datos.enviadoEn !== ultimoEnviadoEn.current) {
         ultimoEnviadoEn.current = datos.enviadoEn
         if (activoRef.current) {
-          const { title, body } = formatear(datos)
-          mostrarNotificacion(title, { body, icon: '/logo-mibaradero.png' }, sector)
+          const { title, body } = formatearRef.current(datos)
+          mostrarNotificacion(title, { body, icon: '/logo-mibaradero.png' }, sectorRef.current)
         }
       }
-    })
+    }, () => setAviso(null))
   }, [nombreDoc])
 
   return aviso

@@ -44,6 +44,10 @@ export function useTrabajador(uid) {
         // propia cuenta) → esta cuenta no es trabajador, sin acceso.
         if (!cancelado) setTrabajador(null)
       }
+    }, () => {
+      // No se pudo leer el propio documento (sin conexión o sin permiso):
+      // sin acceso, en vez de quedarse cargando para siempre.
+      if (!cancelado) setTrabajador(null)
     })
     return () => {
       cancelado = true

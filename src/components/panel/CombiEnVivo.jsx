@@ -8,18 +8,25 @@ import { registrarHistorial } from '../../utils/historial'
 export default function CombiEnVivo() {
   const [paradaId, setParadaId] = useState(null)
   const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     return onSnapshot(doc(db, 'config', 'combiEnVivo'), snap => {
       setParadaId(snap.exists() ? snap.data().paradaId : null)
-    })
+    }, () => setError('No se pudo cargar la posición actual. Revisá tu conexión.'))
   }, [])
 
   const marcar = async parada => {
     setGuardando(true)
-    await setDoc(doc(db, 'config', 'combiEnVivo'), { paradaId: parada.id, actualizadoEn: serverTimestamp() })
-    registrarHistorial({ tipo: 'editar', seccion: 'combi', detalle: `Combi marcada en ${parada.nombre}` })
-    setGuardando(false)
+    setError('')
+    try {
+      await setDoc(doc(db, 'config', 'combiEnVivo'), { paradaId: parada.id, actualizadoEn: serverTimestamp() })
+      registrarHistorial({ tipo: 'editar', seccion: 'combi', detalle: `Combi marcada en ${parada.nombre}` })
+    } catch {
+      setError('No se pudo marcar la posición. Probá de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
   }
 
   const actual = paradas.find(p => p.id === paradaId)
@@ -47,6 +54,7 @@ export default function CombiEnVivo() {
           </button>
         ))}
       </div>
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mt-3">{error}</p>}
       {actual && (
         <p className="text-sm text-gray-400 mt-4 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 shrink-0" /> Última posición marcada: {actual.nombre}
