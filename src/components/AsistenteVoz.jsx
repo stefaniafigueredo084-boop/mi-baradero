@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Mic, MicOff, X } from 'lucide-react'
-import { db } from '../firebase'
-import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado } from '../utils/perfilLocal'
+import { asegurarSesion, db } from '../firebase'
+import { esPrimerGuardadoVecino, marcarVecinoGuardado } from '../utils/perfilLocal'
 import { hablar, escuchar, esAfirmativo, esNegativo, detenerVoz, soportaReconocimientoVoz } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 
@@ -115,7 +115,10 @@ export default function AsistenteVoz({ onClose }) {
     localStorage.setItem('mibaradero_perfil', JSON.stringify(perfil))
 
     const esNuevo = esPrimerGuardadoVecino()
-    await setDoc(doc(db, 'vecinos', idVecino()), {
+    // Documento del vecino = su uid (anónimo o de su cuenta): las Reglas
+    // solo dejan escribirlo a esa misma sesión.
+    const { uid } = await asegurarSesion()
+    await setDoc(doc(db, 'vecinos', uid), {
       nombre,
       apellido,
       notif: perfil.notif,

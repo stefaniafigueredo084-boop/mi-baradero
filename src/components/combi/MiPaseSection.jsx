@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { BadgeCheck, Banknote, CheckCircle2, Clock, Contact, CreditCard, Lock, Loader2, MessageCircle, RefreshCw, ShieldCheck, Ticket } from 'lucide-react'
-import { db } from '../../firebase'
+import { asegurarSesion, db } from '../../firebase'
 import { idVecino, leerPerfilLocal } from '../../utils/perfilLocal'
 import { usePasajero } from '../../hooks/usePasajero'
 import { usePasaje } from '../../hooks/usePasaje'
@@ -81,7 +81,9 @@ export default function MiPaseSection() {
       // arranque el cartel de "pagá en efectivo" a alguien que no tiene
       // que pagar nada.
       const formaPagoFinal = importe === 0 ? 'transferencia' : formaPago
+      const { uid } = await asegurarSesion()
       await setDoc(doc(db, 'pasajes', idPasaje(idVecino(), horario.id, fecha)), {
+        uid,
         pasajeroId: idVecino(),
         nombre: nombreCompleto,
         categoria: categoriaId,
@@ -324,7 +326,9 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
     try {
       const nombreCompleto = `${perfilLocal.nombre} ${perfilLocal.apellido || ''}`.trim()
       const esNuevo = !pasajero
+      const { uid } = await asegurarSesion()
       await setDoc(doc(db, 'pasajeros', idVecino()), {
+        uid,
         nombre: nombreCompleto,
         categoriaSolicitada: categoria.id,
         documentoUrl: documento,

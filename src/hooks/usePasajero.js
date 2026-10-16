@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
-import { doc, onSnapshot } from 'firebase/firestore'
-import { db } from '../firebase'
 import { idVecino } from '../utils/perfilLocal'
+import { useDocPropio } from './useDocPropio'
 
 // Escucha en vivo el documento de pasajero de este dispositivo
 // (pasajeros/{idVecino()}) — la categoría verificada (permanente:
@@ -11,15 +9,6 @@ import { idVecino } from '../utils/perfilLocal'
 // pidió ninguna categoría especial), pasajero es null — sigue pudiendo
 // comprar pasajes "Común" igual.
 export function usePasajero() {
-  const [pasajero, setPasajero] = useState(undefined) // undefined = cargando
-
-  useEffect(() => {
-    return onSnapshot(
-      doc(db, 'pasajeros', idVecino()),
-      snap => setPasajero(snap.exists() ? { id: snap.id, ...snap.data() } : null),
-      () => setPasajero(null)
-    )
-  }, [])
-
+  const pasajero = useDocPropio('pasajeros', idVecino())
   return { pasajero, cargando: pasajero === undefined }
 }

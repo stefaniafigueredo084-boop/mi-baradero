@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { Camera, CheckCircle, ClipboardList, Loader2, MapPin, MessageSquare, Send, X } from 'lucide-react'
-import { db } from '../firebase'
+import { asegurarSesion, db } from '../firebase'
 import { nombreVecino } from '../utils/perfilLocal'
 import { comprimirImagen } from '../utils/imagen'
 import { MENSAJE_MALAS_PALABRAS, tieneMalasPalabras } from '../utils/malasPalabras'
@@ -85,7 +85,9 @@ export default function Reclamos() {
     setError('')
     setEnviando(true)
     try {
+      const { uid } = await asegurarSesion()
       const ref = await addDoc(collection(db, 'reclamos'), {
+        uid,
         tipo,
         area,
         departamento: areaReclamoPorId(area).departamento,

@@ -4,7 +4,7 @@ import { AlertTriangle, Banknote, CheckCircle, CreditCard, Loader2 } from 'lucid
 import { db } from '../../firebase'
 import { useColeccion } from '../../hooks/useColeccion'
 import { registrarHistorial } from '../../utils/historial'
-import { aMilisegundos, categoriaPorId, generarCodigo, puntosPagoParaRuta } from '../../utils/pase'
+import { aMilisegundos, calcularImporte, categoriaPorId, generarCodigo, puntosPagoParaRuta } from '../../utils/pase'
 
 const formatoPesos = n => `$${Number(n || 0).toLocaleString('es-AR')}`
 const formatearFecha = fecha => {
@@ -59,8 +59,13 @@ export default function ConfirmarPago() {
             const esEfectivo = item.formaPago === 'efectivo'
             const venceMs = esEfectivo ? aMilisegundos(item.vencePagoEn) : null
             const vencido = venceMs != null && Date.now() > venceMs
+            // Se recalcula la tarifa: un pasaje con otro importe (creado
+            // antes de que las Reglas lo validaran, o tocado a mano) se
+            // marca en rojo para cobrar lo que corresponde.
+            const importeCorrecto = calcularImporte(item.categoria, item.origen, item.destino)
+            const importeMal = Number(item.importe) !== importeCorrecto
             return (
-              <div key={item.id} className={`card p-4 flex items-center justify-between gap-4 flex-wrap ${vencido ? 'border-2 border-red-200' : ''}`}>
+              <div key={item.id} className={`card p-4 flex items-center justify-between gap-4 flex-wrap ${vencido || importeMal ? 'border-2 border-red-200' : ''}`}>
                 <div className="min-w-0">
                   <p className="font-bold text-gray-800">{item.nombre}</p>
                   <p className="text-sm text-gray-600 mt-1">
@@ -72,6 +77,11 @@ export default function ConfirmarPago() {
                       ? `Paga en efectivo — ${puntosPagoParaRuta(item.origen, item.destino).map(p => p.nombre).join(' o ')}`
                       : 'Paga por transferencia'}
                   </p>
+                  {importeMal && (
+                    <p className="text-xs font-bold text-red-600 mt-1 flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5" /> El importe no coincide con la tarifa: corresponde {formatoPesos(importeCorrecto)}.
+                    </p>
+                  )}
                   {vencido && (
                     <p className="text-xs font-bold text-red-500 mt-1 flex items-center gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5" /> Venció el plazo para pagar — confirmá solo si realmente recibiste el efectivo.

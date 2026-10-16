@@ -62,15 +62,18 @@ export default function PanelTrabajadores() {
   // Reclamos de vecinos: el admin y Atención al Vecino (sector
   // "reclamos") ven todos; cada sector, solo los de sus departamentos.
   const veTodosLosReclamos = trabajador?.rol === 'admin' || trabajador?.sector === 'reclamos'
-  const { items: reclamos, cargando: cargandoReclamos } = useReclamos(
+  const { items: reclamos, cargando: cargandoReclamos, error: errorReclamos, hayMas: hayMasReclamos, cargarMas: cargarMasReclamos } = useReclamos(
     veTodosLosReclamos ? null : departamentosDelSector(trabajador?.sector)
   )
   const sinAtender = lista => lista.filter(r => (r.estado || 'nuevo') === 'nuevo').length
   const reclamosNuevos = sinAtender(reclamos)
 
+  // La sesión anónima (la que tiene cualquier visitante del sitio) no
+  // cuenta como trabajador: para el panel es "sin sesión" → login.
   useEffect(() => onAuthStateChanged(auth, u => {
-    setUsuario(u)
-    if (u) registrarHistorial({ tipo: 'login', seccion: 'usuarios', detalle: '' })
+    const real = u && !u.isAnonymous ? u : null
+    setUsuario(real)
+    if (real) registrarHistorial({ tipo: 'login', seccion: 'usuarios', detalle: '' })
   }), [])
 
   const esAdmin = trabajador?.rol === 'admin'
@@ -97,7 +100,7 @@ export default function PanelTrabajadores() {
         descripcion={`Quejas y reclamos que llegan a ${deptos}`}
         badge={sinAtender(lista)}
       >
-        <ReclamosPanel items={lista} cargando={cargandoReclamos} />
+        <ReclamosPanel items={lista} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} />
       </AcordeonItem>
     )
   }
@@ -337,7 +340,7 @@ export default function PanelTrabajadores() {
               badge={reclamosNuevos}
               abiertoPorDefecto
             >
-              <ReclamosPanel items={reclamos} cargando={cargandoReclamos} completa />
+              <ReclamosPanel items={reclamos} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} completa />
             </AcordeonItem>
 
             <AcordeonItem icono={Info} color="azul" titulo="Cómo llegan y quién los atiende" descripcion="El recorrido de un reclamo y qué departamento se encarga de cada tema">

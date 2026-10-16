@@ -24,7 +24,7 @@ import {
 // "completa" = vista de Atención al Vecino / admin: todos los
 // departamentos, con filtro por departamento y opción de eliminar. Sin
 // "completa" es la vista de un sector (solo sus reclamos).
-export default function ReclamosPanel({ items, cargando, completa = false }) {
+export default function ReclamosPanel({ items, cargando, error = '', hayMas = false, onCargarMas, completa = false }) {
   const [filtroEstado, setFiltroEstado] = useState('nuevo')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroDepto, setFiltroDepto] = useState('')
@@ -170,6 +170,9 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
         )}
       </div>
 
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error}</p>
+      )}
       {cargando ? (
         <p className="text-gray-400 text-sm">Cargando...</p>
       ) : visibles.length === 0 ? (
@@ -279,6 +282,16 @@ export default function ReclamosPanel({ items, cargando, completa = false }) {
             )
           })}
         </div>
+      )}
+
+      {!cargando && hayMas && onCargarMas && (
+        <button
+          type="button"
+          onClick={onCargarMas}
+          className="mt-4 w-full py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-primario-oscuro hover:border-primario transition-colors"
+        >
+          Ver más reclamos
+        </button>
       )}
 
       {fotoAbierta && (

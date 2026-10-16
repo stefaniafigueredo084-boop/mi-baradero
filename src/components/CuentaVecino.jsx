@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import {
+  EmailAuthProvider,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
+  linkWithCredential,
+  linkWithPopup,
   sendPasswordResetEmail,
+  signInWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -44,7 +48,21 @@ export default function CuentaVecino({ usuario }) {
     setError('')
     setCargando(true)
     try {
-      await signInWithPopup(auth, googleProvider)
+      // Si hay una sesión anónima, se VINCULA a la cuenta de Google en vez
+      // de reemplazarla: el uid no cambia y el vecino conserva su pase,
+      // sus pasajes y sus reclamos. Si esa cuenta de Google ya existía,
+      // no se puede vincular y se entra directamente a ella.
+      const actual = auth.currentUser
+      if (actual?.isAnonymous) {
+        try {
+          await linkWithPopup(actual, googleProvider)
+        } catch (err) {
+          if (err.code !== 'auth/credential-already-in-use') throw err
+          await signInWithCredential(auth, GoogleAuthProvider.credentialFromError(err))
+        }
+      } else {
+        await signInWithPopup(auth, googleProvider)
+      }
     } catch (err) {
       setError(MENSAJES_ERROR[err.code] ?? 'No se pudo iniciar sesión con Google.')
     } finally {
@@ -62,7 +80,14 @@ export default function CuentaVecino({ usuario }) {
     setCargando(true)
     try {
       if (modo === 'registro') {
-        await createUserWithEmailAndPassword(auth, email, password)
+        // Igual que con Google: crear la cuenta vinculando la sesión
+        // anónima mantiene el mismo uid (y con él, sus datos).
+        const actual = auth.currentUser
+        if (actual?.isAnonymous) {
+          await linkWithCredential(actual, EmailAuthProvider.credential(email, password))
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password)
+        }
       } else {
         await signInWithEmailAndPassword(auth, email, password)
       }

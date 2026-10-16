@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { doc, onSnapshot } from 'firebase/firestore'
-import { db } from '../firebase'
+import { useAuth } from '../context/AuthContext'
+import { escucharDocPropio } from './useDocPropio'
 
 const CLAVE = 'mibaradero_reclamos'
 
 // Los vecinos no pueden listar la colección "reclamos" (eso es solo del
-// panel), pero sí leer UN reclamo cuyo id ya conocen. Por eso cada
+// panel), pero sí leer los reclamos que crearon ellos (campo uid). Por eso cada
 // dispositivo recuerda acá los ids de los reclamos que mandó, igual que
 // hace con su pase de combi.
 export function leerIdsReclamos() {
@@ -33,24 +33,22 @@ export function recordarReclamo(id) {
 // la carga. Un reclamo que el municipio eliminó simplemente deja de
 // aparecer.
 export function useMisReclamos(ids) {
+  const { uid } = useAuth()
   const [porId, setPorId] = useState({})
   const clave = ids.join(',')
 
   useEffect(() => {
     setPorId(previo => Object.fromEntries(Object.entries(previo).filter(([id]) => ids.includes(id))))
+    if (!uid) return
     const desuscribir = ids.map(id =>
-      onSnapshot(
-        doc(db, 'reclamos', id),
-        snap => setPorId(previo => ({ ...previo, [id]: snap.exists() ? { id, ...snap.data() } : null })),
-        () => setPorId(previo => ({ ...previo, [id]: null }))
-      )
+      escucharDocPropio('reclamos', id, uid, dato => setPorId(previo => ({ ...previo, [id]: dato })))
     )
     return () => desuscribir.forEach(fn => fn())
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clave])
+  }, [clave, uid])
 
   return {
     reclamos: ids.map(id => porId[id]).filter(Boolean),
-    cargando: ids.some(id => porId[id] === undefined),
+    cargando: uid === undefined || ids.some(id => porId[id] === undefined),
   }
 }

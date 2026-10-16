@@ -4,8 +4,8 @@ import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firest
 import { Link } from 'react-router-dom'
 import { User, Phone, MapPin, Bell, BellOff, CheckCircle, Trash2, Calendar, Recycle, Edit3, Sun, Moon, Type, Volume2, Play, Bus, Ticket, ChevronRight, Loader2 } from 'lucide-react'
 import { pedirPermisoNotificacion, saludar } from '../utils/notificaciones'
-import { auth, db } from '../firebase'
-import { idVecino, esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
+import { asegurarSesion, auth, db } from '../firebase'
+import { esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 import { useAuth } from '../context/AuthContext'
 import { hablar } from '../utils/voz'
@@ -128,13 +128,14 @@ export default function Perfil() {
     // el administrador puede ver cuántos vecinos usan la app sin acceder
     // a tus datos de contacto.
     //
-    // Si hay sesión iniciada, el documento queda ligado a la cuenta
-    // (usuario.uid) en vez de al id anónimo del dispositivo — así el
-    // perfil se puede recuperar desde cualquier otro dispositivo.
+    // El documento es siempre el uid de la sesión: el de la cuenta si
+    // inició sesión (así el perfil se recupera desde otro dispositivo),
+    // o el de la sesión anónima de este navegador. Las Reglas solo dejan
+    // escribirlo y borrarlo a esa misma sesión.
     if (perfil.nombre?.trim()) {
       try {
         const esNuevo = !cuenta && esPrimerGuardadoVecino()
-        const idDoc = cuenta ? cuenta.uid : idVecino()
+        const { uid: idDoc } = await asegurarSesion()
         await setDoc(doc(db, 'vecinos', idDoc), {
           nombre: perfil.nombre.trim(),
           apellido: perfil.apellido?.trim() || '',
@@ -167,7 +168,8 @@ export default function Perfil() {
         await deleteDoc(doc(db, 'vecinos', cuenta.uid)).catch(() => {})
         await deleteUser(cuenta)
       } else {
-        await deleteDoc(doc(db, 'vecinos', idVecino())).catch(() => {})
+        const { uid } = await asegurarSesion()
+        await deleteDoc(doc(db, 'vecinos', uid)).catch(() => {})
         olvidarVecino()
       }
       setPerfil(defaultPerfil)
