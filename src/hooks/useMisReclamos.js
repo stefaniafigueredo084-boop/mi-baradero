@@ -41,7 +41,7 @@ export function useMisReclamos(ids) {
     setPorId(previo => Object.fromEntries(Object.entries(previo).filter(([id]) => ids.includes(id))))
     if (!uid) return
     const desuscribir = ids.map(id =>
-      escucharDocPropio('reclamos', id, uid, dato => setPorId(previo => ({ ...previo, [id]: dato })))
+      escucharDocPropio('reclamos', id, dato => setPorId(previo => ({ ...previo, [id]: dato })))
     )
     return () => desuscribir.forEach(fn => fn())
     // eslint-disable-next-line react-hooks/exhaustive-deps

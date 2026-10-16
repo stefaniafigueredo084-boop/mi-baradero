@@ -3,9 +3,9 @@ rules_version = '2';
 // Reglas de seguridad de Firestore para "Mi Baradero".
 //
 // IMPORTANTE: esto NO se aplica solo (copiar el archivo al repo no alcanza).
-// Hay que pegarlo en Firebase Console → Firestore Database → Reglas → Publicar,
-// o desplegarlo con `firebase deploy --only firestore:rules` si tenés el
-// proyecto vinculado con firebase-tools.
+// Se publica junto con el sitio y los índices:
+//   npm run build && firebase deploy --only hosting,firestore:rules,firestore:indexes
+// (o pegándolo en Firebase Console → Firestore Database → Reglas → Publicar).
 //
 // Sin esto, la separación por sectores del panel de trabajadores es solo
 // una restricción visual (de la interfaz): cualquiera con las credenciales
@@ -54,17 +54,6 @@ service cloud.firestore {
     // "uid" al crearse.
     function esDueno() {
       return estaLogueado() && resource.data.get('uid', null) == request.auth.uid;
-    }
-
-    // Documentos de antes de que existiera "uid" (se crearon solo con el
-    // id aleatorio del dispositivo): su dueño los "reclama" la primera vez
-    // que los abre, escribiendo SOLO su uid. Funciona una única vez — apenas
-    // tiene dueño, nadie más puede reclamarlo.
-    function reclamaSinDueno() {
-      return estaLogueado()
-             && resource.data.get('uid', null) == null
-             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid'])
-             && request.resource.data.uid == request.auth.uid;
     }
 
     // Choferes: sector aparte de "combi" — puede escanear pasajes al
@@ -118,7 +107,7 @@ service cloud.firestore {
     // agregar una entrada (login/logout/acciones), pero es de solo lectura
     // para el admin, e inmutable para todos (no se edita ni se borra).
     // Reclamos: quejas, reclamos, sugerencias y felicitaciones que manda
-    // cualquier vecino desde /reclamos, sin login. Siempre nacen en
+    // cualquier vecino desde /reclamos, sin cuenta (con su sesión anónima). Siempre nacen en
     // estado "nuevo" y solo con los campos del formulario — el vecino no
     // puede escribirse una respuesta ni marcarse el reclamo como resuelto.
     //
@@ -184,8 +173,7 @@ service cloud.firestore {
                              .hasOnly(['estado', 'respuesta', 'departamento', 'actualizadoEn', 'respondidoPor', 'respondidoEn'])
                         && departamentoValido(request.resource.data.departamento)
                         && request.resource.data.estado in ['nuevo', 'en_proceso', 'resuelto']
-                        && textoCorto('respuesta', 2000))
-                    || reclamaSinDueno();
+                        && textoCorto('respuesta', 2000));
       allow delete: if puedeEditar('reclamos');
     }
 
@@ -223,7 +211,7 @@ service cloud.firestore {
       // el token de su QR — nunca puede aprobarse o rechazarse a sí
       // mismo. Aprobar/rechazar (tocar estadoVerificacion a esos valores,
       // o motivoRechazo) es solo del empleado del sector combi/admin.
-      allow update: if puedeEditar('combi') || (esDueno() && esAutoServicioPasajero()) || reclamaSinDueno();
+      allow update: if puedeEditar('combi') || (esDueno() && esAutoServicioPasajero());
     }
 
     // Viajes: instancia de un horario de combi para un día puntual
@@ -313,8 +301,7 @@ service cloud.firestore {
                         && request.resource.data.diff(resource.data).affectedKeys()
                              .hasOnly(['usado', 'usadoEn', 'conductorUid', 'conductorEmail'])
                         && request.resource.data.usado == true)
-                    || (esDueno() && resource.data.estado == 'pendiente' && resource.data.usado == false && datosPasajeValidos(id))
-                    || reclamaSinDueno();
+                    || (esDueno() && resource.data.estado == 'pendiente' && resource.data.usado == false && datosPasajeValidos(id));
     }
   }
 }
