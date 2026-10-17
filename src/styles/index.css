@@ -48,11 +48,16 @@
 
   /* El verde secundario es claro: el texto va oscuro (tinta), nunca blanco. */
   .btn-secondary {
-    @apply bg-secundario hover:brightness-95 text-tinta font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
+    @apply bg-secundario hover:brightness-95 font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
+    /* Color escrito directo (no con @apply text-tinta): @apply también
+       copiaría la regla ".dark .text-tinta" y en modo oscuro quedaría
+       texto claro sobre verde claro. */
+    color: #1D3328;
   }
 
   .btn-acento {
-    @apply bg-acento hover:bg-acento-oscuro text-gray-900 font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
+    @apply bg-acento hover:bg-acento-oscuro font-semibold py-3 px-6 rounded-xl transition-colors duration-200;
+    color: #1D3328; /* directo, por lo mismo que .btn-secondary */
   }
 
   .card {
@@ -64,7 +69,8 @@
   }
 
   .card-secundario {
-    @apply bg-gradient-to-br from-secundario to-secundario-oscuro text-tinta rounded;
+    @apply bg-gradient-to-br from-secundario to-secundario-oscuro rounded;
+    color: #1D3328;
   }
 
   .card-acento {
@@ -195,7 +201,7 @@
   }
 
   .link-quiet {
-    @apply block w-full text-center text-gray-400 hover:text-gray-600 text-xs font-semibold pt-2;
+    @apply block w-full text-center text-gray-400 hover:text-gray-600 text-sm font-semibold pt-2;
   }
 
   .input-field {
@@ -325,6 +331,11 @@
    fondo oscuro (si no, el título claro quedaba sobre fondo claro). */
 .hero-portada { background-image: linear-gradient(to bottom, #E2EFE7, theme('colors.fondo-app')); }
 .dark .hero-portada { background-image: linear-gradient(to bottom, #132a20, #0f172a); }
+
+/* Fondo del mapa ilustrativo de la combi, con su versión oscura. */
+.mapa-fondo { background-image: linear-gradient(to bottom right, #f0fdf4, #ecfdf5); }
+.dark .mapa-fondo { background-image: linear-gradient(to bottom right, #12261d, #10221c); }
+.dark .bg-white\/95 { background-color: rgba(30, 41, 59, 0.95); }
 
 .dark .bg-white   { background-color: #1e293b; }
 .dark .bg-fondo-app { background-color: #0f172a; }

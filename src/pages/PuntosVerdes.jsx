@@ -103,7 +103,7 @@ export default function PuntosVerdes() {
                     <inst.icono className="w-6 h-6" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-800 mb-1">{inst.titulo}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{inst.descripcion}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{inst.descripcion}</p>
                 </div>
               ))}
             </div>
@@ -122,7 +122,7 @@ export default function PuntosVerdes() {
                     <Recycle className="w-5 h-5" style={{ color: info.color }} />
                   </div>
                   <p className="text-sm font-semibold text-gray-800">{nombre}</p>
-                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{info.descripcion}</p>
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">{info.descripcion}</p>
                 </div>
               ))}
             </div>
@@ -217,7 +217,7 @@ export default function PuntosVerdes() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <h3 className="font-semibold text-sm text-gray-800 truncate">{punto.nombre}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5 truncate">{punto.direccion}</p>
+                      <p className="text-sm text-gray-500 mt-0.5 truncate">{punto.direccion}</p>
                     </div>
                     {punto.activo
                       ? <CheckCircle className="w-4 h-4 text-secundario shrink-0" />
@@ -306,7 +306,7 @@ export default function PuntosVerdes() {
                       <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: info?.color || '#888' }} />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-800">{mat}</p>
-                        <p className="text-xs text-gray-500 truncate">{info?.descripcion}</p>
+                        <p className="text-sm text-gray-500 truncate">{info?.descripcion}</p>
                       </div>
                     </div>
                   )

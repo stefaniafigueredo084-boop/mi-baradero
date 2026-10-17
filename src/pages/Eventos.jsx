@@ -124,13 +124,13 @@ export default function Eventos() {
           {notifActiva && (
             <div className="mt-3 flex items-center gap-2 bg-secundario/5 border border-secundario/20 rounded p-3">
               <CheckCircle className="w-4 h-4 text-secundario shrink-0" />
-              <p className="text-xs text-secundario-oscuro">Te avisaremos de eventos próximos y nuevos en la agenda de Baradero.</p>
+              <p className="text-sm text-secundario-oscuro">Te avisaremos de eventos próximos y nuevos en la agenda de Baradero.</p>
             </div>
           )}
           {avisoEventos?.mensaje && (
             <div className="mt-3 flex items-center gap-2 bg-acento/10 border border-acento/30 rounded p-3">
               <Bell className="w-4 h-4 text-amber-900 shrink-0" />
-              <p className="text-xs text-amber-900">{avisoEventos.mensaje}</p>
+              <p className="text-sm text-amber-900">{avisoEventos.mensaje}</p>
             </div>
           )}
         </div>
@@ -147,7 +147,7 @@ export default function Eventos() {
                 <button
                   key={cat}
                   onClick={() => setCatActiva(cat)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-200 ${
+                  className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors duration-200 ${
                     catActiva === cat
                       ? 'bg-primario-oscuro text-white'
                       : 'bg-white text-gray-600 border border-gray-200 hover:border-primario hover:text-primario-oscuro'

@@ -222,7 +222,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
                 <div className="flex gap-4 items-start">
                   <div className="min-w-0 flex-1">
                     <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line break-words">{item.mensaje}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-gray-500">
                       <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {item.nombre || 'Anónimo'}</span>
                       {item.ubicacion && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {item.ubicacion}</span>}
                     </div>
@@ -247,7 +247,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
                       key={e.id}
                       onClick={() => cambiarEstado(item, e.id)}
                       disabled={procesando === item.id}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all disabled:opacity-60 ${
+                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all disabled:opacity-60 ${
                         estadoActual === e.id ? e.color + ' ring-2 ring-current' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
@@ -257,10 +257,10 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
                 </div>
 
                 {/* Departamento: derivar si no corresponde */}
-                <label className="flex flex-wrap items-center gap-2 mt-3 text-xs font-semibold text-gray-500">
+                <label className="flex flex-wrap items-center gap-2 mt-3 text-sm font-semibold text-gray-500">
                   Departamento:
                   <select
-                    className="select-field !w-auto !py-1.5 !px-3 !text-xs"
+                    className="select-field !w-auto !py-1.5 !px-3 !text-sm"
                     value={depto.id}
                     onChange={e => derivar(item, e.target.value)}
                     disabled={procesando === item.id}

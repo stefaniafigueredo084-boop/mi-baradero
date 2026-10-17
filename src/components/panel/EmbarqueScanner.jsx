@@ -207,7 +207,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           {soloHorarios?.length ? 'Tu horario (hoy)' : 'Horario del viaje (hoy)'}
         </label>
         {soloHorarios?.length === 0 && (
-          <p className="text-xs text-amber-900 mb-2">Todavía no tenés horarios asignados — pedile a un administrador que te asigne alguno.</p>
+          <p className="text-sm text-amber-900 mb-2">Todavía no tenés horarios asignados — pedile a un administrador que te asigne alguno.</p>
         )}
         {/* Con la cámara prendida no se puede cambiar de horario: lo que
             se escanea se cuenta en ESTE viaje, y cambiarlo a mitad de
@@ -224,7 +224,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
           ))}
         </select>
         {escaneando && (
-          <p className="text-xs text-gray-500 mt-1.5">Apagá la cámara para cambiar de horario.</p>
+          <p className="text-sm text-gray-500 mt-1.5">Apagá la cámara para cambiar de horario.</p>
         )}
 
         {horario && viaje && !viaje.cargando && (
@@ -300,7 +300,7 @@ export default function EmbarqueScanner({ soloHorarios } = {}) {
         </div>
 
         <details className="mt-4">
-          <summary className="text-xs text-gray-400 cursor-pointer select-none">Sin cámara a mano — pedile el código de 4 letras y buscalo acá</summary>
+          <summary className="text-sm text-gray-400 cursor-pointer select-none">Sin cámara a mano — pedile el código de 4 letras y buscalo acá</summary>
           <div className="flex gap-2 mt-2">
             <input
               className="input-field !py-2 !text-sm !text-center !text-lg !font-bold tracking-[0.3em] uppercase"

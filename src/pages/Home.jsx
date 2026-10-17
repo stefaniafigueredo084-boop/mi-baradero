@@ -164,7 +164,7 @@ export default function Home() {
                     <Icon className="w-[21px] h-[21px]" />
                   </span>
                   <span className="text-sm font-semibold text-tinta leading-tight">{titulo}</span>
-                  <span className="hidden sm:block text-xs text-gray-500 leading-tight">{detalle}</span>
+                  <span className="hidden sm:block text-sm text-gray-500 leading-tight">{detalle}</span>
                 </Link>
               ))}
             </div>

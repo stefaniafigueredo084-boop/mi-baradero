@@ -210,7 +210,7 @@ export default function CuentaVecino({ usuario }) {
             type="button"
             onClick={recuperarPassword}
             disabled={recuperando}
-            className="text-xs text-gray-400 hover:text-primario-oscuro font-medium disabled:opacity-60"
+            className="text-sm text-gray-500 hover:text-primario-oscuro font-medium disabled:opacity-60"
           >
             {recuperando ? 'Enviando...' : '¿Olvidaste tu contraseña?'}
           </button>

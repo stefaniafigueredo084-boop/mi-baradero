@@ -37,10 +37,9 @@ export default function Header() {
       {/* Franja institucional */}
       <div className="bg-primario-oscuro text-white text-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 h-8 sm:h-9">
-          <span className="truncate">Sitio oficial · Municipalidad de Baradero</span>
+          <span className="truncate"><span className="hidden sm:inline">Mi Baradero · </span>Proyecto de la E.S.T. N°1 Vuelta de Obligado</span>
           <div className="hidden md:flex items-center gap-6 shrink-0">
             <Link to="/perfil#accesibilidad" className="hover:underline">Accesibilidad</Link>
-            <span>Atención: 147</span>
             <Link to="/panel-trabajadores" className="hover:underline">Panel de trabajadores</Link>
           </div>
         </div>
@@ -127,9 +126,8 @@ export default function Header() {
               <HelpCircle className="w-5 h-5" /> Ayuda
             </button>
           </nav>
-          <div className="px-4 pb-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-500">
+          <div className="px-4 pb-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-500">
             <Link to="/perfil#accesibilidad" onClick={() => setMenuOpen(false)} className="hover:underline">Accesibilidad</Link>
-            <span>Atención: 147</span>
             <Link to="/panel-trabajadores" onClick={() => setMenuOpen(false)} className="hover:underline">Panel de trabajadores</Link>
           </div>
         </div>

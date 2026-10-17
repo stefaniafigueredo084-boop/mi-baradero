@@ -348,7 +348,7 @@ export default function Perfil() {
         </div>
 
         {/* Accesibilidad */}
-        <div id="accesibilidad" className="card p-4 scroll-mt-28">
+        <div id="accesibilidad" className="card p-4 scroll-mt-32">
           <h2 className="text-lg font-bold font-poppins flex items-center gap-2 mb-5">
             <Sun className="w-5 h-5 text-acento" /> Accesibilidad
           </h2>
@@ -397,7 +397,7 @@ export default function Perfil() {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-1.5">Cambia el tamaño de todo el texto del sitio.</p>
+              <p className="text-sm text-gray-400 mt-1.5">Cambia el tamaño de todo el texto del sitio.</p>
             </div>
 
             {/* Lector de pantalla */}
@@ -408,7 +408,7 @@ export default function Perfil() {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-800 text-sm">Lector de pantalla</p>
-                  <p className="text-xs text-gray-500">Muestra un botón para escuchar el contenido de cada página en voz alta.</p>
+                  <p className="text-sm text-gray-500">Muestra un botón para escuchar el contenido de cada página en voz alta.</p>
                 </div>
               </div>
               <button
@@ -458,7 +458,7 @@ export default function Perfil() {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-800 text-sm">{label}</p>
-                        <p className="text-xs text-gray-500">{desc}</p>
+                        <p className="text-sm text-gray-500">{desc}</p>
                       </div>
                     </div>
                     <button
@@ -479,11 +479,11 @@ export default function Perfil() {
                       <div className="flex items-center gap-2 min-w-0">
                         <Volume2 className={`w-4 h-4 shrink-0 ${perfil.notifVoz[key] ? 'text-primario' : 'text-gray-400'}`} />
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-gray-700">Recibir también con voz</p>
+                          <p className="text-sm font-semibold text-gray-700">Recibir también con voz</p>
                           <button
                             type="button"
                             onClick={() => escucharEjemplo(ejemplo)}
-                            className="flex items-center gap-1 text-xs text-secundario hover:text-secundario-oscuro font-medium mt-0.5"
+                            className="flex items-center gap-1 text-sm text-secundario hover:text-secundario-oscuro font-medium mt-0.5"
                           >
                             <Play className="w-3 h-3" /> Escuchar ejemplo
                           </button>

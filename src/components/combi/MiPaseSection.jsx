@@ -132,7 +132,7 @@ export default function MiPaseSection() {
         </form>
       ) : (
         <>
-          <div id="mipase-horario" className="scroll-mt-32">
+          <div id="mipase-horario" className="scroll-mt-44">
             <div className="mb-5 max-w-xs">
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Fecha del viaje</label>
               <input
@@ -167,7 +167,7 @@ export default function MiPaseSection() {
           )}
 
           {horario && !cargandoPasaje && !pasaje && (
-            <div id="mipase-categoria" className="max-w-md scroll-mt-32">
+            <div id="mipase-categoria" className="max-w-md scroll-mt-44">
               <p className="text-sm font-semibold text-gray-700 mb-3">Tipo de pasaje</p>
               <div className="space-y-3 mb-5">
                 {CATEGORIAS.map(cat => {
@@ -198,12 +198,12 @@ export default function MiPaseSection() {
                             {bloqueada && <Lock className="w-3 h-3 text-gray-400" />}
                             <span className="ml-auto font-bold text-sm shrink-0">{formatoPesos(precio)}</span>
                           </div>
-                          <p className="text-xs opacity-80">{cat.descripcion}</p>
+                          <p className="text-sm opacity-80">{cat.descripcion}</p>
                         </div>
                       </label>
 
                       {bloqueada && pendienteEsta && (
-                        <p className="text-xs text-amber-900 mt-2 flex items-center gap-1.5 pl-6">
+                        <p className="text-sm text-amber-900 mt-2 flex items-center gap-1.5 pl-6">
                           <Clock className="w-3 h-3 shrink-0" /> Tu solicitud está en revisión.
                         </p>
                       )}
@@ -239,7 +239,7 @@ export default function MiPaseSection() {
                     </button>
                   </div>
                   {formaPago === 'efectivo' && (
-                    <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded p-3 mt-2 leading-relaxed">
+                    <p className="text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded p-3 mt-2 leading-relaxed">
                       Se paga en persona en {puntosPagoParaRuta(horario.origen, horario.destino).map(p => p.nombre).join(' o ')},
                       {' '}{puntosPagoEfectivo.horarioAtencion.toLowerCase()}.
                       Tenés que pagarlo antes de que salga tu combi ({horario.salida} hs) — si no, la reserva vence y vas a tener que generarla de nuevo.
@@ -346,7 +346,7 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
 
   if (enviado) {
     return (
-      <p className="text-xs text-primario mt-2 pl-6 flex items-center gap-1.5">
+      <p className="text-sm text-primario mt-2 pl-6 flex items-center gap-1.5">
         <Clock className="w-3 h-3 shrink-0" /> Solicitud enviada, un empleado la va a revisar.
       </p>
     )
@@ -355,18 +355,18 @@ function VerificarCategoria({ categoria, pasajero, perfilLocal }) {
   return (
     <div className="mt-3 pl-6 pr-1">
       {rechazada && pasajero.motivoRechazo && (
-        <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg p-2 mb-2">{pasajero.motivoRechazo}</p>
+        <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg p-2 mb-2">{pasajero.motivoRechazo}</p>
       )}
-      <p className="text-xs text-gray-500 mb-1.5">
+      <p className="text-sm text-gray-500 mb-1.5">
         Para desbloquear esta tarifa, subí: {categoria.descripcionDocumento}
       </p>
       <ImagenInput valor={documento} onChange={setDocumento} />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       <button
         type="button"
         onClick={enviar}
         disabled={enviando}
-        className="btn-secondary !text-xs !py-1.5 mt-2 disabled:opacity-60"
+        className="btn-secondary !text-sm !py-1.5 mt-2 disabled:opacity-60"
       >
         {enviando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
         {rechazada ? 'Volver a enviar' : 'Verificar categoría'}
@@ -400,7 +400,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
           <p>{formatearFecha(pasaje.fecha)} · {pasaje.salida} hs</p>
           <p className="font-bold text-primario-oscuro">Importe abonado: {formatoPesos(pasaje.importe)}</p>
         </div>
-        <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+        <p className="text-sm text-gray-400 mt-4 leading-relaxed">
           Mostrale esta pantalla al conductor para embarcar.
         </p>
       </div>
@@ -415,7 +415,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
   if (vencido) {
     return (
       <div className="max-w-sm bg-red-50 border border-red-200 rounded p-5">
-        <p className="text-xs font-bold text-red-600 flex items-center gap-1.5 mb-3">
+        <p className="text-sm font-bold text-red-600 flex items-center gap-1.5 mb-3">
           <Clock className="w-3.5 h-3.5" /> Reserva vencida
         </p>
         <div className="text-sm text-gray-700 space-y-1 mb-4">
@@ -454,7 +454,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
 
   return (
     <div className="max-w-sm bg-amber-50 border border-amber-200 rounded p-5">
-      <p className="text-xs font-bold text-amber-900 flex items-center gap-1.5 mb-3">
+      <p className="text-sm font-bold text-amber-900 flex items-center gap-1.5 mb-3">
         <Clock className="w-3.5 h-3.5" /> Estado: Pago pendiente
       </p>
       <div className="text-sm text-gray-700 space-y-1 mb-4">
@@ -467,7 +467,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
 
       {esEfectivo ? (
         <div className="pt-3 border-t border-amber-200 space-y-2">
-          <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-gray-600 flex items-center gap-1.5">
             <Banknote className="w-3.5 h-3.5" /> Pagá en efectivo, en persona:
           </p>
           <ul className="text-sm text-gray-700 space-y-0.5">
@@ -475,14 +475,14 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
               <li key={p.nombre}>• {p.nombre}{p.direccion ? ` — ${p.direccion}` : ''}</li>
             ))}
           </ul>
-          <p className="text-xs text-gray-500">{puntosPagoEfectivo.horarioAtencion}.</p>
-          <p className="text-xs font-bold text-amber-900 pt-1">
+          <p className="text-sm text-gray-500">{puntosPagoEfectivo.horarioAtencion}.</p>
+          <p className="text-sm font-bold text-amber-900 pt-1">
             Pagalo antes de las {pasaje.salida} hs del {formatearFecha(pasaje.fecha)} (cuando sale tu combi) o la reserva vence.
           </p>
         </div>
       ) : (
         <div className="pt-3 border-t border-amber-200 space-y-2">
-          <p className="text-xs font-semibold text-gray-600">Pagá por transferencia:</p>
+          <p className="text-sm font-semibold text-gray-600">Pagá por transferencia:</p>
           <CopiarCampo label="Alias" valor={datosPago.alias} />
           <CopiarCampo label="Titular" valor={datosPago.titular} />
           <a
@@ -493,7 +493,7 @@ function EstadoPasaje({ pasaje, onReintentar, reintentando }) {
           >
             <MessageCircle className="w-4 h-4" /> Enviar comprobante por WhatsApp
           </a>
-          <p className="text-xs text-amber-900 pt-1">
+          <p className="text-sm text-amber-900 pt-1">
             Apenas se confirme el pago, tu QR va a aparecer acá — no hace falta que hagas nada más.
           </p>
         </div>

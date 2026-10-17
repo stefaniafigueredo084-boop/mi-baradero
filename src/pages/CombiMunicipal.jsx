@@ -98,7 +98,8 @@ export default function CombiMunicipal() {
           para orientarse rápido, no para esconder nada (a diferencia
           del acordeón del panel de empleados, esto lo lee un vecino de
           punta a punta). */}
-      <nav className="sticky top-[59px] z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+      {/* Se pega justo debajo del header (96 px en celular, 108 px desde sm). */}
+      <nav className="sticky top-24 sm:top-[108px] z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-2 grid grid-cols-5 gap-1.5 sm:flex sm:gap-2">
           {[
             { href: '#en-vivo', label: 'Recorrido' },
@@ -121,7 +122,7 @@ export default function CombiMunicipal() {
       <div className="max-w-6xl mx-auto px-4 py-5 space-y-6">
 
         {/* Estado en tiempo real */}
-        <div id="en-vivo" className="card p-4 scroll-mt-32">
+        <div id="en-vivo" className="card p-4 scroll-mt-44">
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             <Navigation className="w-6 h-6 text-primario" />
             {/* "En vivo" solo cuando un empleado marcó la parada actual;
@@ -147,7 +148,7 @@ export default function CombiMunicipal() {
           </div>
 
           {/* Mapa simulado */}
-          <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 rounded border border-gray-200 h-64 overflow-hidden mb-5">
+          <div className="relative mapa-fondo rounded border border-gray-200 h-64 overflow-hidden mb-5">
             {/* Ruta SVG */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <polyline
@@ -226,7 +227,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Alertas */}
-        <div id="alertas" className="scroll-mt-32">
+        <div id="alertas" className="scroll-mt-44">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold font-poppins flex items-center gap-2">
               <Bell className="w-5 h-5 text-orange-500" /> Alertas y Demoras
@@ -263,7 +264,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Paradas */}
-        <div id="paradas" className="scroll-mt-32">
+        <div id="paradas" className="scroll-mt-44">
           <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
             <MapPin className="w-5 h-5 text-primario" /> Paradas Disponibles
           </h2>
@@ -274,14 +275,14 @@ export default function CombiMunicipal() {
                   <p.icono className="w-6 h-6" />
                 </div>
                 <h3 className="font-semibold font-poppins text-gray-800 text-sm">{p.nombre}</h3>
-                <p className="text-xs text-gray-500 mt-1">{p.descripcion}</p>
+                <p className="text-sm text-gray-500 mt-1">{p.descripcion}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Horarios */}
-        <div id="horarios" className="scroll-mt-32">
+        <div id="horarios" className="scroll-mt-44">
           <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-secundario" /> Horarios del Día
           </h2>
@@ -313,7 +314,7 @@ export default function CombiMunicipal() {
         </div>
 
         {/* Mi Pase (QR) */}
-        <div id="mi-pase" className="scroll-mt-32">
+        <div id="mi-pase" className="scroll-mt-44">
           <MiPaseSection />
         </div>
 
@@ -335,7 +336,7 @@ function LugaresConPase({ horario }) {
   return (
     <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-1.5 flex-wrap">
       <Ticket className="w-3 h-3 text-secundario shrink-0" />
-      <span className="text-xs text-gray-500">{libres} libres para comprar con pase QR</span>
+      <span className="text-sm text-gray-500">{libres} libres para comprar con pase QR</span>
       {!liberado && hayReservados && (
         <span className="text-xs text-gray-400">
           (<Accessibility className="w-3 h-3 inline -mt-0.5" aria-label="Discapacidad" /> {prioritarios.discapacidad.libres}/{prioritarios.discapacidad.reservados} · Jubilados {prioritarios.jubilado.libres}/{prioritarios.jubilado.reservados})

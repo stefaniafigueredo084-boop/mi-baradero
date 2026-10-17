@@ -35,7 +35,7 @@ function MiReclamo({ reclamo }) {
         <span className={`badge text-xs font-bold ${estado.color}`}>{estado.label}</span>
       </div>
       <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line break-words">{reclamo.mensaje}</p>
-      <p className="text-xs text-gray-400 mt-2">
+      <p className="text-sm text-gray-400 mt-2">
         {codigoReclamo(reclamo.id)}{reclamo.creadoEn ? ` · ${fechaReclamo(reclamo.creadoEn)}` : ''}
         {' · '}Lo atiende: {departamentoDeReclamo(reclamo).label}
       </p>
@@ -174,7 +174,7 @@ export default function Reclamos() {
                       <t.icono className="w-5 h-5" />
                     </span>
                     <span className="font-bold text-gray-800 block">{t.label}</span>
-                    <span className="text-xs text-gray-500 leading-snug block">{t.desc}</span>
+                    <span className="text-sm text-gray-500 leading-snug block">{t.desc}</span>
                   </button>
                 ))}
               </div>
@@ -289,7 +289,7 @@ export default function Reclamos() {
                 {enviando ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                 {enviando ? 'Enviando...' : 'Enviar'}
               </button>
-              <p className="text-gray-400 text-xs text-center mt-3">
+              <p className="text-gray-400 text-sm text-center mt-3">
                 No pedimos teléfono ni dirección de tu casa. Por una emergencia llamá al 100, 101 o 107.
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function Reclamos() {
           <p className="text-gray-500 text-sm mb-5">Lo que enviaste desde este dispositivo y en qué estado está.</p>
 
           {ids.length === 0 ? (
-            <p className="text-gray-400 text-sm">Todavía no enviaste nada desde este dispositivo.</p>
+            <EstadoVacio compacto texto="Todavía no enviaste nada desde este dispositivo." />
           ) : cargando && reclamos.length === 0 ? (
             <Esqueleto filas={3} />
           ) : reclamos.length === 0 ? (

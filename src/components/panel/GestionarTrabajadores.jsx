@@ -87,13 +87,13 @@ export default function GestionarTrabajadores() {
                   </div>
 
                   {esUnoMismo ? (
-                    <p className="text-xs text-gray-400 shrink-0">Esta es tu cuenta — no se puede modificar desde acá.</p>
+                    <p className="text-sm text-gray-400 shrink-0">Esta es tu cuenta — no se puede modificar desde acá.</p>
                   ) : (
                     <div className="flex gap-2 shrink-0">
                       <button
                         onClick={() => alternarActivo(t)}
                         disabled={procesando === t.id}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs transition-colors disabled:opacity-60 ${
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 ${
                           activo ? 'bg-amber-50 text-amber-900 hover:bg-amber-100' : 'bg-primario/10 text-primario-oscuro hover:bg-primario/20'
                         }`}
                       >
@@ -103,7 +103,7 @@ export default function GestionarTrabajadores() {
                       <button
                         onClick={() => setConfirmando(t.id)}
                         disabled={procesando === t.id}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 font-semibold text-xs transition-colors disabled:opacity-60"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 font-semibold text-sm transition-colors disabled:opacity-60"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Eliminar
                       </button>
@@ -113,16 +113,16 @@ export default function GestionarTrabajadores() {
 
                 {confirmando === t.id && (
                   <div className="mt-3 pt-3 border-t border-gray-100 bg-red-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-2xl">
-                    <p className="text-xs text-red-600 flex items-start gap-1.5 mb-2">
+                    <p className="text-sm text-red-600 flex items-start gap-1.5 mb-2">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                       Esto le saca el acceso para siempre (no es lo mismo que desactivar). ¿Confirmás eliminar la cuenta de {t.email}?
                     </p>
                     <div className="flex gap-2">
-                      <button onClick={() => setConfirmando(null)} className="btn-secondary !text-xs !py-1.5">Cancelar</button>
+                      <button onClick={() => setConfirmando(null)} className="btn-secondary !text-sm !py-1.5">Cancelar</button>
                       <button
                         onClick={() => eliminarDefinitivo(t)}
                         disabled={procesando === t.id}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-red-500 hover:bg-red-600 text-white font-semibold text-xs py-1.5 rounded-2xl transition-colors disabled:opacity-60"
+                        className="flex-1 flex items-center justify-center gap-1.5 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm py-1.5 rounded-2xl transition-colors disabled:opacity-60"
                       >
                         {procesando === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         Sí, eliminar definitivamente

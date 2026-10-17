@@ -89,19 +89,19 @@ export default function ConfirmarPago() {
                   <p className="text-sm text-gray-600 mt-1">
                     {categoriaPorId(item.categoria).label} · {item.origen} → {item.destino} · {formatearFecha(item.fecha)} · {item.salida} hs
                   </p>
-                  <p className={`text-xs font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-900' : 'text-secundario'}`}>
+                  <p className={`text-sm font-semibold mt-1.5 flex items-center gap-1.5 ${esEfectivo ? 'text-amber-900' : 'text-secundario'}`}>
                     {esEfectivo ? <Banknote className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
                     {esEfectivo
                       ? `Paga en efectivo — ${puntosPagoParaRuta(item.origen, item.destino).map(p => p.nombre).join(' o ')}`
                       : 'Paga por transferencia'}
                   </p>
                   {importeMal && (
-                    <p className="text-xs font-bold text-red-600 mt-1 flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-red-600 mt-1 flex items-center gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5" /> El importe no coincide con la tarifa: corresponde {formatoPesos(importeCorrecto)}.
                     </p>
                   )}
                   {vencido && (
-                    <p className="text-xs font-bold text-red-500 mt-1 flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-red-500 mt-1 flex items-center gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5" /> Venció el plazo para pagar — confirmá solo si realmente recibiste el efectivo.
                     </p>
                   )}

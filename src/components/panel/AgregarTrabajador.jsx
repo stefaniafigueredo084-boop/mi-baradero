@@ -112,7 +112,7 @@ export default function AgregarTrabajador() {
               <ShieldCheck className="w-4 h-4 text-primario shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-gray-800">Administrador general</p>
-                <p className="text-xs text-gray-500">Accede a todas las secciones y al historial de actividad.</p>
+                <p className="text-sm text-gray-500">Accede a todas las secciones y al historial de actividad.</p>
               </div>
             </label>
             {SECTORES.map(s => (
@@ -120,7 +120,7 @@ export default function AgregarTrabajador() {
                 <input type="radio" name="acceso" checked={acceso === s.id} onChange={() => setAcceso(s.id)} className="accent-secundario w-4 h-4" />
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Solo {s.label}</p>
-                  <p className="text-xs text-gray-500">Únicamente puede ver y editar esta sección.</p>
+                  <p className="text-sm text-gray-500">Únicamente puede ver y editar esta sección.</p>
                 </div>
               </label>
             ))}
@@ -148,7 +148,7 @@ export default function AgregarTrabajador() {
                 </label>
               ))}
             </div>
-            <p className="text-xs text-gray-400 mt-1.5">Va a ver solo estos horarios en la pantalla de escaneo, no los del resto de los choferes.</p>
+            <p className="text-sm text-gray-400 mt-1.5">Va a ver solo estos horarios en la pantalla de escaneo, no los del resto de los choferes.</p>
           </div>
         )}
 
@@ -163,7 +163,7 @@ export default function AgregarTrabajador() {
           Crear cuenta
         </button>
       </form>
-      <p className="text-xs text-gray-400 mt-5 leading-relaxed">
+      <p className="text-sm text-gray-400 mt-5 leading-relaxed">
         Para desactivar o eliminar una cuenta existente, usá la lista de arriba ("Cuentas del panel"). Por seguridad, "eliminar" le saca el acceso pero no borra la cuenta de acceso (email/contraseña) — para eso hace falta entrar a Firebase Console → Authentication → Users.
       </p>
     </div>

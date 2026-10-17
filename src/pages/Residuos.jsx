@@ -144,10 +144,10 @@ export default function Residuos() {
           </div>
 
           <div className="card p-4 lg:col-span-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-bold font-poppins flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-acento" />
+                  <Bell className="w-5 h-5 text-acento shrink-0" />
                   Notificaciones de Recolección
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
@@ -158,7 +158,7 @@ export default function Residuos() {
               </div>
               <button
                 onClick={() => setNotifActiva(!notifActiva)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                className={`shrink-0 self-start sm:self-auto flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
                   notifActiva
                     ? 'bg-secundario/10 text-secundario border border-secundario/30 hover:bg-secundario/20'
                     : 'btn-acento'
@@ -307,7 +307,7 @@ export default function Residuos() {
                 </div>
                 {zonaSeleccionada?.id === zona.id && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-primario font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
+                    <p className="text-sm text-primario font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
                   </div>
                 )}
               </button>
