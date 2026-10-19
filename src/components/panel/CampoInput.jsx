@@ -80,6 +80,21 @@ export default function CampoInput({ campo, valor, onChange }) {
     )
   }
 
+  // Coordenada (latitud/longitud): admite signo y decimales, que el campo
+  // numérico de arriba borraría. Acepta coma o punto decimal.
+  if (campo.type === 'coordenada') {
+    return (
+      <input
+        type="text"
+        inputMode="decimal"
+        className={base}
+        placeholder={campo.placeholder}
+        value={valor ?? ''}
+        onChange={e => onChange(e.target.value.replace(',', '.').replace(/[^\d.-]/g, ''))}
+      />
+    )
+  }
+
   return (
     <input
       type={campo.type === 'number' ? 'number' : 'text'}

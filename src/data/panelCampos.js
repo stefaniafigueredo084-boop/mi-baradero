@@ -38,6 +38,10 @@ export const camposPuntosVerdes = [
   { name: 'materiales', label: 'Materiales que recibe', type: 'multiselect', options: ['Cartón', 'Papel', 'Vidrio', 'Plástico', 'Metales', 'Residuos orgánicos'] },
   { name: 'activo', label: 'Estado', type: 'checkbox', checkboxLabel: 'Punto activo', default: true },
   { name: 'capacidad', label: 'Capacidad ocupada (%)', type: 'number', placeholder: '0', default: '0' },
+  // Para que aparezca en el mapa. En Google Maps: clic derecho sobre el
+  // lugar → se copian las coordenadas (la primera es la latitud).
+  { name: 'lat', label: 'Latitud (para el mapa)', type: 'coordenada', placeholder: 'Ej: -33.8127' },
+  { name: 'lng', label: 'Longitud (para el mapa)', type: 'coordenada', placeholder: 'Ej: -59.5044' },
 ]
 
 export const camposHorariosCombi = [

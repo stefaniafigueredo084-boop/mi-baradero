@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import { MapPin, Clock, CheckCircle, XCircle, Recycle, Leaf, BarChart3, Navigation, ShoppingBag, Droplets, Package, Ban, Layers, GlassWater } from 'lucide-react'
 import { puntosVerdes as puntosFijos, materialesInfo } from '../data/puntosVerdesData'
 import { useColeccion } from '../hooks/useColeccion'
-import { posicionDesdeId } from '../utils/posicionHash'
+import Esqueleto from '../components/Esqueleto'
+import { coordenadasDe } from '../utils/coordenadas'
+
+// El mapa (Leaflet) se carga aparte, solo al abrir esta página.
+const MapaPuntosVerdes = lazy(() => import('../components/MapaPuntosVerdes'))
 import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 
 const instrucciones = [
@@ -58,16 +62,16 @@ function linkComoLlegar(punto) {
 export default function PuntosVerdes() {
   const [puntoSeleccionado, setPuntoSeleccionado] = useState(null)
 
-  // Puntos cargados desde el panel de trabajadores, con una posición en
-  // el mapa calculada a partir de su id (el formulario no la pide).
+  // Puntos fijos del sitio + los cargados desde el panel de trabajadores.
   const { items: puntosLive } = useColeccion('puntosVerdesExtra')
   const puntosVerdes = useMemo(
     () => [
       ...puntosFijos.filter(p => !puntosLive.some(lp => lp.idOriginal === p.id)),
-      ...puntosLive.map(p => ({ ...posicionDesdeId(p.id), ...p })),
+      ...puntosLive,
     ],
     [puntosLive]
   )
+  const sinUbicacion = puntosVerdes.filter(p => !coordenadasDe(p))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,71 +135,27 @@ export default function PuntosVerdes() {
 
         {/* Mapa + Lista */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Mapa simulado */}
+          {/* Mapa real (OpenStreetMap) */}
           <div className="lg:col-span-3">
             <h2 className="text-xl font-bold font-poppins mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-secundario" /> Mapa de Puntos Verdes
             </h2>
-            <div className="relative bg-gradient-to-br from-emerald-50 to-green-50 rounded border border-gray-200 h-80 overflow-hidden">
-              {/* Grid de mapa ficticio */}
-              <div className="absolute inset-0 opacity-20">
-                {Array.from({ length: 8 }, (_, i) => (
-                  <div key={i} className="absolute border-gray-400 border-t" style={{ top: `${i * 12.5}%`, left: 0, right: 0 }} />
-                ))}
-                {Array.from({ length: 8 }, (_, i) => (
-                  <div key={i} className="absolute border-gray-400 border-l" style={{ left: `${i * 12.5}%`, top: 0, bottom: 0 }} />
-                ))}
-              </div>
-
-              {/* Calles simuladas */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <line x1="0" y1="50" x2="100" y2="50" stroke="#cbd5e1" strokeWidth="1.5" />
-                <line x1="50" y1="0" x2="50" y2="100" stroke="#cbd5e1" strokeWidth="1.5" />
-                <line x1="0" y1="30" x2="100" y2="30" stroke="#e2e8f0" strokeWidth="0.8" />
-                <line x1="0" y1="70" x2="100" y2="70" stroke="#e2e8f0" strokeWidth="0.8" />
-                <line x1="25" y1="0" x2="25" y2="100" stroke="#e2e8f0" strokeWidth="0.8" />
-                <line x1="75" y1="0" x2="75" y2="100" stroke="#e2e8f0" strokeWidth="0.8" />
-              </svg>
-
-              {/* Puntos verdes en mapa */}
-              {puntosVerdes.map(punto => (
-                <button
-                  key={punto.id}
-                  onClick={() => setPuntoSeleccionado(puntoSeleccionado?.id === punto.id ? null : punto)}
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2 group z-10"
-                  style={{ left: `${punto.posX}%`, top: `${punto.posY}%` }}
-                >
-                  <div className={`w-10 h-10 rounded-full border-3 flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 ${
-                    punto.activo
-                      ? puntoSeleccionado?.id === punto.id
-                        ? 'bg-secundario border-secundario-oscuro scale-125'
-                        : 'bg-primario border-primario-oscuro'
-                      : 'bg-gray-400 border-gray-500'
-                  }`} style={{ border: '3px solid' }}>
-                    <Recycle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white text-gray-800 text-xs font-semibold px-2 py-1 rounded-lg shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    {punto.nombre}
-                  </div>
-                </button>
-              ))}
-
-              {/* Leyenda */}
-              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded p-2.5 text-xs space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-primario" />
-                  <span className="text-gray-600">Activo</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-gray-400" />
-                  <span className="text-gray-600">Inactivo</span>
-                </div>
-              </div>
-
-              <div className="absolute top-3 right-3 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded-lg">
-                Mapa simulado
-              </div>
+            <Suspense fallback={<Esqueleto filas={1} alto="h-80" />}>
+              <MapaPuntosVerdes
+                puntos={puntosVerdes}
+                elegidoId={puntoSeleccionado?.id}
+                onElegir={punto => setPuntoSeleccionado(puntoSeleccionado?.id === punto.id ? null : punto)}
+              />
+            </Suspense>
+            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><span className="marcador-punto activo !w-3.5 !h-3.5 !border-2" /> Activo</span>
+              <span className="flex items-center gap-1.5"><span className="marcador-punto inactivo !w-3.5 !h-3.5 !border-2" /> Inactivo</span>
             </div>
+            {sinUbicacion.length > 0 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Sin ubicación en el mapa todavía: {sinUbicacion.map(p => p.nombre).join(', ')}. Están en la lista, con "Cómo llegar" por dirección.
+              </p>
+            )}
           </div>
 
           {/* Lista de puntos */}

@@ -1,6 +1,8 @@
 // Ubicaciones reales, confirmadas por el municipio (agosto 2026).
-// posX/posY son solo la posición dentro del mapa simulado (no son
-// coordenadas reales) — "Cómo llegar" en cambio usa la dirección real.
+// lat/lng: el cruce de las dos calles de la dirección, calculado con los
+// datos de OpenStreetMap (octubre 2026). Si una esquina no se pudo
+// ubicar, el punto no lleva lat/lng y no aparece en el mapa (sí en la
+// lista, con "Cómo llegar" por dirección). Se pueden cargar desde el panel.
 const HORARIO_GENERAL = 'Lun a Vie: 8:00 - 20:00'
 const MATERIALES_GENERAL = ['Cartón', 'Papel', 'Vidrio', 'Plástico', 'Metales']
 
@@ -10,8 +12,8 @@ export const puntosVerdes = [
     nombre: 'Punto Verde Plaza Che Guevara',
     direccion: 'Pueyrredón y Pacheco de Melo',
     horario: HORARIO_GENERAL,
-    posX: 40,
-    posY: 35,
+    lat: -33.801499,
+    lng: -59.510881,
     materiales: MATERIALES_GENERAL,
     activo: true,
     capacidad: 40,
@@ -21,8 +23,8 @@ export const puntosVerdes = [
     nombre: 'Punto Verde Plaza de los Intendentes',
     direccion: 'Malabia y Pringles',
     horario: HORARIO_GENERAL,
-    posX: 65,
-    posY: 40,
+    lat: -33.815432,
+    lng: -59.489799,
     materiales: MATERIALES_GENERAL,
     activo: true,
     capacidad: 40,
@@ -32,8 +34,8 @@ export const puntosVerdes = [
     nombre: 'Punto Verde Plaza Colón',
     direccion: 'Medrano y Laprida',
     horario: HORARIO_GENERAL,
-    posX: 45,
-    posY: 65,
+    lat: -33.812699,
+    lng: -59.504429,
     materiales: MATERIALES_GENERAL,
     activo: true,
     capacidad: 40,
@@ -43,8 +45,6 @@ export const puntosVerdes = [
     nombre: 'Punto Verde Plaza Malvinas Argentinas',
     direccion: "Liaudat y O'Roarke",
     horario: HORARIO_GENERAL,
-    posX: 70,
-    posY: 65,
     materiales: MATERIALES_GENERAL,
     activo: true,
     capacidad: 40,

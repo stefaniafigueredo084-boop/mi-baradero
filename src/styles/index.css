@@ -522,3 +522,18 @@
 .dark .to-yellow-500    { --tw-gradient-to: #713f12 var(--tw-gradient-to-position); }
 .dark .to-acento-oscuro{ --tw-gradient-to: #713f12 var(--tw-gradient-to-position); }
 .dark .via-primario        { --tw-gradient-to: rgb(27 142 62 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #0b3d1f var(--tw-gradient-via-position), var(--tw-gradient-to); }
+
+/* Marcadores del mapa de Puntos Verdes (Leaflet) */
+.marcador-punto {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.marcador-punto.activo { background: #3D8B68; }
+.marcador-punto.inactivo { background: #9ca3af; }
+.marcador-punto.elegido { background: #6AAE4E; transform: scale(1.25); }
+/* Mapa en modo oscuro: se oscurecen los mosaicos (los marcadores no). */
+.dark .leaflet-tile { filter: brightness(0.75) invert(1) contrast(0.85) hue-rotate(180deg) saturate(0.6); }

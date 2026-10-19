@@ -40,6 +40,12 @@ export default defineConfig({
             options: { cacheName: 'tipografias', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 } },
           },
           {
+            // Mosaicos del mapa de Puntos Verdes: la zona ya vista se ve sin conexión.
+            urlPattern: ({ url }) => url.origin === 'https://tile.openstreetmap.org',
+            handler: 'CacheFirst',
+            options: { cacheName: 'mapa', expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 14 } },
+          },
+          {
             urlPattern: ({ request, sameOrigin }) => sameOrigin && request.destination === 'image',
             handler: 'CacheFirst',
             options: { cacheName: 'imagenes', expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 } },
