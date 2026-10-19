@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 // Configuración del proyecto Firebase "Mi Baradero".
 // El apiKey de Firebase es público por diseño (identifica el proyecto,
@@ -17,7 +17,12 @@ const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig)
 export const auth = getAuth(firebaseApp)
-export const db = getFirestore(firebaseApp)
+// Caché local de Firestore (IndexedDB): lo que ya se leyó queda guardado
+// en el teléfono, así la app muestra horarios, calendario, eventos y tu
+// pase aunque no haya conexión, y se pone al día sola cuando vuelve.
+export const db = initializeFirestore(firebaseApp, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+})
 
 // Cada visitante tiene un uid real de Firebase Auth: si no inició sesión
 // (Google o email), entra como anónimo. Ese uid es el que las Reglas de
