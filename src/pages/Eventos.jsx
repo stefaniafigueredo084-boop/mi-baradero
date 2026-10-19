@@ -6,6 +6,7 @@ import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import EstadoVacio from '../components/EstadoVacio'
 import Noticias from '../components/Noticias'
+import BotonCalendario from '../components/BotonCalendario'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-primario/10 text-primario',
@@ -203,6 +204,7 @@ export default function Eventos() {
                       {evento.ubicacion}
                     </div>
                   </div>
+                  <BotonCalendario evento={evento} />
                 </div>
               </div>
             ))}

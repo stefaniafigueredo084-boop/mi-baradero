@@ -80,6 +80,11 @@ export default function CampoInput({ campo, valor, onChange }) {
     )
   }
 
+  // Fecha exacta (selector de fecha del teléfono); se guarda "2026-11-21".
+  if (campo.type === 'fecha') {
+    return <input type="date" className={base} value={valor ?? ''} onChange={e => onChange(e.target.value)} />
+  }
+
   // Coordenada (latitud/longitud): admite signo y decimales, que el campo
   // numérico de arriba borraría. Acepta coma o punto decimal.
   if (campo.type === 'coordenada') {

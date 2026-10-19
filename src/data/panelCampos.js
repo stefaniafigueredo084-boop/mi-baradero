@@ -9,6 +9,8 @@ export const camposEventos = [
   { name: 'imagenData', label: 'Foto del evento (opcional)', type: 'image' },
   { name: 'categoria', label: 'Categoría', type: 'select', options: ['Festival', 'Gastronomía', 'Comunidad', 'Cultura', 'Deportes', 'Obras Públicas', 'Educación', 'Salud'] },
   { name: 'fechaDisplay', label: 'Fecha', type: 'text', placeholder: 'Ej: 15 de Agosto' },
+  // Opcional: si se carga, el evento muestra "Agregar a mi calendario".
+  { name: 'fechaISO', label: 'Fecha exacta (opcional, para "Agregar a mi calendario")', type: 'fecha' },
   { name: 'hora', label: 'Hora', type: 'text', placeholder: 'Ej: 20:00' },
   { name: 'ubicacion', label: 'Ubicación', type: 'text', placeholder: 'Ej: Plaza Mitre', default: 'Baradero' },
   { name: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Contá de qué se trata el evento...' },
