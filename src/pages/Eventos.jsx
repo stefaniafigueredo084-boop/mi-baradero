@@ -5,6 +5,7 @@ import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
 import EstadoVacio from '../components/EstadoVacio'
+import Noticias from '../components/Noticias'
 
 const categoriaBadgeColor = {
   'Festival': 'bg-primario/10 text-primario',
@@ -79,6 +80,9 @@ export default function Eventos() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-5 space-y-6">
+
+        {/* Noticias publicadas desde el panel (no aparece si no hay) */}
+        <Noticias />
 
         {/* Evento destacado */}
         {eventos.filter(e => e.destacado).slice(0, 1).map(evento => (

@@ -16,6 +16,15 @@ export const camposEventos = [
   { name: 'destacado', label: 'Mostrar como destacado', type: 'checkbox', checkboxLabel: 'Sí, destacarlo arriba de todo' },
 ]
 
+// Noticias: novedades de la ciudad que publica el sector Eventos desde el
+// panel (se ven en Eventos y en la portada, la más nueva primero).
+export const camposNoticias = [
+  { name: 'titulo', label: 'Título', type: 'text', required: true, placeholder: 'Ej: Nuevo horario de la combi a Portela' },
+  { name: 'resumen', label: 'Resumen (una o dos líneas)', type: 'textarea', required: true, placeholder: 'Lo más importante, en pocas palabras.' },
+  { name: 'cuerpo', label: 'Texto completo (opcional)', type: 'textarea', placeholder: 'Más detalles, si hacen falta.' },
+  { name: 'imagenData', label: 'Foto (opcional)', type: 'image' },
+]
+
 export const camposZonasResiduos = [
   { name: 'nombre', label: 'Zona / Barrio', type: 'text', required: true, placeholder: 'Ej: Barrio Norte' },
   // Con este horario se calcula "Tu zona" (si ya pasó, está pasando o falta).

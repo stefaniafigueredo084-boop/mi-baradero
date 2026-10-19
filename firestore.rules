@@ -74,6 +74,7 @@ service cloud.firestore {
     // Contenido editable desde el panel: lectura pública (lo consume el
     // sitio para todos los vecinos), escritura solo del sector dueño o admin.
     match /eventos/{doc}          { allow read: if true; allow write: if puedeEditar('eventos'); }
+    match /noticias/{doc}         { allow read: if true; allow write: if puedeEditar('eventos'); }
     match /horariosCombi/{doc}    { allow read: if true; allow write: if puedeEditar('combi'); }
     match /alertasCombi/{doc}     { allow read: if true; allow write: if puedeEditar('combi'); }
     match /zonasResiduos/{doc}    { allow read: if true; allow write: if puedeEditar('residuos'); }

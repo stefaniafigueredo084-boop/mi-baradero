@@ -6,6 +6,7 @@ import { nombreVecino } from '../utils/perfilLocal'
 import { useTutorial } from '../context/TutorialContext'
 import EstadoVacio from '../components/EstadoVacio'
 import HoyEnBaradero from '../components/HoyEnBaradero'
+import Noticias from '../components/Noticias'
 
 const servicios = [
   { to: '/combi', icon: Bus, titulo: 'Combi Municipal', detalle: 'Pasajes, horarios y recorrido', color: 'bg-primario text-white', claves: 'pasaje colectivo micro pase horarios viaje' },
@@ -209,6 +210,9 @@ export default function Home() {
             )}
           </section>
         )}
+
+        {/* ── NOTICIAS (las últimas 3, si hay) ─────────────────────── */}
+        {!q && <Noticias limite={3} titulo="Últimas noticias" className="pt-5" />}
 
         {/* ── AYUDA (TACHÍN) ───────────────────────────────────────── */}
         {!q && (

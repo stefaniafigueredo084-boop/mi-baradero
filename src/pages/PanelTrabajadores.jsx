@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Info, Lightbulb, Loader2, LogOut, MapPin, Megaphone, MessageSquare, Navigation, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
+import { Bell, Bus, Calendar, Car, Clock, CreditCard, History as HistoryIcon, ClipboardList, Info, Lightbulb, Loader2, LogOut, MapPin, Megaphone, MessageSquare, Navigation, Newspaper, Recycle, ShieldOff, Trash2, Truck, Users, UserCheck, UserPlus } from 'lucide-react'
 import { auth } from '../firebase'
 import LogoMiBaradero from '../components/LogoMiBaradero'
 import { useTrabajador } from '../hooks/useTrabajador'
@@ -27,6 +27,7 @@ import { DEPARTAMENTOS, departamentoDeReclamo, departamentosDelSector } from '..
 import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
 import {
   camposEventos,
+  camposNoticias,
   camposHorariosCombi,
   camposAlertasCombi,
   camposZonasResiduos,
@@ -205,6 +206,16 @@ export default function PanelTrabajadores() {
                 campos={camposEventos}
                 renderTitulo={i => i.titulo}
                 renderSubtitulo={i => [i.fechaDisplay, i.ubicacion].filter(Boolean).join(' · ')}
+              />
+            </AcordeonItem>
+
+            <AcordeonItem icono={Newspaper} color="azul" titulo="Noticias" descripcion="Publicar novedades de la ciudad">
+              <ColeccionCRUD
+                coleccion="noticias"
+                seccion="eventos"
+                campos={camposNoticias}
+                renderTitulo={i => i.titulo}
+                renderSubtitulo={i => i.resumen}
               />
             </AcordeonItem>
 
