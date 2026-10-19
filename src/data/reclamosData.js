@@ -67,6 +67,12 @@ export const departamentosDelSector = sector => DEPARTAMENTOS.filter(d => d.sect
 // mismo reclamo sin dictar el id completo de Firestore.
 export const codigoReclamo = id => `#${String(id).slice(-6).toUpperCase()}`
 
+// "#abc123", "abc 123", "ABC123" → "ABC123" (o '' si no tiene 6 letras/números).
+export const normalizarCodigo = texto => {
+  const limpio = String(texto || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  return limpio.length === 6 ? limpio : ''
+}
+
 export function fechaReclamo(marca) {
   const fecha = marca?.toDate?.()
   if (!fecha) return ''

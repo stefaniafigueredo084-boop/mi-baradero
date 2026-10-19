@@ -100,7 +100,7 @@ export default function PanelTrabajadores() {
         descripcion={`Quejas y reclamos que llegan a ${deptos}`}
         badge={sinAtender(lista)}
       >
-        <ReclamosPanel items={lista} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} />
+        <ReclamosPanel items={lista} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} departamentos={departamentosDelSector(sector)} />
       </AcordeonItem>
     )
   }
@@ -340,7 +340,7 @@ export default function PanelTrabajadores() {
               badge={reclamosNuevos}
               abiertoPorDefecto
             >
-              <ReclamosPanel items={reclamos} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} completa />
+              <ReclamosPanel items={reclamos} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} departamentos={veTodosLosReclamos ? null : departamentosDelSector(trabajador?.sector)} completa />
             </AcordeonItem>
 
             <AcordeonItem icono={Info} color="azul" titulo="Cómo llegan y quién los atiende" descripcion="El recorrido de un reclamo y qué departamento se encarga de cada tema">

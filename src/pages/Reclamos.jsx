@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { Camera, CheckCircle, ClipboardList, Loader2, MapPin, MessageSquare, Send, X } from 'lucide-react'
 import { asegurarSesion, db } from '../firebase'
 import { nombreVecino } from '../utils/perfilLocal'
@@ -88,8 +88,13 @@ export default function Reclamos() {
     setEnviando(true)
     try {
       const { uid } = await asegurarSesion()
-      const ref = await addDoc(collection(db, 'reclamos'), {
+      // El id se genera antes de guardar para poder guardar también el
+      // código corto (#ABC123, los últimos 6 caracteres del id): así el
+      // panel puede buscar un reclamo por el código que dicta el vecino.
+      const ref = doc(collection(db, 'reclamos'))
+      await setDoc(ref, {
         uid,
+        codigo: ref.id.slice(-6).toUpperCase(),
         tipo,
         area,
         departamento: areaReclamoPorId(area).departamento,

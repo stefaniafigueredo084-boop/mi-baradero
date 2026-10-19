@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
-import { deleteDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
-import { Building2, Check, Loader2, MapPin, MessageSquare, Trash2, User } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { collection, deleteDoc, doc, limit, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore'
+import { Building2, Check, Loader2, MapPin, MessageSquare, Search, Trash2, User, X } from 'lucide-react'
 import { auth, db } from '../../firebase'
 import { registrarHistorial } from '../../utils/historial'
 import {
@@ -13,6 +13,7 @@ import {
   departamentoPorId,
   estadoReclamoPorId,
   fechaReclamo,
+  normalizarCodigo,
   tipoReclamoPorId,
 } from '../../data/reclamosData'
 import EstadoVacio from '../EstadoVacio'
@@ -26,7 +27,10 @@ import Esqueleto from '../Esqueleto'
 // "completa" = vista de Atención al Vecino / admin: todos los
 // departamentos, con filtro por departamento y opción de eliminar. Sin
 // "completa" es la vista de un sector (solo sus reclamos).
-export default function ReclamosPanel({ items, cargando, error = '', hayMas = false, onCargarMas, completa = false }) {
+// "departamentos": los que atiende quien mira (null = todos). Hace falta
+// para buscar por código: las Reglas solo dejan consultar reclamos de los
+// departamentos propios.
+export default function ReclamosPanel({ items, cargando, error = '', hayMas = false, onCargarMas, completa = false, departamentos = null }) {
   const [filtroEstado, setFiltroEstado] = useState('nuevo')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [filtroDepto, setFiltroDepto] = useState('')
@@ -35,12 +39,47 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
   const [errorAccion, setErrorAccion] = useState('')
   const [fotoAbierta, setFotoAbierta] = useState(null)
 
+  // Búsqueda por código (#ABC123): consulta Firestore directo, así
+  // encuentra el reclamo aunque no esté entre los cargados en la lista.
+  const [textoCodigo, setTextoCodigo] = useState('')
+  const [codigoBuscado, setCodigoBuscado] = useState('')
+  const [encontrados, setEncontrados] = useState(null) // null = sin búsqueda
+  const [errorBusqueda, setErrorBusqueda] = useState('')
+  const deptosRef = useRef(departamentos)
+  deptosRef.current = departamentos
+
+  useEffect(() => {
+    if (!codigoBuscado) { setEncontrados(null); return }
+    setEncontrados(undefined)
+    setErrorBusqueda('')
+    const deptos = deptosRef.current
+    const q = query(
+      collection(db, 'reclamos'),
+      ...(deptos ? [where('departamento', 'in', deptos)] : []),
+      where('codigo', '==', codigoBuscado),
+      limit(5)
+    )
+    return onSnapshot(
+      q,
+      snap => setEncontrados(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+      () => { setEncontrados([]); setErrorBusqueda('No se pudo buscar. Revisá tu conexión y probá de nuevo.') }
+    )
+  }, [codigoBuscado])
+
+  const buscarCodigo = e => {
+    e.preventDefault()
+    const codigo = normalizarCodigo(textoCodigo)
+    if (!codigo) { setErrorBusqueda('El código tiene 6 letras o números, por ejemplo #K3F9QA.'); return }
+    setCodigoBuscado(codigo)
+  }
+  const limpiarBusqueda = () => { setTextoCodigo(''); setCodigoBuscado(''); setErrorBusqueda('') }
+
   const cantidadPorEstado = useMemo(
     () => Object.fromEntries(ESTADOS_RECLAMO.map(e => [e.id, items.filter(i => (i.estado || 'nuevo') === e.id).length])),
     [items]
   )
 
-  const visibles = useMemo(
+  const filtrados = useMemo(
     () => items.filter(i =>
       (!filtroEstado || (i.estado || 'nuevo') === filtroEstado) &&
       (!filtroTipo || i.tipo === filtroTipo) &&
@@ -48,6 +87,8 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
     ),
     [items, filtroEstado, filtroTipo, filtroDepto]
   )
+  const buscando = codigoBuscado !== ''
+  const visibles = buscando ? (encontrados || []) : filtrados
 
   const avisarError = (accion, item) =>
     setErrorAccion(`No se pudo ${accion} ${codigoReclamo(item.id)}. Revisá tu conexión y probá de nuevo.`)
@@ -144,7 +185,32 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
           : 'Lo que los vecinos mandan sobre tu área. Cambiá el estado a medida que se atiende y dejá una respuesta: el vecino la ve desde su teléfono. Si no le corresponde a tu área, derivalo a otro departamento.'}
       </p>
 
+      {/* Buscar por código */}
+      <form onSubmit={buscarCodigo} className="flex flex-wrap items-center gap-2 mb-4">
+        <label className="flex items-center gap-2 flex-1 min-w-[200px] max-w-sm bg-white border-2 border-gray-200 rounded-lg px-3 focus-within:border-primario">
+          <Search className="w-4 h-4 text-gray-400 shrink-0" />
+          <input
+            value={textoCodigo}
+            onChange={e => setTextoCodigo(e.target.value)}
+            placeholder="Buscar por código (#K3F9QA)"
+            aria-label="Buscar reclamo por código"
+            className="flex-1 min-w-0 bg-transparent py-2 text-sm outline-none uppercase placeholder:normal-case"
+          />
+        </label>
+        <button type="submit" className="btn-primary !py-2 !px-4 text-sm">Buscar</button>
+        {buscando && (
+          <button type="button" onClick={limpiarBusqueda} className="flex items-center gap-1 text-sm font-semibold text-primario-oscuro hover:underline px-2">
+            <X className="w-4 h-4" /> Ver la lista
+          </button>
+        )}
+      </form>
+      {errorBusqueda && <p role="alert" className="text-sm text-red-600 mb-3">{errorBusqueda}</p>}
+      {buscando && encontrados && encontrados.length > 0 && (
+        <p className="text-sm text-gray-500 mb-3">Resultado para #{codigoBuscado}:</p>
+      )}
+
       {/* Filtro por estado, con cuántos hay en cada uno */}
+      {!buscando && <>
       <div className="flex flex-wrap gap-2 mb-3">
         {ESTADOS_RECLAMO.map(e => (
           <button
@@ -192,14 +258,15 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
           </select>
         )}
       </div>
+      </>}
 
       {(error || errorAccion) && (
         <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mb-3">{error || errorAccion}</p>
       )}
-      {cargando ? (
+      {(buscando ? encontrados === undefined : cargando) ? (
         <Esqueleto filas={3} />
       ) : visibles.length === 0 ? (
-        <EstadoVacio compacto texto="No hay mensajes en esta vista." />
+        <EstadoVacio compacto texto={buscando ? `No encontramos ningún reclamo con el código #${codigoBuscado}.` : 'No hay mensajes en esta vista.'} />
       ) : (
         <div className="space-y-4">
           {visibles.map(item => {
@@ -307,7 +374,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
         </div>
       )}
 
-      {!cargando && hayMas && onCargarMas && (
+      {!buscando && !cargando && hayMas && onCargarMas && (
         <button
           type="button"
           onClick={onCargarMas}

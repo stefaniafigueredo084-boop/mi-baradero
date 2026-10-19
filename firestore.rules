@@ -152,8 +152,11 @@ service cloud.firestore {
       allow list: if atiendeReclamo(resource.data.departamento);
       allow create: if estaLogueado()
                      && request.resource.data.keys()
-                       .hasOnly(['uid', 'tipo', 'area', 'departamento', 'mensaje', 'ubicacion', 'nombre', 'fotoUrl', 'estado', 'creadoEn', 'actualizadoEn'])
+                       .hasOnly(['uid', 'codigo', 'tipo', 'area', 'departamento', 'mensaje', 'ubicacion', 'nombre', 'fotoUrl', 'estado', 'creadoEn', 'actualizadoEn'])
                      && request.resource.data.uid == request.auth.uid
+                     // Código corto = últimos 6 caracteres del id, en mayúsculas
+                     // (lo usa el panel para buscar un reclamo por código).
+                     && request.resource.data.codigo == id[id.size() - 6:id.size()].upper()
                      && departamentoValido(request.resource.data.departamento)
                      && request.resource.data.estado == 'nuevo'
                      && request.resource.data.tipo in ['queja', 'reclamo', 'sugerencia', 'felicitacion']
