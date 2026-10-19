@@ -8,6 +8,7 @@ import { asegurarSesion, db } from '../firebase'
 import { esPrimerGuardadoVecino, marcarVecinoGuardado, olvidarVecino } from '../utils/perfilLocal'
 import { useAccesibilidad, TAMANOS_FUENTE } from '../context/AccesibilidadContext'
 import { useAuth } from '../context/AuthContext'
+import { useZonasResiduos } from '../hooks/useResiduos'
 import { hablar } from '../utils/voz'
 import { NOTIF_SECTORES } from '../data/notifSectores'
 import CuentaVecino from '../components/CuentaVecino'
@@ -15,7 +16,6 @@ import ImagenInput from '../components/panel/ImagenInput'
 
 const ICONOS_NOTIF = { basura: Trash2, eventos: Calendar, puntosVerdes: Recycle, combi: Bus }
 
-const ZONAS = ['Zona Centro', 'Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste']
 
 const defaultPerfil = {
   nombre: '',
@@ -43,14 +43,9 @@ const defaultPerfil = {
 
 export default function Perfil() {
   const { tema, setTema, tamanoFuente, setTamanoFuente, lector, setLector } = useAccesibilidad()
-
-  // Link "Accesibilidad" de la franja de arriba: baja directo a esa sección
-  useEffect(() => {
-    if (window.location.hash !== '#accesibilidad') return
-    const t = setTimeout(() => document.getElementById('accesibilidad')?.scrollIntoView({ behavior: 'smooth' }), 100)
-    return () => clearTimeout(t)
-  }, [])
   const { usuario: cuenta } = useAuth()
+  // Mismas zonas que Residuos (ahí se ve el horario de "Tu zona").
+  const zonasResiduos = useZonasResiduos()
   const [perfil, setPerfil] = useState(() => {
     try {
       const guardado = localStorage.getItem('mibaradero_perfil')
@@ -341,7 +336,7 @@ export default function Perfil() {
                 className="select-field disabled:bg-gray-50 disabled:text-gray-600"
               >
                 <option value="">Seleccioná tu zona</option>
-                {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
+                {zonasResiduos.map(z => <option key={z.id} value={z.nombre}>{z.nombre} ({z.horario})</option>)}
               </select>
             </div>
           </div>

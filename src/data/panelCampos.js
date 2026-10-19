@@ -18,8 +18,8 @@ export const camposEventos = [
 
 export const camposZonasResiduos = [
   { name: 'nombre', label: 'Zona / Barrio', type: 'text', required: true, placeholder: 'Ej: Barrio Norte' },
+  // Con este horario se calcula "Tu zona" (si ya pasó, está pasando o falta).
   { name: 'horario', label: 'Horario de recolección', type: 'text', placeholder: 'Ej: 08:00 - 10:00' },
-  { name: 'proximaRecoleccion', label: 'Próxima recolección (minutos)', type: 'number', placeholder: '30' },
 ]
 
 export const camposPuntosVerdes = [

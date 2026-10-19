@@ -16,6 +16,25 @@ export function leerPerfilLocal() {
   }
 }
 
+// Zona de recolección del vecino (nombre de una zona de Residuos). Se
+// guarda en el mismo perfil local; el evento avisa a las otras
+// pantallas abiertas (la portada y Residuos la muestran).
+export const EVENTO_PERFIL = 'mibaradero-perfil'
+
+export function zonaVecino() {
+  return leerPerfilLocal()?.zona || ''
+}
+
+export function guardarZonaVecino(zona) {
+  const perfil = { ...(leerPerfilLocal() || {}), zona }
+  try {
+    localStorage.setItem(CLAVE_PERFIL, JSON.stringify(perfil))
+  } catch {
+    // Sin localStorage: la zona vale solo mientras está abierta la página.
+  }
+  window.dispatchEvent(new Event(EVENTO_PERFIL))
+}
+
 export function nombreVecino() {
   return leerPerfilLocal()?.nombre?.trim() || ''
 }

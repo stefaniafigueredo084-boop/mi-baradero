@@ -49,7 +49,14 @@ function Layout() {
   // camino si la página nueva todavía está acomodando su altura.
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
-  }, [location.pathname])
+    // Link a una sección de otra página (ej: "/residuos#tu-zona"): una
+    // vez dibujada la página nueva, baja hasta esa sección.
+    if (!location.hash) return
+    const t = setTimeout(() => {
+      document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ behavior: 'smooth' })
+    }, 150)
+    return () => clearTimeout(t)
+  }, [location.pathname, location.hash])
 
   // Saluda por voz al abrir la app, si el vecino ya se registró antes
   // (nombre guardado en este dispositivo) Y tiene activado "Lector de

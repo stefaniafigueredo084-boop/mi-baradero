@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { doc, onSnapshot } from 'firebase/firestore'
-import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, AlertTriangle, Navigation, Calendar, Recycle } from 'lucide-react'
-import { calendario as calendarioFijo, zonas as zonasFijas, estadosCamion, consejos as consejosFijos } from '../data/residuosData'
-import { db } from '../firebase'
+import { Trash2, Bell, BellOff, Truck, MapPin, Lightbulb, CheckCircle, XCircle, Navigation, Calendar, Recycle } from 'lucide-react'
+import { estadosCamion, consejos as consejosFijos } from '../data/residuosData'
+import { useDocConfig } from '../hooks/useDocConfig'
+import { useCalendarioResiduos, useZonasResiduos } from '../hooks/useResiduos'
+import { useZonaVecino } from '../hooks/useZonaVecino'
+import { fraseZonaHoy } from '../utils/residuos'
 import { useColeccion } from '../hooks/useColeccion'
 import { useAviso } from '../hooks/useAviso'
 import { pedirPermisoNotificacion, mostrarNotificacion, saludar } from '../utils/notificaciones'
@@ -40,21 +42,6 @@ function useGpsCamion(activo) {
   return distancia
 }
 
-// Estado del camión y calendario, publicados por el panel de trabajadores
-// en documentos config/estadoCamion y config/calendarioResiduos.
-function useDocConfig(nombreDoc, valorInicial, extraer) {
-  const [valor, setValor] = useState(valorInicial)
-  const extraerRef = useRef(extraer)
-  extraerRef.current = extraer
-  useEffect(() => {
-    return onSnapshot(doc(db, 'config', nombreDoc), snap => {
-      if (snap.exists()) setValor(extraerRef.current(snap.data()))
-    }, () => {
-      // Sin conexión: se queda con el valor por defecto.
-    })
-  }, [nombreDoc])
-  return valor
-}
 
 const colorMap = {
   verde: { bg: 'bg-secundario/10', border: 'border-secundario/30', text: 'text-secundario', icon: 'bg-secundario' },
@@ -69,17 +56,15 @@ const ICONO_DIA = { verde: Trash2, azul: Recycle, gris: XCircle }
 export default function Residuos() {
   const [notifActiva, setNotifActiva] = useState(false)
   const [gpsActivo, setGpsActivo] = useState(false)
-  const [zonaSeleccionada, setZonaSeleccionada] = useState(null)
   const distancia = useGpsCamion(gpsActivo)
 
   const estadoCamion = useDocConfig('estadoCamion', 'EN_SERVICIO', d => d.valor)
-  const calendario = useDocConfig('calendarioResiduos', calendarioFijo, d => d.dias)
+  const calendario = useCalendarioResiduos()
 
-  const { items: zonasLive } = useColeccion('zonasResiduos')
-  const zonas = useMemo(() => [
-    ...zonasFijas.filter(z => !zonasLive.some(lz => lz.idOriginal === z.id)),
-    ...zonasLive,
-  ], [zonasLive])
+  const zonas = useZonasResiduos()
+  const [nombreZona, setNombreZona] = useZonaVecino()
+  const tuZona = zonas.find(z => z.nombre === nombreZona) || null
+  const hoyTuZona = fraseZonaHoy(tuZona, calendario)
 
   const { items: consejosLive } = useColeccion('consejosResiduos')
   const consejos = useMemo(() => [
@@ -280,54 +265,54 @@ export default function Residuos() {
           </div>
         </AcordeonItem>
 
-        {/* Alertas por zona */}
-        <div>
-          <h2 className="text-xl font-bold font-poppins mb-5 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-primario" /> Alerta por Zona
+        {/* Tu zona: el vecino elige su zona (queda guardada en el teléfono)
+            y ve el horario de recolección de hoy. Es el horario estimado de
+            cada zona, no un seguimiento del camión. */}
+        <div id="tu-zona" className="scroll-mt-32">
+          <h2 className="text-xl font-bold font-poppins mb-1 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primario" /> Tu zona
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {zonas.map(zona => (
-              <button
-                key={zona.id}
-                onClick={() => setZonaSeleccionada(zonaSeleccionada?.id === zona.id ? null : zona)}
-                className={`card p-4 text-left transition-all border-2 ${
-                  zonaSeleccionada?.id === zona.id ? 'border-primario ring-2 ring-primario/20' : 'border-transparent'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold font-poppins text-gray-800">{zona.nombre}</h3>
-                  <span className="badge bg-primario/10 text-primario text-xs">{zona.horario}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-acento" />
-                  <p className="text-sm text-gray-600">
-                    El camión estará en tu zona en{' '}
-                    <span className="font-bold text-amber-900">{zona.proximaRecoleccion} min</span>
-                  </p>
-                </div>
-                {zonaSeleccionada?.id === zona.id && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-sm text-primario font-medium flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 shrink-0" /> Zona seleccionada — Recibirás alertas aquí</p>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+          <p className="text-sm text-gray-500 mb-4">
+            {tuZona ? 'Tocá otra zona para cambiarla.' : 'Elegí tu zona para ver cuándo pasa el camión. Queda guardada en este teléfono.'}
+          </p>
 
-          {zonaSeleccionada && (
-            <div className="mt-4 bg-acento/10 border border-acento/30 rounded p-5 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-acento flex items-center justify-center shrink-0">
-                <Truck className="w-5 h-5 text-white" />
+          {tuZona && (
+            <div className={`mb-4 rounded p-4 flex items-start gap-3 border ${hoyTuZona.momento === 'ahora' ? 'bg-acento/15 border-acento/40' : 'bg-primario-suave border-primario/20'}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${hoyTuZona.momento === 'ahora' ? 'bg-acento text-tinta' : 'bg-primario text-white'}`}>
+                <Truck className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-bold text-gray-800">
-                  El camión estará en {zonaSeleccionada.nombre} en {zonaSeleccionada.proximaRecoleccion} minutos
-                </p>
-                <p className="text-sm text-gray-600 mt-0.5">Horario de recolección: {zonaSeleccionada.horario}</p>
-                <p className="text-sm text-amber-900 font-medium mt-1">¡Recordá sacar las bolsas al cordón!</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">{tuZona.nombre}</p>
+                <p className="font-bold font-poppins text-tinta">{hoyTuZona.titulo}</p>
+                {hoyTuZona.detalle && <p className="text-sm text-gray-600 mt-0.5">{hoyTuZona.detalle}</p>}
+                {hoyTuZona.momento === 'antes' && <p className="text-sm text-amber-900 font-medium mt-1">Sacá las bolsas al cordón antes de que empiece el horario.</p>}
               </div>
             </div>
           )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {zonas.map(zona => {
+              const elegida = tuZona?.id === zona.id
+              return (
+                <button
+                  key={zona.id}
+                  onClick={() => setNombreZona(elegida ? '' : zona.nombre)}
+                  aria-pressed={elegida}
+                  className={`card p-4 text-left transition-all border-2 ${elegida ? 'border-primario ring-2 ring-primario/20' : 'border-transparent'}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-semibold font-poppins text-gray-800">{zona.nombre}</h3>
+                    <span className="badge bg-primario/10 text-primario-oscuro text-xs">{zona.horario}</span>
+                  </div>
+                  {elegida && (
+                    <p className="text-sm text-primario-oscuro font-medium flex items-center gap-1 mt-2">
+                      <CheckCircle className="w-3.5 h-3.5 shrink-0" /> Tu zona
+                    </p>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Consejos — colapsado, como en el panel de trabajadores */}
