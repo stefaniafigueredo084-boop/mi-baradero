@@ -5,6 +5,7 @@ import { galeriaEventos, tiposEvento } from '../data/galeriaEventos'
 import { nombreVecino } from '../utils/perfilLocal'
 import { useTutorial } from '../context/TutorialContext'
 import EstadoVacio from '../components/EstadoVacio'
+import HoyEnBaradero from '../components/HoyEnBaradero'
 
 const servicios = [
   { to: '/combi', icon: Bus, titulo: 'Combi Municipal', detalle: 'Pasajes, horarios y recorrido', color: 'bg-primario text-white', claves: 'pasaje colectivo micro pase horarios viaje' },
@@ -147,6 +148,9 @@ export default function Home() {
             texto="Probá con otra palabra, como “pasaje”, “basura” o “reclamo”."
           />
         )}
+
+        {/* ── HOY EN BARADERO ──────────────────────────────────────── */}
+        {!q && <HoyEnBaradero />}
 
         {/* ── SERVICIOS ────────────────────────────────────────────── */}
         {serviciosVisibles.length > 0 && (
