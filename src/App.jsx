@@ -15,6 +15,7 @@ import PuntosVerdes from './pages/PuntosVerdes'
 import Reclamos from './pages/Reclamos'
 import Perfil from './pages/Perfil'
 import PanelTrabajadores from './pages/PanelTrabajadores'
+import Presentacion from './pages/Presentacion'
 import { nombreVecino } from './utils/perfilLocal'
 import { hablar, escuchar, soportaSintesisVoz, soportaReconocimientoVoz } from './utils/voz'
 import { interpretarComandoVoz } from './data/comandosVoz'
@@ -36,6 +37,9 @@ function Layout() {
   // El panel de trabajadores tiene su propio header (login/logout) y no
   // debe mostrar la navegación pública.
   const esPanelTrabajadores = location.pathname === '/panel-trabajadores'
+  // La presentación (página para ofrecer la app) también va sin la
+  // navegación pública, Tachín ni el lector.
+  const sinNavPublica = esPanelTrabajadores || location.pathname === '/presentacion'
   const { lector } = useAccesibilidad()
   const [escuchandoSaludo, setEscuchandoSaludo] = useState(false)
 
@@ -74,7 +78,7 @@ function Layout() {
   useEffect(() => {
     if (yaSaludo.current) return
     yaSaludo.current = true
-    if (esPanelTrabajadores || !soportaSintesisVoz() || !lector) return
+    if (sinNavPublica || !soportaSintesisVoz() || !lector) return
     const nombre = nombreVecino()
     if (!nombre) return
 
@@ -108,8 +112,8 @@ function Layout() {
   }, [])
 
   return (
-    <div className={`flex flex-col min-h-screen ${esPanelTrabajadores ? '' : 'pb-16 xl:pb-0'}`}>
-      {!esPanelTrabajadores && <Header />}
+    <div className={`flex flex-col min-h-screen ${sinNavPublica ? '' : 'pb-16 xl:pb-0'}`}>
+      {!sinNavPublica && <Header />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -123,12 +127,13 @@ function Layout() {
               este redirect para que un link o marcador viejo no rompa. */}
           <Route path="/mi-pase" element={<Navigate to="/combi" replace />} />
           <Route path="/panel-trabajadores" element={<PanelTrabajadores />} />
+          <Route path="/presentacion" element={<Presentacion />} />
         </Routes>
       </main>
-      {!esPanelTrabajadores && <Footer />}
-      {!esPanelTrabajadores && <BottomNav />}
-      {!esPanelTrabajadores && <LectorPantalla />}
-      {!esPanelTrabajadores && <Tachin />}
+      {!sinNavPublica && <Footer />}
+      {!sinNavPublica && <BottomNav />}
+      {!sinNavPublica && <LectorPantalla />}
+      {!sinNavPublica && <Tachin />}
 
       {escuchandoSaludo && (
         <div className="fixed bottom-20 xl:bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-primario text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-xl animate-fade-in">
