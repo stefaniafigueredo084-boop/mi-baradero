@@ -10,10 +10,10 @@ import Noticias from '../components/Noticias'
 
 const servicios = [
   { to: '/combi', icon: Bus, titulo: 'Combi Municipal', detalle: 'Pasajes, horarios y recorrido', color: 'bg-primario text-white', claves: 'pasaje colectivo micro pase horarios viaje' },
-  { to: '/residuos', icon: Trash2, titulo: 'Residuos', detalle: 'Calendario de recolección', color: 'bg-secundario text-tinta', claves: 'basura camion recoleccion reciclables' },
+  { to: '/residuos', icon: Trash2, titulo: 'Residuos', detalle: 'Calendario de recolección', color: 'bg-secundario text-white', claves: 'basura camion recoleccion reciclables' },
   { to: '/eventos', icon: Calendar, titulo: 'Eventos y Noticias', detalle: 'Agenda de la ciudad', color: 'bg-primario-oscuro text-white', claves: 'agenda festival feria novedades' },
-  { to: '/puntos-verdes', icon: MapPin, titulo: 'Puntos Verdes', detalle: 'Dónde reciclar', color: 'bg-secundario text-tinta', claves: 'reciclaje reciclar mapa' },
-  { to: '/reclamos', icon: MessageSquare, titulo: 'Reclamos', detalle: 'Escribile al municipio', color: 'bg-primario-oscuro text-white', claves: 'sugerencias queja reclamo' },
+  { to: '/puntos-verdes', icon: MapPin, titulo: 'Puntos Verdes', detalle: 'Dónde reciclar', color: 'bg-secundario text-white', claves: 'reciclaje reciclar mapa' },
+  { to: '/reclamos', icon: MessageSquare, titulo: 'Reclamos', detalle: 'Escribile al municipio', color: 'bg-acento-oscuro text-white', claves: 'sugerencias queja reclamo' },
   { to: '/perfil', icon: UserCircle, titulo: 'Mi Perfil', detalle: 'Tus datos y tu pase', color: 'bg-primario text-white', claves: 'cuenta datos usuario' },
 ]
 
@@ -158,18 +158,20 @@ export default function Home() {
           <section id="servicios" className="pt-6 scroll-mt-32">
             <span className="block w-12 h-1.5 rounded-full bg-acento mb-3" />
             <h2 className="text-base sm:text-lg font-bold font-poppins text-tinta mb-2.5">Servicios</h2>
-            <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
               {serviciosVisibles.map(({ to, icon: Icon, titulo, detalle, color }) => (
                 <Link
                   key={to}
                   to={to}
-                  className="bg-white border border-gray-200 rounded px-1.5 pt-2.5 pb-2 flex flex-col items-center gap-1.5 text-center hover:border-primario transition-colors"
+                  className="bg-white border border-gray-200 rounded p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 hover:border-primario transition-colors"
                 >
-                  <span className={`w-[42px] h-[42px] rounded-xl ${color} flex items-center justify-center`}>
-                    <Icon className="w-[21px] h-[21px]" />
+                  <span className={`w-9 h-9 sm:w-[42px] sm:h-[42px] rounded-lg ${color} flex items-center justify-center shrink-0`}>
+                    <Icon className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                   </span>
-                  <span className="text-sm font-semibold text-tinta leading-tight">{titulo}</span>
-                  <span className="hidden sm:block text-sm text-gray-500 leading-tight">{detalle}</span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-tinta leading-tight">{titulo}</span>
+                    <span className="hidden sm:block text-[13px] text-gray-500 leading-tight mt-0.5">{detalle}</span>
+                  </span>
                 </Link>
               ))}
             </div>
