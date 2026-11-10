@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Mic } from 'lucide-react'
 import Header from './components/Header'
-import Footer from './components/Footer'
 import BottomNav from './components/BottomNav'
 import LectorPantalla from './components/LectorPantalla'
 import Tachin from './components/tachin/Tachin'
@@ -130,7 +129,6 @@ function Layout() {
           <Route path="/presentacion" element={<Presentacion />} />
         </Routes>
       </main>
-      {!sinNavPublica && <Footer />}
       {!sinNavPublica && <BottomNav />}
       {!sinNavPublica && <LectorPantalla />}
       {!sinNavPublica && <Tachin />}
