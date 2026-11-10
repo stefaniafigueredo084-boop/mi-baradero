@@ -24,7 +24,7 @@ import ReclamosPanel from '../components/panel/ReclamosPanel'
 import ComoLleganReclamos from '../components/panel/ComoLleganReclamos'
 import { useReclamos } from '../hooks/useReclamos'
 import { DEPARTAMENTOS, departamentoDeReclamo, departamentosDelSector } from '../data/reclamosData'
-import AcordeonItem, { Acordeon } from '../components/panel/Acordeon'
+import AcordeonItem, { ListaSecciones as Acordeon } from '../components/panel/SeccionPanel'
 import {
   camposEventos,
   camposNoticias,
@@ -96,7 +96,6 @@ export default function PanelTrabajadores() {
     return (
       <AcordeonItem
         icono={MessageSquare}
-        color="amarillo"
         titulo="Reclamos de vecinos"
         descripcion={`Quejas y reclamos que llegan a ${deptos}`}
         badge={sinAtender(lista)}
@@ -136,53 +135,64 @@ export default function PanelTrabajadores() {
     )
   }
 
+  const tabActual = tabsVisibles.find(t => t.id === tab)
+  const rolTexto = esAdmin
+    ? 'Administrador general'
+    : trabajador?.sector ? `Sector ${TODAS_LAS_TABS.find(t => t.id === trabajador.sector)?.label}` : ''
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-primario-oscuro to-[#171A45] text-white py-8 px-4">
-        <div className="max-w-5xl mx-auto">
-          <Link
-            to="/"
-            className="inline-flex items-center transition-transform duration-200 hover:scale-[1.03] mb-5"
-            aria-label="Mi Baradero — ir al sitio"
-          >
-            <LogoMiBaradero size="sm" theme="white" />
-          </Link>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-poppins">Panel de Trabajadores</h1>
-              <p className="text-white/80 text-sm mt-1">
-                Conectado como {usuario.email}
-                {!esAdmin && trabajador?.sector && <> · Sector: {TODAS_LAS_TABS.find(t => t.id === trabajador.sector)?.label}</>}
-                {esAdmin && <> · Administrador general</>}
-              </p>
+    <div className="panel-sistema min-h-screen bg-gray-100 text-gray-900">
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link to="/" className="shrink-0" aria-label="Mi Baradero — ir al sitio">
+              <LogoMiBaradero size="sm" />
+            </Link>
+            <span className="h-5 w-px bg-gray-300 shrink-0" />
+            <span className="text-sm font-semibold text-gray-700 truncate">Panel de trabajadores</span>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="hidden sm:block text-right leading-tight">
+              <p className="text-xs font-medium text-gray-800">{usuario.email}</p>
+              {rolTexto && <p className="text-xs text-gray-500">{rolTexto}</p>}
             </div>
             <button
               onClick={cerrarSesion}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 rounded-2xl font-semibold transition-colors"
+              className="flex items-center gap-1.5 text-sm text-gray-700 border border-gray-300 rounded px-3 py-1.5 hover:bg-gray-50"
             >
-              <LogOut className="w-4 h-4" /> Cerrar sesión
+              <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Cerrar sesión</span><span className="sm:hidden">Salir</span>
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {tabsVisibles.length > 1 && (
-          <div className="flex gap-2 mb-8 flex-wrap">
-            {tabsVisibles.map(({ id, label, icon: Icon }) => (
+      {tabsVisibles.length > 1 && (
+        <nav className="bg-white border-b border-gray-200" aria-label="Secciones del panel">
+          <div className="max-w-6xl mx-auto px-4 flex gap-6 overflow-x-auto">
+            {tabsVisibles.map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all ${
-                  tab === id ? 'bg-primario text-white shadow-md' : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-primario'
+                aria-current={tab === id ? 'page' : undefined}
+                className={`flex items-center gap-1.5 py-3 text-sm whitespace-nowrap border-b-2 -mb-px ${
+                  tab === id ? 'border-primario text-primario font-semibold' : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <Icon className="w-4 h-4" /> {label}
+                {label}
                 {id === 'reclamos' && reclamosNuevos > 0 && (
-                  <span className="bg-red-50 text-red-500 text-xs font-bold px-2 py-0.5 rounded-full">{reclamosNuevos}</span>
+                  <span className="bg-red-600 text-white text-[11px] font-semibold px-1.5 rounded-sm tabular-nums">{reclamosNuevos}</span>
                 )}
               </button>
             ))}
+          </div>
+        </nav>
+      )}
+
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {tabActual && (
+          <div className="mb-4">
+            <h1 className="text-lg font-semibold text-gray-900">{tabActual.label}</h1>
+            <p className="sm:hidden text-xs text-gray-500 mt-0.5">{usuario.email}{rolTexto && ` · ${rolTexto}`}</p>
           </div>
         )}
 
@@ -195,11 +205,11 @@ export default function PanelTrabajadores() {
 
         {tab === 'eventos' && (
           <Acordeon>
-            <AcordeonItem icono={Megaphone} color="azul" titulo="Avisos" descripcion="Publicar un aviso nuevo">
+            <AcordeonItem icono={Megaphone} titulo="Avisos" descripcion="Publicar un aviso nuevo">
               <EnviarAviso nombreDoc="avisoEventos" seccion="eventos" placeholder="Ej: La Fiesta de la Primavera empieza en 30 minutos" />
             </AcordeonItem>
 
-            <AcordeonItem icono={Calendar} color="verde" titulo="Eventos" descripcion="Agregar o editar eventos" abiertoPorDefecto>
+            <AcordeonItem icono={Calendar} titulo="Eventos" descripcion="Agregar o editar eventos" abiertoPorDefecto>
               <ColeccionCRUD
                 coleccion="eventos"
                 seccion="eventos"
@@ -209,7 +219,7 @@ export default function PanelTrabajadores() {
               />
             </AcordeonItem>
 
-            <AcordeonItem icono={Newspaper} color="azul" titulo="Noticias" descripcion="Publicar novedades de la ciudad">
+            <AcordeonItem icono={Newspaper} titulo="Noticias" descripcion="Publicar novedades de la ciudad">
               <ColeccionCRUD
                 coleccion="noticias"
                 seccion="eventos"
@@ -231,7 +241,6 @@ export default function PanelTrabajadores() {
           <Acordeon>
             <AcordeonItem
               icono={CreditCard}
-              color="azul"
               titulo="Confirmar pagos"
               descripcion="Pasajes esperando confirmación"
               badge={pagosPendientes}
@@ -242,7 +251,6 @@ export default function PanelTrabajadores() {
 
             <AcordeonItem
               icono={ClipboardList}
-              color="azul"
               titulo="Solicitudes de categoría"
               descripcion="Certificados de estudiante/jubilado/discapacidad a revisar"
               badge={categoriasPendientes}
@@ -251,11 +259,11 @@ export default function PanelTrabajadores() {
               <SolicitudesCategoria />
             </AcordeonItem>
 
-            <AcordeonItem icono={Navigation} color="verde" titulo="Combi en vivo" descripcion="Marcar la parada actual">
+            <AcordeonItem icono={Navigation} titulo="Combi en vivo" descripcion="Marcar la parada actual">
               <CombiEnVivo />
             </AcordeonItem>
 
-            <AcordeonItem icono={Clock} color="verde" titulo="Horarios de la combi" descripcion="Agregar o editar los horarios del día">
+            <AcordeonItem icono={Clock} titulo="Horarios de la combi" descripcion="Agregar o editar los horarios del día">
               <ColeccionCRUD
                 coleccion="horariosCombi"
                 seccion="combi"
@@ -265,7 +273,7 @@ export default function PanelTrabajadores() {
               />
             </AcordeonItem>
 
-            <AcordeonItem icono={Bell} color="amarillo" titulo="Alertas y demoras" descripcion="Publicar un aviso nuevo">
+            <AcordeonItem icono={Bell} titulo="Alertas y demoras" descripcion="Publicar un aviso nuevo">
               <p className="text-gray-500 text-sm mb-4">
                 Cada alerta que agregás acá también le llega como notificación a quienes activaron avisos de la combi.
               </p>
@@ -284,11 +292,11 @@ export default function PanelTrabajadores() {
 
         {tab === 'residuos' && (
           <Acordeon>
-            <AcordeonItem icono={Truck} color="verde" titulo="Estado del camión" descripcion="Dónde está ahora" abiertoPorDefecto>
+            <AcordeonItem icono={Truck} titulo="Estado del camión" descripcion="Dónde está ahora" abiertoPorDefecto>
               <EstadoCamion />
             </AcordeonItem>
 
-            <AcordeonItem icono={Megaphone} color="azul" titulo="Avisos" descripcion="Publicar un aviso nuevo">
+            <AcordeonItem icono={Megaphone} titulo="Avisos" descripcion="Publicar un aviso nuevo">
               <EnviarAviso
                 nombreDoc="avisoResiduos"
                 seccion="residuos"
@@ -297,11 +305,11 @@ export default function PanelTrabajadores() {
               />
             </AcordeonItem>
 
-            <AcordeonItem icono={Calendar} color="azul" titulo="Calendario semanal" descripcion="Qué residuo corresponde cada día">
+            <AcordeonItem icono={Calendar} titulo="Calendario semanal" descripcion="Qué residuo corresponde cada día">
               <CalendarioResiduos />
             </AcordeonItem>
 
-            <AcordeonItem icono={MapPin} color="verde" titulo="Zonas y próxima recolección" descripcion="Agregar o editar zonas">
+            <AcordeonItem icono={MapPin} titulo="Zonas y próxima recolección" descripcion="Agregar o editar zonas">
               <ColeccionCRUD
                 coleccion="zonasResiduos"
                 seccion="residuos"
@@ -311,7 +319,7 @@ export default function PanelTrabajadores() {
               />
             </AcordeonItem>
 
-            <AcordeonItem icono={Lightbulb} color="amarillo" titulo="Consejos de reciclado" descripcion="Agregar o editar consejos">
+            <AcordeonItem icono={Lightbulb} titulo="Consejos de reciclado" descripcion="Agregar o editar consejos">
               <ColeccionCRUD
                 coleccion="consejosResiduos"
                 seccion="residuos"
@@ -327,7 +335,7 @@ export default function PanelTrabajadores() {
 
         {tab === 'puntosVerdes' && (
           <Acordeon>
-            <AcordeonItem icono={Recycle} color="verde" titulo="Puntos verdes" descripcion="Agregar o editar puntos de reciclaje" abiertoPorDefecto>
+            <AcordeonItem icono={Recycle} titulo="Puntos verdes" descripcion="Agregar o editar puntos de reciclaje" abiertoPorDefecto>
               <ColeccionCRUD
                 coleccion="puntosVerdesExtra"
                 seccion="puntosVerdes"
@@ -345,7 +353,6 @@ export default function PanelTrabajadores() {
           <Acordeon>
             <AcordeonItem
               icono={MessageSquare}
-              color="verde"
               titulo="Bandeja de reclamos"
               descripcion="Todos los reclamos de vecinos, de todos los departamentos"
               badge={reclamosNuevos}
@@ -354,7 +361,7 @@ export default function PanelTrabajadores() {
               <ReclamosPanel items={reclamos} cargando={cargandoReclamos} error={errorReclamos} hayMas={hayMasReclamos} onCargarMas={cargarMasReclamos} departamentos={veTodosLosReclamos ? null : departamentosDelSector(trabajador?.sector)} completa />
             </AcordeonItem>
 
-            <AcordeonItem icono={Info} color="azul" titulo="Cómo llegan y quién los atiende" descripcion="El recorrido de un reclamo y qué departamento se encarga de cada tema">
+            <AcordeonItem icono={Info} titulo="Cómo llegan y quién los atiende" descripcion="El recorrido de un reclamo y qué departamento se encarga de cada tema">
               <ComoLleganReclamos />
             </AcordeonItem>
           </Acordeon>
@@ -362,10 +369,10 @@ export default function PanelTrabajadores() {
 
         {tab === 'usuarios' && esAdmin && (
           <Acordeon>
-            <AcordeonItem icono={Users} color="verde" titulo="Cuentas del panel" descripcion="Desactivar, reactivar o eliminar" abiertoPorDefecto>
+            <AcordeonItem icono={Users} titulo="Cuentas del panel" descripcion="Desactivar, reactivar o eliminar" abiertoPorDefecto>
               <GestionarTrabajadores />
             </AcordeonItem>
-            <AcordeonItem icono={UserPlus} color="azul" titulo="Agregar trabajador" descripcion="Crear una cuenta nueva">
+            <AcordeonItem icono={UserPlus} titulo="Agregar trabajador" descripcion="Crear una cuenta nueva">
               <AgregarTrabajador />
             </AcordeonItem>
           </Acordeon>

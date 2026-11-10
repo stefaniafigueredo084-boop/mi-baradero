@@ -110,8 +110,8 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
           </div>
         </form>
       ) : (
-        <button onClick={empezarNuevo} className="btn-primary flex items-center gap-2 mb-6">
-          <Plus className="w-5 h-5" /> Agregar nuevo
+        <button onClick={empezarNuevo} className="btn-primary flex items-center gap-2 mb-4">
+          <Plus className="w-4 h-4" /> Agregar nuevo
         </button>
       )}
 
@@ -120,25 +120,31 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
       ) : items.length === 0 ? (
         <EstadoVacio compacto texto="Todavía no hay registros cargados acá." />
       ) : (
-        <div className="space-y-3">
+        <div className="border border-gray-200 rounded divide-y divide-gray-200">
+          <div className="flex items-center justify-between gap-4 px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <span>{items.length} registro{items.length === 1 ? '' : 's'}</span>
+            <span>Acciones</span>
+          </div>
           {items.map(item => (
-            <div key={item.id} className="card p-4 flex items-center justify-between gap-4">
+            <div key={item.id} className="px-3 py-2.5 flex items-center justify-between gap-4 hover:bg-gray-50">
               <div className="min-w-0">
-                <p className="font-bold text-gray-800 truncate">{renderTitulo(item)}</p>
-                {renderSubtitulo && <p className="text-sm text-gray-500 truncate">{renderSubtitulo(item)}</p>}
+                <p className="text-sm font-medium text-gray-900 truncate">{renderTitulo(item)}</p>
+                {renderSubtitulo && <p className="text-xs text-gray-500 truncate">{renderSubtitulo(item)}</p>}
               </div>
-              <div className="flex gap-2 shrink-0">
+              <div className="flex gap-1 shrink-0">
                 <button
                   onClick={() => empezarEdicion(item)}
-                  className="p-2.5 rounded-xl bg-secundario/10 text-secundario hover:bg-secundario/20 transition-colors"
+                  className="p-2 rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                   aria-label="Editar"
+                  title="Editar"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => eliminar(item)}
-                  className="p-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                  className="p-2 rounded text-gray-500 hover:bg-red-50 hover:text-red-600"
                   aria-label="Eliminar"
+                  title="Eliminar"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

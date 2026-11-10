@@ -537,3 +537,61 @@
 .marcador-punto.elegido { background: #6AAE4E; transform: scale(1.25); }
 /* Mapa en modo oscuro: se oscurecen los mosaicos (los marcadores no). */
 .dark .leaflet-tile { filter: brightness(0.75) invert(1) contrast(0.85) hue-rotate(180deg) saturate(0.6); }
+
+/* ── Panel de Trabajadores: estilo de sistema ──────────────────────
+   Más formal y quieto que la app de vecinos: esquinas casi rectas,
+   sin sombras, sin animaciones ni movimientos al pasar el mouse,
+   botones y campos más compactos. Solo dentro de .panel-sistema. */
+.panel-sistema *,
+.panel-sistema *::before,
+.panel-sistema *::after {
+  transition: none !important;
+  animation: none !important;
+}
+.panel-sistema .animate-spin {
+  animation: spin 1s linear infinite !important; /* el "cargando" sí gira */
+}
+.panel-sistema [class*="shadow"] {
+  box-shadow: none !important;
+}
+.panel-sistema [class*="hover:scale"]:hover,
+.panel-sistema [class*="hover:-translate"]:hover,
+.panel-sistema [class*="hover:translate"]:hover {
+  transform: none !important;
+}
+.panel-sistema .rounded-lg,
+.panel-sistema .rounded-xl,
+.panel-sistema .rounded-2xl,
+.panel-sistema .rounded-3xl,
+.panel-sistema .card {
+  border-radius: 4px !important;
+}
+.panel-sistema .btn-primary,
+.panel-sistema .btn-secondary,
+.panel-sistema .btn-acento {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+.panel-sistema .input-field,
+.panel-sistema .select-field {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border-color: #d1d5db;
+}
+.panel-sistema .input-field:focus,
+.panel-sistema .select-field:focus {
+  box-shadow: none !important;
+  border-color: #3D8B68;
+  outline: 1px solid #3D8B68;
+  outline-offset: 0;
+}
+.panel-sistema .font-poppins {
+  font-weight: 600;
+}
+.panel-sistema button:focus-visible,
+.panel-sistema a:focus-visible {
+  outline: 2px solid #3D8B68;
+  outline-offset: 1px;
+}
