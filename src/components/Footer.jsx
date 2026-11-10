@@ -1,4 +1,4 @@
-import { Instagram, Users } from 'lucide-react'
+import { Instagram } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import LogoMiBaradero from './LogoMiBaradero'
 
@@ -39,7 +39,7 @@ export default function Footer() {
 
       {/* Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
           {/* Servicios */}
           <div>
@@ -62,26 +62,6 @@ export default function Footer() {
                     <span className="w-1 h-1 rounded-full bg-white/50 group-hover:bg-acento transition-colors" />
                     {label}
                   </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Integrantes */}
-          <div>
-            <h3 className="font-bold font-poppins mb-3 text-white text-sm uppercase tracking-wider">
-              Integrantes del Proyecto
-            </h3>
-            <ul className="space-y-2.5 text-sm text-white/80">
-              {[
-                'Stefania Figueredo',
-                'Celeste Weiss',
-                'Roman Van Loo',
-                'Wanda Garcia',
-              ].map(nombre => (
-                <li key={nombre} className="flex items-center gap-2.5">
-                  <Users className="w-3.5 h-3.5 shrink-0 text-acento" />
-                  <span>{nombre}</span>
                 </li>
               ))}
             </ul>

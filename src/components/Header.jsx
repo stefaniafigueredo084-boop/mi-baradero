@@ -35,10 +35,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white shadow-sm">
 
       {/* Franja institucional */}
-      <div className="bg-primario-oscuro text-white text-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 h-8 sm:h-9">
-          <span className="truncate"><span className="hidden sm:inline">Mi Baradero · </span>Proyecto de la E.S.T. N°1 Vuelta de Obligado</span>
-          <div className="hidden md:flex items-center gap-6 shrink-0">
+      <div className="hidden md:block bg-primario-oscuro text-white text-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-end gap-4 h-9">
+          <div className="flex items-center gap-6 shrink-0">
             <Link to="/perfil#accesibilidad" className="hover:underline">Accesibilidad</Link>
             <Link to="/panel-trabajadores" className="hover:underline">Panel de trabajadores</Link>
           </div>
