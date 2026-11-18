@@ -380,6 +380,15 @@ const ROLES = [
   { nombre: 'Roman Van Loo', roles: 'Búsqueda y análisis de información, fotos, entrevistas y videos' },
 ]
 
+// Cómo fue cambiando la app. Las capturas salen de versiones reales
+// guardadas en el historial del proyecto (public/historia).
+const HISTORIA = [
+  { fecha: 'Junio 2026', titulo: 'El primer prototipo', img: '/historia/2026-06-prototipo.jpg', texto: 'Portada, servicios y las pantallas de Combi, Residuos, Eventos, Puntos Verdes y Perfil. Todavía sin datos reales.' },
+  { fecha: 'Agosto 2026', titulo: 'Se conecta y crece', img: '/historia/2026-08-combi.jpg', texto: 'Base de datos, panel de trabajadores, pasaje de la combi con QR, accesibilidad, asistente por voz y Tachín.' },
+  { fecha: 'Octubre 2026', titulo: 'Rediseño institucional', img: '/historia/2026-10-rediseno.jpg', texto: 'Estética en verde, más seguridad, mapa real de Puntos Verdes, "Tu zona" en Residuos y app instalable.' },
+  { fecha: 'Noviembre 2026', titulo: 'Hoy', img: '/historia/2026-11-hoy.jpg', texto: 'Portada con atajos, panel más sobrio para los trabajadores y lista para mostrar al municipio.' },
+]
+
 const FUTURO = [
   { titulo: 'Turnos de salud', texto: 'Pedido por la comunidad: sacar turno sin ir “de gusto” hasta el hospital.' },
   { titulo: 'Turismo', texto: 'Dar más visibilidad a los atractivos de Baradero para vecinos y visitantes.' },
@@ -1451,6 +1460,27 @@ export default function Presentacion() {
               <p className="text-xs" style={{ ...mono, color: C.suave }}>PASO 0{i + 1}</p>
               <p className="pres-titulo mt-4 text-xl tracking-[-0.02em]">{titulo}</p>
               <p className="mt-3 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ol>
+      </Diapo>
+
+      {/* Cómo fue cambiando */}
+      <Diapo parte="04">
+        <Titulo
+          rotulo="Cómo llegamos hasta acá"
+          titulo="De prototipo a app"
+          texto="Así fue cambiando Mi Baradero desde la primera versión. Son capturas reales de cada etapa."
+        />
+        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {HISTORIA.map(({ fecha, titulo, img, texto }, i) => (
+            <li key={fecha} className="border-t pt-6" style={{ borderColor: i === HISTORIA.length - 1 ? C.verde : C.linea }}>
+              <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{fecha}</p>
+              <div className="mt-4 rounded-[10px] overflow-hidden border aspect-[390/560] lg:aspect-[390/470]" style={{ borderColor: C.elevado }}>
+                <img src={img} alt={`Mi Baradero en ${fecha.toLowerCase()}`} loading="lazy" className="w-full h-full object-cover object-top" />
+              </div>
+              <p className="pres-titulo mt-5 text-xl tracking-[-0.02em]">{titulo}</p>
+              <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
             </li>
           ))}
         </ol>
