@@ -382,6 +382,13 @@ const ROLES = [
 
 // Cómo fue cambiando la app. Las capturas salen de versiones reales
 // guardadas en el historial del proyecto (public/historia).
+// Los primeros diseños (imágenes que pasó el equipo, con su fecha real).
+const DISENOS = [
+  { fecha: '20 de marzo de 2026', titulo: 'La primera idea', img: '/historia/2026-03-diseno-inicio.jpg', texto: 'Cómo imaginamos el inicio: Puntos Verdes, recolección, pasajes de la combi y voluntariados.' },
+  { fecha: '25 de marzo de 2026', titulo: 'Diseño del perfil', img: '/historia/2026-03-diseno-perfil.jpg', texto: 'Las pantallas de perfil, edición de datos y configuración.' },
+  { fecha: '6 de agosto de 2026', titulo: 'En el celular', img: '/historia/2026-08-celular.jpg', texto: 'El primer prototipo funcionando en un celular, ya publicado en internet.' },
+]
+
 const HISTORIA = [
   { fecha: 'Junio 2026', titulo: 'El primer prototipo', img: '/historia/2026-06-prototipo.jpg', texto: 'Portada, servicios y las pantallas de Combi, Residuos, Eventos, Puntos Verdes y Perfil. Todavía sin datos reales.' },
   { fecha: 'Agosto 2026', titulo: 'Se conecta y crece', img: '/historia/2026-08-combi.jpg', texto: 'Base de datos, panel de trabajadores, pasaje de la combi con QR, accesibilidad, asistente por voz y Tachín.' },
@@ -933,6 +940,28 @@ export default function Presentacion() {
             </div>
           ))}
         </div>
+      </Diapo>
+
+      {/* Primeros diseños */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="Antes de programar"
+          color={C.verde}
+          titulo="Los primeros diseños"
+          texto="En marzo diseñamos cómo queríamos que fuera la app. Después la llevamos al celular."
+        />
+        <ol className="mt-12 grid sm:grid-cols-3 gap-6">
+          {DISENOS.map(({ fecha, titulo, img, texto }, i) => (
+            <li key={fecha} className="border-t pt-6" style={{ borderColor: i === DISENOS.length - 1 ? C.amarillo : C.verde }}>
+              <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{fecha}</p>
+              <div className="mt-4 rounded-[10px] overflow-hidden border h-[420px] lg:h-[380px] flex items-center justify-center" style={{ borderColor: C.elevado, background: C.tarjeta }}>
+                <img src={img} alt={titulo} loading="lazy" className="max-w-full max-h-full object-contain" />
+              </div>
+              <p className="pres-titulo mt-5 text-xl tracking-[-0.02em]">{titulo}</p>
+              <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ol>
       </Diapo>
 
       {/* Cómo fue cambiando */}
