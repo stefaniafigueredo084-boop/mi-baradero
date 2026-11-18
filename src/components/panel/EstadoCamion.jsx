@@ -38,7 +38,7 @@ export default function EstadoCamion() {
       <h3 className="font-bold font-poppins text-lg text-gray-800 flex items-center gap-2 mb-4">
         <Truck className="w-5 h-5 text-primario" /> Estado del camión de residuos
       </h3>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-end gap-3">
         {estadosCamionOpciones.map(op => (
           <button
             key={op.id}

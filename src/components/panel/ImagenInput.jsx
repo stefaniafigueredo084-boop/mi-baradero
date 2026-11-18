@@ -36,11 +36,13 @@ export default function ImagenInput({ valor, onChange }) {
           </button>
         </div>
       )}
+      <div className="flex justify-end">
       <label className="btn-secondary inline-flex items-center gap-2 cursor-pointer w-fit !text-base">
         {subiendo ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
         {valor ? 'Cambiar imagen' : 'Subir imagen'}
         <input type="file" accept="image/*" className="hidden" onChange={manejarArchivo} disabled={subiendo} />
       </label>
+      </div>
       {error && <p className="text-red-500 text-sm mt-1.5">{error}</p>}
     </div>
   )

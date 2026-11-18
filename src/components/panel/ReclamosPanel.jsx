@@ -307,7 +307,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
                 </div>
 
                 {/* Estado */}
-                <div className="flex flex-wrap items-center gap-2 mt-4">
+                <div className="flex flex-wrap items-center justify-end gap-2 mt-4">
                   <span className="text-xs font-semibold text-gray-500">Estado:</span>
                   {ESTADOS_RECLAMO.map(e => (
                     <button
