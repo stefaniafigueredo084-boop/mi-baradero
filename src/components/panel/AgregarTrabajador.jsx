@@ -158,10 +158,12 @@ export default function AgregarTrabajador() {
             {resultado.mensaje}
           </p>
         )}
-        <button type="submit" disabled={creando} className="btn-primary flex items-center gap-2 disabled:opacity-60">
-          {creando ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-          Crear cuenta
-        </button>
+        <div className="flex justify-end">
+          <button type="submit" disabled={creando} className="btn-primary flex items-center gap-2 disabled:opacity-60">
+            {creando ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+            Crear cuenta
+          </button>
+        </div>
       </form>
       <p className="text-sm text-gray-400 mt-5 leading-relaxed">
         Para desactivar o eliminar una cuenta existente, usá la lista de arriba ("Cuentas del panel"). Por seguridad, "eliminar" le saca el acceso pero no borra la cuenta de acceso (email/contraseña) — para eso hace falta entrar a Firebase Console → Authentication → Users.

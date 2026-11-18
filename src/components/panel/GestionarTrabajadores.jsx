@@ -117,12 +117,12 @@ export default function GestionarTrabajadores() {
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                       Esto le saca el acceso para siempre (no es lo mismo que desactivar). ¿Confirmás eliminar la cuenta de {t.email}?
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex justify-end gap-2">
                       <button onClick={() => setConfirmando(null)} className="btn-secondary !text-sm !py-1.5">Cancelar</button>
                       <button
                         onClick={() => eliminarDefinitivo(t)}
                         disabled={procesando === t.id}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm py-1.5 rounded-2xl transition-colors disabled:opacity-60"
+                        className="flex items-center justify-center gap-1.5 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-4 py-1.5 rounded-2xl transition-colors disabled:opacity-60"
                       >
                         {procesando === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         Sí, eliminar definitivamente

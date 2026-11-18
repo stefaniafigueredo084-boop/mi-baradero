@@ -99,7 +99,7 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
             </div>
           ))}
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div className="flex gap-3 pt-1">
+          <div className="flex justify-end gap-3 pt-1">
             <button type="button" onClick={cancelar} className="btn-secondary">
               <X className="w-4 h-4" /> Cancelar
             </button>
@@ -110,9 +110,11 @@ export default function ColeccionCRUD({ coleccion, seccion, campos, renderTitulo
           </div>
         </form>
       ) : (
-        <button onClick={empezarNuevo} className="btn-primary flex items-center gap-2 mb-4">
-          <Plus className="w-4 h-4" /> Agregar nuevo
-        </button>
+        <div className="flex justify-end mb-4">
+          <button onClick={empezarNuevo} className="btn-primary flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Agregar nuevo
+          </button>
+        </div>
       )}
 
       {cargando ? (

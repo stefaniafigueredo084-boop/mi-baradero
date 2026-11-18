@@ -102,7 +102,7 @@ export default function SolicitudesCategoria() {
                       value={motivo}
                       onChange={e => setMotivo(e.target.value)}
                     />
-                    <div className="flex gap-2">
+                    <div className="flex justify-end gap-2">
                       <button
                         onClick={() => { setRechazando(null); setMotivo('') }}
                         className="btn-secondary !text-sm !py-2"
@@ -112,7 +112,7 @@ export default function SolicitudesCategoria() {
                       <button
                         onClick={() => confirmarRechazo(item)}
                         disabled={procesando === item.id}
-                        className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm py-2 rounded-2xl transition-colors disabled:opacity-60"
+                        className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-4 py-2 rounded-2xl transition-colors disabled:opacity-60"
                       >
                         {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
                         Confirmar rechazo
@@ -120,7 +120,7 @@ export default function SolicitudesCategoria() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex justify-end gap-2 mt-3">
                     <button
                       onClick={() => setRechazando(item.id)}
                       disabled={procesando === item.id}
@@ -131,7 +131,7 @@ export default function SolicitudesCategoria() {
                     <button
                       onClick={() => aprobar(item)}
                       disabled={procesando === item.id}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-primario text-white hover:bg-primario-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
+                      className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-primario text-white hover:bg-primario-oscuro font-semibold text-sm transition-colors disabled:opacity-60"
                     >
                       {procesando === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       Aprobar

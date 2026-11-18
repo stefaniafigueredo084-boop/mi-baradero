@@ -346,7 +346,7 @@ export default function ReclamosPanel({ items, cargando, error = '', hayMas = fa
                     value={borrador}
                     onChange={e => setRespuestas(previo => ({ ...previo, [item.id]: e.target.value }))}
                   />
-                  <div className={`flex items-center gap-2 mt-2 flex-wrap ${completa ? 'justify-between' : 'justify-end'}`}>
+                  <div className="flex items-center justify-end gap-2 mt-2 flex-wrap">
                     {completa && (
                       <button
                         onClick={() => eliminar(item)}

@@ -71,10 +71,12 @@ export default function CalendarioResiduos() {
           </div>
         ))}
       </div>
-      <button onClick={guardar} disabled={guardando} className="btn-primary mt-4 flex items-center gap-2 disabled:opacity-60">
-        {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-        {guardado ? 'Guardado' : 'Guardar calendario'}
-      </button>
+      <div className="flex justify-end mt-4">
+        <button onClick={guardar} disabled={guardando} className="btn-primary flex items-center gap-2 disabled:opacity-60">
+          {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+          {guardado ? 'Guardado' : 'Guardar calendario'}
+        </button>
+      </div>
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded p-3 mt-3">{error}</p>}
     </div>
   )
