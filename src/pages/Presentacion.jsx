@@ -20,7 +20,7 @@ const URL_APP = 'https://mi-baradero.web.app'
 // señal en puntos y detalles.
 
 // Los colores que cambian entre fondo oscuro y fondo blanco salen de
-// variables (ver ESTILOS). Con ?fondo=blanco en la dirección se ve en blanco.
+// variables (ver ESTILOS). Se ve en blanco; con ?fondo=oscuro se ve la versión oscura.
 const C = {
   fondo: 'var(--p-fondo)',
   elevado: 'var(--p-elevado)',
@@ -439,7 +439,7 @@ function Mini({ titulo, children }) {
 
 export default function Presentacion() {
   const raiz = useRef(null)
-  const blanco = new URLSearchParams(window.location.search).get('fondo') === 'blanco'
+  const blanco = new URLSearchParams(window.location.search).get('fondo') !== 'oscuro'
   const [actual, setActual] = useState({ i: 0, total: 1, parte: '01' })
 
   // En compu se ve como presentación: una pantalla por vez. En el
