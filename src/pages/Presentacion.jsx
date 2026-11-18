@@ -389,6 +389,24 @@ const HISTORIA = [
   { fecha: 'Noviembre 2026', titulo: 'Hoy', img: '/historia/2026-11-hoy.jpg', texto: 'Portada con atajos, panel más sobrio para los trabajadores y lista para mostrar al municipio.' },
 ]
 
+// PESTEL y FODA: resumidos del informe del proyecto (versión revisada,
+// 18/11/2026). No agregar puntos que no estén en el informe.
+const PESTEL = [
+  { letra: 'P', factor: 'Político', texto: 'Trabajar con el municipio mejora el acceso a horarios, eventos, reciclaje y reclamos. Los cambios de prioridades pueden retrasar acuerdos: por eso definimos responsables, fuentes y frecuencia de actualización.' },
+  { letra: 'E', factor: 'Económico', texto: 'La inflación y los aumentos afectan alojamiento, dominio y conectividad. El poder adquisitivo condiciona el acceso digital y el presupuesto de los comercios. Vamos a explorar patrocinios y convenios.' },
+  { letra: 'S', factor: 'Social', texto: 'Hay interés en encontrar información local ordenada, con diferencias de edad, experiencia digital y necesidades de acceso. Casos concretos: la combi a Alsina y Portela, los eventos y los reclamos.' },
+  { letra: 'T', factor: 'Tecnológico', texto: 'Una web adaptable hecha con HTML, CSS y JavaScript. La conexión, el alojamiento, el mantenimiento y la seguridad condicionan la experiencia. Hay que probar mapas, ubicación y voz en distintos celulares.' },
+  { letra: 'E', factor: 'Ecológico', texto: 'Los Puntos Verdes y las campañas facilitan el reciclaje, y los reclamos de recolección muestran problemas que se repiten. Lo digital reduce impresos, aunque también consume energía.' },
+  { letra: 'L', factor: 'Legal', texto: 'Proteger los datos de los reclamos y de Mi Pase y definir quién accede (Ley 25.326). Respetar derechos de autor e imágenes (Ley 11.723) y las condiciones de los servicios externos.' },
+]
+
+const FODA = [
+  { titulo: 'Fortalezas', tipo: 'Interno', color: '#6AAE4E', items: ['Prototipo web funcionando', 'Conocimiento del contexto local', 'Identidad visual propia', 'Centraliza información y reclamos'] },
+  { titulo: 'Debilidades', tipo: 'Interno', color: '#8FA89B', items: ['Operación, costos y ventas todavía sin validar', 'Los datos dependen de cargarlos a mano', 'Accesibilidad pendiente de prueba con usuarios'] },
+  { titulo: 'Oportunidades', tipo: 'Externo', color: '#F2B53E', items: ['Interés de los vecinos en redes', 'Cooperación con instituciones y medios', 'Difusión de comercios', 'Necesidad de mejorar el acceso a servicios'] },
+  { titulo: 'Amenazas', tipo: 'Externo', color: '#8FA89B', items: ['Cambios en las fuentes oficiales', 'Canales gratuitos ya instalados', 'Aumentos en los costos tecnológicos', 'Poca adhesión de patrocinadores'] },
+]
+
 const FUTURO = [
   { titulo: 'Turnos de salud', texto: 'Pedido por la comunidad: sacar turno sin ir “de gusto” hasta el hospital.' },
   { titulo: 'Turismo', texto: 'Dar más visibilidad a los atractivos de Baradero para vecinos y visitantes.' },
@@ -871,6 +889,57 @@ export default function Presentacion() {
         <div className="mt-12 rounded-[10px] border p-5 flex flex-wrap items-center gap-x-6 gap-y-2" style={{ borderColor: C.linea }}>
           <span className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.amarillo }}><Punto vivo /> Feria Provincial de Ciencias 2026</span>
           <span className="text-sm" style={{ color: C.suave }}>7° 4ta Programación · Modalidad técnico profesional · Área tecnología y aplicaciones web</span>
+        </div>
+      </Diapo>
+
+      {/* PESTEL */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="Análisis PESTEL"
+          titulo="Lo que pasa alrededor del proyecto"
+          texto="Cómo influyen los factores externos en Mi Baradero y en sus funciones."
+        />
+        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PESTEL.map(({ letra, factor, texto }, i) => (
+            <Tarjeta key={factor}>
+              <div className="flex items-baseline gap-4">
+                <span className="pres-titulo text-[48px] leading-none tracking-[-0.05em]" style={{ color: i === 0 ? C.amarillo : C.verde }}>{letra}</span>
+                <span className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{factor}</span>
+              </div>
+              <p className="mt-4 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </Tarjeta>
+          ))}
+        </div>
+      </Diapo>
+
+      {/* FODA */}
+      <Diapo parte="01" className="justify-center">
+        <Titulo
+          rotulo="Análisis FODA"
+          color={C.verde}
+          titulo="Dónde estamos parados"
+          texto="Lo que depende de nosotros (interno) y lo que viene de afuera (externo)."
+        />
+        <div className="mt-12 grid sm:grid-cols-2 gap-px rounded-[10px] overflow-hidden border" style={{ background: C.linea, borderColor: C.linea }}>
+          {FODA.map(({ titulo, tipo, color, items }) => (
+            <div key={titulo} className="p-6 sm:p-8" style={{ background: C.fondo }}>
+              <div className="flex items-center justify-between gap-4">
+                <p className="flex items-center gap-3">
+                  <span className="pres-titulo w-9 h-9 rounded-[3px] flex items-center justify-center text-lg text-[#0F1D17]" style={{ background: color }}>{titulo[0]}</span>
+                  <span className="pres-titulo text-xl tracking-[-0.02em]">{titulo}</span>
+                </p>
+                <span className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{tipo}</span>
+              </div>
+              <ul className="mt-5 space-y-2.5">
+                {items.map(t => (
+                  <li key={t} className="flex gap-3 text-sm" style={{ color: C.apagado }}>
+                    <span className="mt-[7px] w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </Diapo>
 
