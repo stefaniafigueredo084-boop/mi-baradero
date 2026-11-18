@@ -801,81 +801,6 @@ export default function Presentacion() {
 
       <PortadaParte parte={PARTES[0]} />
 
-      {/* Un día en Baradero */}
-      <Diapo parte="01">
-        <Titulo
-          rotulo="Un día cualquiera"
-          titulo="Cuatro preguntas que se hace cualquier vecino"
-          texto="Son cosas simples, pero hoy cada una tiene su propio camino para encontrar la respuesta."
-        />
-        <div className="mt-12 grid sm:grid-cols-2 gap-6">
-          {SITUACIONES.map(({ pregunta, donde, Icon }, i) => (
-            <Tarjeta key={pregunta} className="flex flex-col">
-              <div className="flex items-center justify-between">
-                <span className="text-xs" style={{ ...mono, color: C.suave }}>0{i + 1}</span>
-                <Icon className="w-5 h-5" style={{ color: C.amarillo }} />
-              </div>
-              <p className="pres-titulo mt-6 text-[22px] sm:text-2xl leading-snug tracking-[-0.02em]">“{pregunta}”</p>
-              <p className="mt-6 pt-4 border-t flex items-center gap-2 text-xs uppercase" style={{ ...mono, borderColor: C.elevado, color: C.verde }}>
-                <Punto color={C.verde} /> {donde}
-              </p>
-            </Tarjeta>
-          ))}
-        </div>
-      </Diapo>
-
-      {/* El problema */}
-      <Diapo parte="01" className="justify-center">
-        <TarjetaClara className="grid lg:grid-cols-2 gap-10">
-          <div>
-            <Rotulo oscuro>El problema</Rotulo>
-            <h2 className="mt-4 text-[32px] sm:text-[44px] leading-[1.1] tracking-[-0.025em]">Hoy la información está repartida</h2>
-            <p className="mt-4 text-base leading-normal text-[#3E5A4C]">
-              Para saber a qué hora pasa la combi, qué día se saca el reciclable o cómo hacer un reclamo,
-              el vecino tiene que buscar en carteles, redes o llamar por teléfono. Y del lado del municipio,
-              cada área avisa por su cuenta y los pedidos de los vecinos se pueden perder.
-            </p>
-          </div>
-          <div>
-            <Rotulo oscuro color={C.verde}>Con Mi Baradero</Rotulo>
-            <ul className="mt-4">
-              {[
-                'Todo en una sola dirección: mi-baradero.web.app',
-                'Cada área del municipio actualiza lo suyo',
-                'El vecino ve los cambios en el momento',
-                'Los reclamos quedan registrados, con código y respuesta',
-              ].map((t, i) => (
-                <li key={t} className="flex gap-4 py-3.5 border-b border-[#0F1D17]/15 text-base">
-                  <span className="text-xs pt-1 text-[#8FA89B]" style={mono}>0{i + 1}</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </TarjetaClara>
-      </Diapo>
-
-      {/* Dónde está hoy la información */}
-      <Diapo parte="01" className="justify-center">
-        <Titulo
-          rotulo="Lo que investigamos"
-          titulo="Cinco lugares distintos para buscar lo mismo"
-          texto="Durante la investigación vimos que la información de Baradero está repartida en todos estos canales. Algunas novedades no llegan a todos, o llegan tarde."
-        />
-        <div className="mt-12 grid sm:grid-cols-5 border rounded-[10px] overflow-hidden" style={{ borderColor: C.elevado }}>
-          {CANALES_HOY.map((c, i) => (
-            <div key={c} className="p-6 border-b sm:border-b-0 sm:border-r last:border-r-0" style={{ borderColor: C.elevado }}>
-              <p className="text-xs" style={{ ...mono, color: C.amarillo }}>0{i + 1}</p>
-              <p className="pres-titulo mt-8 text-lg leading-snug">{c}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 flex items-center gap-3 text-base" style={{ color: C.suave }}>
-          <ArrowRight className="w-5 h-5 shrink-0" style={{ color: C.verde }} />
-          Mi Baradero los junta en uno solo.
-        </p>
-      </Diapo>
-
       {/* Misión, visión y valores */}
       <Diapo parte="01" className="justify-center">
         <div className="grid lg:grid-cols-2 gap-6">
@@ -897,55 +822,6 @@ export default function Presentacion() {
               </li>
             ))}
           </ul>
-        </div>
-      </Diapo>
-
-      {/* Objetivos */}
-      <Diapo parte="01" className="justify-center">
-        <Titulo rotulo="Nuestra idea" color={C.verde} titulo="Tres objetivos" texto="Todo lo que tiene la app sale de alguno de estos tres." />
-        <div className="mt-12 grid lg:grid-cols-3 gap-6">
-          {OBJETIVOS.map(({ titulo, texto }, i) => (
-            <div key={titulo} className="border-t pt-6" style={{ borderColor: i === 0 ? C.amarillo : C.linea }}>
-              <p className="text-xs" style={{ ...mono, color: C.suave }}>OBJETIVO 0{i + 1}</p>
-              <p className="pres-titulo mt-4 text-[40px] leading-none tracking-[-0.04em]">{titulo}</p>
-              <p className="mt-4 text-base leading-normal" style={{ color: C.apagado }}>{texto}</p>
-            </div>
-          ))}
-        </div>
-      </Diapo>
-
-      {/* Hipótesis */}
-      <Diapo parte="01" className="justify-center">
-        <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Nuestra hipótesis</p>
-        <p className="pres-titulo mt-8 text-[32px] sm:text-[52px] leading-[1.1] tracking-[-0.035em] max-w-5xl">
-          “Reunir toda la información relevante de Baradero en una única plataforma digital
-          <span style={{ color: C.verde }}> facilitará el acceso de los vecinos</span> a la información y a los servicios de la ciudad.”
-        </p>
-        <div className="mt-12 grid sm:grid-cols-2 gap-6 max-w-4xl">
-          <Mini titulo="Ciudades inteligentes">Usan la tecnología para mejorar la vida de sus habitantes y conectar a los vecinos con su comunidad.</Mini>
-          <Mini titulo="Gobierno digital">Brinda servicios públicos de forma más accesible, rápida y transparente, sin depender solo de los medios de siempre.</Mini>
-        </div>
-      </Diapo>
-
-      {/* Cómo lo hicimos */}
-      <Diapo parte="01">
-        <Titulo rotulo="Cómo lo hicimos" color={C.verde} titulo="De marzo a agosto, paso a paso" texto="Organizamos el proyecto con una planificación mensual." />
-        <ol className="mt-12 relative">
-          <span className="hidden lg:block absolute left-0 right-0 top-[7px] h-px" style={{ background: C.linea }} />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-5">
-            {ITINERARIO.map(({ mes, t, d }, i) => (
-              <li key={mes} className="relative">
-                <span className="block w-[15px] h-[15px] rounded-full border-2" style={{ borderColor: i === ITINERARIO.length - 1 ? C.amarillo : C.verde, background: C.fondo }} />
-                <p className="mt-5 text-xs uppercase" style={{ ...mono, color: C.suave }}>{mes}</p>
-                <p className="pres-titulo mt-2 text-base">{t}</p>
-                <p className="mt-2 text-sm" style={{ color: C.apagado }}>{d}</p>
-              </li>
-            ))}
-          </div>
-        </ol>
-        <div className="mt-12 rounded-[10px] border p-5 flex flex-wrap items-center gap-x-6 gap-y-2" style={{ borderColor: C.linea }}>
-          <span className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.amarillo }}><Punto vivo /> Feria Provincial de Ciencias 2026</span>
-          <span className="text-sm" style={{ color: C.suave }}>7° 4ta Programación · Modalidad técnico profesional · Área tecnología y aplicaciones web</span>
         </div>
       </Diapo>
 
@@ -1058,6 +934,171 @@ export default function Presentacion() {
           ))}
         </div>
       </Diapo>
+
+      {/* Cómo fue cambiando */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="Cómo llegamos hasta acá"
+          titulo="De prototipo a app"
+          texto="Así fue cambiando Mi Baradero desde la primera versión. Son capturas reales de cada etapa."
+        />
+        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {HISTORIA.map(({ fecha, titulo, img, texto }, i) => (
+            <li key={fecha} className="border-t pt-6" style={{ borderColor: i === HISTORIA.length - 1 ? C.verde : C.linea }}>
+              <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{fecha}</p>
+              <div className="mt-4 rounded-[10px] overflow-hidden border aspect-[390/560] lg:aspect-[390/470]" style={{ borderColor: C.elevado }}>
+                <img src={img} alt={`Mi Baradero en ${fecha.toLowerCase()}`} loading="lazy" className="w-full h-full object-cover object-top" />
+              </div>
+              <p className="pres-titulo mt-5 text-xl tracking-[-0.02em]">{titulo}</p>
+              <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ol>
+      </Diapo>
+
+      {/* Lean Startup */}
+      <Diapo parte="01" className="justify-center">
+        <Titulo
+          rotulo="Metodología Lean Startup"
+          color={C.verde}
+          titulo="Probar, aprender y ajustar"
+          texto="Cada versión salió de lo que aprendimos con la anterior."
+        />
+        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {LEAN.map(({ paso, texto }, i) => (
+            <li key={paso} className="border-t pt-6" style={{ borderColor: i === LEAN.length - 1 ? C.amarillo : C.verde }}>
+              <p className="text-xs" style={{ ...mono, color: C.suave }}>0{i + 1}</p>
+              <p className="pres-titulo mt-4 text-xl tracking-[-0.02em]">{paso}</p>
+              <p className="mt-3 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ol>
+      </Diapo>
+
+      {/* Un día en Baradero */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="Un día cualquiera"
+          titulo="Cuatro preguntas que se hace cualquier vecino"
+          texto="Son cosas simples, pero hoy cada una tiene su propio camino para encontrar la respuesta."
+        />
+        <div className="mt-12 grid sm:grid-cols-2 gap-6">
+          {SITUACIONES.map(({ pregunta, donde, Icon }, i) => (
+            <Tarjeta key={pregunta} className="flex flex-col">
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ ...mono, color: C.suave }}>0{i + 1}</span>
+                <Icon className="w-5 h-5" style={{ color: C.amarillo }} />
+              </div>
+              <p className="pres-titulo mt-6 text-[22px] sm:text-2xl leading-snug tracking-[-0.02em]">“{pregunta}”</p>
+              <p className="mt-6 pt-4 border-t flex items-center gap-2 text-xs uppercase" style={{ ...mono, borderColor: C.elevado, color: C.verde }}>
+                <Punto color={C.verde} /> {donde}
+              </p>
+            </Tarjeta>
+          ))}
+        </div>
+      </Diapo>
+
+      {/* El problema */}
+      <Diapo parte="01" className="justify-center">
+        <TarjetaClara className="grid lg:grid-cols-2 gap-10">
+          <div>
+            <Rotulo oscuro>El problema</Rotulo>
+            <h2 className="mt-4 text-[32px] sm:text-[44px] leading-[1.1] tracking-[-0.025em]">Hoy la información está repartida</h2>
+            <p className="mt-4 text-base leading-normal text-[#3E5A4C]">
+              Para saber a qué hora pasa la combi, qué día se saca el reciclable o cómo hacer un reclamo,
+              el vecino tiene que buscar en carteles, redes o llamar por teléfono. Y del lado del municipio,
+              cada área avisa por su cuenta y los pedidos de los vecinos se pueden perder.
+            </p>
+          </div>
+          <div>
+            <Rotulo oscuro color={C.verde}>Con Mi Baradero</Rotulo>
+            <ul className="mt-4">
+              {[
+                'Todo en una sola dirección: mi-baradero.web.app',
+                'Cada área del municipio actualiza lo suyo',
+                'El vecino ve los cambios en el momento',
+                'Los reclamos quedan registrados, con código y respuesta',
+              ].map((t, i) => (
+                <li key={t} className="flex gap-4 py-3.5 border-b border-[#0F1D17]/15 text-base">
+                  <span className="text-xs pt-1 text-[#8FA89B]" style={mono}>0{i + 1}</span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </TarjetaClara>
+      </Diapo>
+
+      {/* Dónde está hoy la información */}
+      <Diapo parte="01" className="justify-center">
+        <Titulo
+          rotulo="Lo que investigamos"
+          titulo="Cinco lugares distintos para buscar lo mismo"
+          texto="Durante la investigación vimos que la información de Baradero está repartida en todos estos canales. Algunas novedades no llegan a todos, o llegan tarde."
+        />
+        <div className="mt-12 grid sm:grid-cols-5 border rounded-[10px] overflow-hidden" style={{ borderColor: C.elevado }}>
+          {CANALES_HOY.map((c, i) => (
+            <div key={c} className="p-6 border-b sm:border-b-0 sm:border-r last:border-r-0" style={{ borderColor: C.elevado }}>
+              <p className="text-xs" style={{ ...mono, color: C.amarillo }}>0{i + 1}</p>
+              <p className="pres-titulo mt-8 text-lg leading-snug">{c}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 flex items-center gap-3 text-base" style={{ color: C.suave }}>
+          <ArrowRight className="w-5 h-5 shrink-0" style={{ color: C.verde }} />
+          Mi Baradero los junta en uno solo.
+        </p>
+      </Diapo>
+
+      {/* Objetivos */}
+      <Diapo parte="01" className="justify-center">
+        <Titulo rotulo="Nuestra idea" color={C.verde} titulo="Tres objetivos" texto="Todo lo que tiene la app sale de alguno de estos tres." />
+        <div className="mt-12 grid lg:grid-cols-3 gap-6">
+          {OBJETIVOS.map(({ titulo, texto }, i) => (
+            <div key={titulo} className="border-t pt-6" style={{ borderColor: i === 0 ? C.amarillo : C.linea }}>
+              <p className="text-xs" style={{ ...mono, color: C.suave }}>OBJETIVO 0{i + 1}</p>
+              <p className="pres-titulo mt-4 text-[40px] leading-none tracking-[-0.04em]">{titulo}</p>
+              <p className="mt-4 text-base leading-normal" style={{ color: C.apagado }}>{texto}</p>
+            </div>
+          ))}
+        </div>
+      </Diapo>
+
+      {/* Hipótesis */}
+      <Diapo parte="01" className="justify-center">
+        <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Nuestra hipótesis</p>
+        <p className="pres-titulo mt-8 text-[32px] sm:text-[52px] leading-[1.1] tracking-[-0.035em] max-w-5xl">
+          “Reunir toda la información relevante de Baradero en una única plataforma digital
+          <span style={{ color: C.verde }}> facilitará el acceso de los vecinos</span> a la información y a los servicios de la ciudad.”
+        </p>
+        <div className="mt-12 grid sm:grid-cols-2 gap-6 max-w-4xl">
+          <Mini titulo="Ciudades inteligentes">Usan la tecnología para mejorar la vida de sus habitantes y conectar a los vecinos con su comunidad.</Mini>
+          <Mini titulo="Gobierno digital">Brinda servicios públicos de forma más accesible, rápida y transparente, sin depender solo de los medios de siempre.</Mini>
+        </div>
+      </Diapo>
+
+      {/* Cómo lo hicimos */}
+      <Diapo parte="01">
+        <Titulo rotulo="Cómo lo hicimos" color={C.verde} titulo="De marzo a agosto, paso a paso" texto="Organizamos el proyecto con una planificación mensual." />
+        <ol className="mt-12 relative">
+          <span className="hidden lg:block absolute left-0 right-0 top-[7px] h-px" style={{ background: C.linea }} />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-5">
+            {ITINERARIO.map(({ mes, t, d }, i) => (
+              <li key={mes} className="relative">
+                <span className="block w-[15px] h-[15px] rounded-full border-2" style={{ borderColor: i === ITINERARIO.length - 1 ? C.amarillo : C.verde, background: C.fondo }} />
+                <p className="mt-5 text-xs uppercase" style={{ ...mono, color: C.suave }}>{mes}</p>
+                <p className="pres-titulo mt-2 text-base">{t}</p>
+                <p className="mt-2 text-sm" style={{ color: C.apagado }}>{d}</p>
+              </li>
+            ))}
+          </div>
+        </ol>
+        <div className="mt-12 rounded-[10px] border p-5 flex flex-wrap items-center gap-x-6 gap-y-2" style={{ borderColor: C.linea }}>
+          <span className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.amarillo }}><Punto vivo /> Feria Provincial de Ciencias 2026</span>
+          <span className="text-sm" style={{ color: C.suave }}>7° 4ta Programación · Modalidad técnico profesional · Área tecnología y aplicaciones web</span>
+        </div>
+      </Diapo>
+
 
       {/* ═════════════════ PARTE 02 · PARA EL VECINO ═════════════════ */}
 
@@ -1644,46 +1685,6 @@ export default function Presentacion() {
             <li key={titulo} className="border-t pt-6" style={{ borderColor: i === 0 ? C.amarillo : C.linea }}>
               <p className="text-xs" style={{ ...mono, color: C.suave }}>PASO 0{i + 1}</p>
               <p className="pres-titulo mt-4 text-xl tracking-[-0.02em]">{titulo}</p>
-              <p className="mt-3 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
-            </li>
-          ))}
-        </ol>
-      </Diapo>
-
-      {/* Cómo fue cambiando */}
-      <Diapo parte="04">
-        <Titulo
-          rotulo="Cómo llegamos hasta acá"
-          titulo="De prototipo a app"
-          texto="Así fue cambiando Mi Baradero desde la primera versión. Son capturas reales de cada etapa."
-        />
-        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {HISTORIA.map(({ fecha, titulo, img, texto }, i) => (
-            <li key={fecha} className="border-t pt-6" style={{ borderColor: i === HISTORIA.length - 1 ? C.verde : C.linea }}>
-              <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>{fecha}</p>
-              <div className="mt-4 rounded-[10px] overflow-hidden border aspect-[390/560] lg:aspect-[390/470]" style={{ borderColor: C.elevado }}>
-                <img src={img} alt={`Mi Baradero en ${fecha.toLowerCase()}`} loading="lazy" className="w-full h-full object-cover object-top" />
-              </div>
-              <p className="pres-titulo mt-5 text-xl tracking-[-0.02em]">{titulo}</p>
-              <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
-            </li>
-          ))}
-        </ol>
-      </Diapo>
-
-      {/* Lean Startup */}
-      <Diapo parte="04" className="justify-center">
-        <Titulo
-          rotulo="Metodología Lean Startup"
-          color={C.verde}
-          titulo="Probar, aprender y ajustar"
-          texto="Cada versión salió de lo que aprendimos con la anterior."
-        />
-        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {LEAN.map(({ paso, texto }, i) => (
-            <li key={paso} className="border-t pt-6" style={{ borderColor: i === LEAN.length - 1 ? C.amarillo : C.verde }}>
-              <p className="text-xs" style={{ ...mono, color: C.suave }}>0{i + 1}</p>
-              <p className="pres-titulo mt-4 text-xl tracking-[-0.02em]">{paso}</p>
               <p className="mt-3 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
             </li>
           ))}
