@@ -407,6 +407,39 @@ const FODA = [
   { titulo: 'Amenazas', tipo: 'Externo', color: '#8FA89B', items: ['Cambios en las fuentes oficiales', 'Canales gratuitos ya instalados', 'Aumentos en los costos tecnológicos', 'Poca adhesión de patrocinadores'] },
 ]
 
+// Identidad, mercado, Porter y Lean Startup: resumidos del informe del
+// proyecto (Informe APA 7, 17-18/11/2026). No agregar datos que no estén ahí.
+const VALORES = ['Accesibilidad', 'Información verificada', 'Participación ciudadana', 'Respeto por los datos personales', 'Transparencia']
+
+const PUBLICO = [
+  'Vecinos que consultan desde el celular',
+  'Quienes viajan entre Baradero, Alsina y Portela',
+  'Familias que buscan actividades',
+  'Personas que necesitan opciones de lectura accesibles',
+  'Visitantes, como público secundario',
+]
+
+const ALTERNATIVAS = [
+  { quien: 'Gobierno Abierto de Baradero', que: 'Compite en parte con la información municipal, pero también puede ser una fuente oficial.' },
+  { quien: 'Baradero Te Informa y Baradero Hoy', que: 'Compiten en parte con las noticias locales. Pueden ser aliados para difundir.' },
+  { quien: 'WhatsApp, redes, cartelería y radio', que: 'Rápidos y de uso habitual, pero la información queda repartida en muchos lugares.' },
+]
+
+const PORTER = [
+  { fuerza: 'Rivalidad existente', nivel: 'Media–alta', n: 4, texto: 'Portales y radios compiten por la atención y los auspicios. Nos diferenciamos con servicios juntos, accesibilidad y reclamos.' },
+  { fuerza: 'Nuevos competidores', nivel: 'Media', n: 3, texto: 'Lanzar un portal es posible, pero sostener fuentes confiables y actualizaciones requiere continuidad.' },
+  { fuerza: 'Productos sustitutos', nivel: 'Alta', n: 5, texto: 'Redes, mensajería, radio y portales: gratis y con hábitos ya instalados.' },
+  { fuerza: 'Poder de los clientes', nivel: 'Alto', n: 5, texto: 'Los comercios tienen otras formas de promocionarse y los vecinos pueden volver a sus canales de siempre.' },
+  { fuerza: 'Poder de los proveedores', nivel: 'Medio–alto', n: 4, texto: 'Hay opciones de alojamiento, pero los datos oficiales y los reclamos dependen de organismos específicos.' },
+]
+
+const LEAN = [
+  { paso: 'Hipótesis', texto: 'Reunir la información local reduce el esfuerzo de buscarla.' },
+  { paso: 'Primera versión', texto: 'Combis, Puntos Verdes, noticias y eventos. La probamos en celulares y analizamos los comentarios en redes.' },
+  { paso: 'Lo que aprendimos', texto: 'Mantener todo junto, renovar la estética, reforzar la accesibilidad, simplificar el panel y sumar reclamos. Los turnos de salud quedan para más adelante.' },
+  { paso: 'Próximo ciclo', texto: 'Probar con al menos 10 vecinos que busquen información y envíen un reclamo de prueba. Meta: 80 % de las tareas sin ayuda.' },
+]
+
 const FUTURO = [
   { titulo: 'Turnos de salud', texto: 'Pedido por la comunidad: sacar turno sin ir “de gusto” hasta el hospital.' },
   { titulo: 'Turismo', texto: 'Dar más visibilidad a los atractivos de Baradero para vecinos y visitantes.' },
@@ -843,6 +876,30 @@ export default function Presentacion() {
         </p>
       </Diapo>
 
+      {/* Misión, visión y valores */}
+      <Diapo parte="01" className="justify-center">
+        <div className="grid lg:grid-cols-2 gap-6">
+          <TarjetaClara>
+            <Rotulo oscuro color={C.verde}>Misión</Rotulo>
+            <p className="pres-titulo mt-6 text-[24px] sm:text-[30px] leading-[1.2] tracking-[-0.02em]">Reunir y ordenar la información y los servicios de Baradero en una plataforma accesible, para que vecinos y visitantes encuentren lo que necesitan y propongan mejoras para su ciudad.</p>
+          </TarjetaClara>
+          <Tarjeta className="sm:p-10">
+            <Rotulo>Visión</Rotulo>
+            <p className="pres-titulo mt-6 text-[24px] sm:text-[30px] leading-[1.2] tracking-[-0.02em]">Ser la referencia digital de Baradero, reconocida por sus datos al día, lo fácil que es usarla y la colaboración entre vecinos, instituciones y comercios.</p>
+          </Tarjeta>
+        </div>
+        <div className="mt-10">
+          <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Nuestros valores</p>
+          <ul className="mt-4 flex flex-wrap gap-3">
+            {VALORES.map(v => (
+              <li key={v} className="flex items-center gap-2 border rounded-[3px] px-4 h-10 text-sm" style={{ borderColor: C.linea }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: C.verde }} /> {v}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Diapo>
+
       {/* Objetivos */}
       <Diapo parte="01" className="justify-center">
         <Titulo rotulo="Nuestra idea" color={C.verde} titulo="Tres objetivos" texto="Todo lo que tiene la app sale de alguno de estos tres." />
@@ -890,6 +947,65 @@ export default function Presentacion() {
           <span className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.amarillo }}><Punto vivo /> Feria Provincial de Ciencias 2026</span>
           <span className="text-sm" style={{ color: C.suave }}>7° 4ta Programación · Modalidad técnico profesional · Área tecnología y aplicaciones web</span>
         </div>
+      </Diapo>
+
+      {/* Estudio de mercado */}
+      <Diapo parte="01">
+        <Titulo rotulo="Estudio de mercado" titulo="A quién le sirve y con quién compite" />
+        <div className="mt-12 grid lg:grid-cols-[1fr_1.3fr] gap-12 items-start">
+          <div>
+            <p className="pres-titulo text-[64px] sm:text-[88px] leading-none tracking-[-0.05em]">39.223</p>
+            <p className="mt-3 text-sm max-w-sm" style={{ color: C.apagado }}>personas viven en el partido de Baradero (Censo 2022, INDEC). Es nuestra referencia territorial.</p>
+            <ul className="mt-8 space-y-2.5">
+              {PUBLICO.map((t, i) => (
+                <li key={t} className="flex gap-3 text-sm" style={{ color: i === PUBLICO.length - 1 ? C.apagado : C.tinta }}>
+                  <span className="mt-[7px] w-1.5 h-1.5 rounded-full shrink-0" style={{ background: i === PUBLICO.length - 1 ? C.linea : C.amarillo }} /> {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Lo que usan hoy los vecinos</p>
+            <ul className="mt-4">
+              {ALTERNATIVAS.map(({ quien, que }) => (
+                <li key={quien} className="py-5 border-t" style={{ borderColor: C.linea }}>
+                  <p className="pres-titulo text-lg tracking-[-0.01em]">{quien}</p>
+                  <p className="mt-1.5 text-sm" style={{ color: C.apagado }}>{que}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Diapo>
+
+      {/* Cinco fuerzas de Porter */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="Cinco fuerzas de Porter"
+          color={C.verde}
+          titulo="Qué tan difícil es competir"
+          texto="La intensidad estimada de cada fuerza sobre el proyecto."
+        />
+        <ul className="mt-10">
+          {PORTER.map(({ fuerza, nivel, n, texto }) => (
+            <li key={fuerza} className="grid sm:grid-cols-[220px_150px_1fr] gap-x-8 gap-y-2 items-center py-4 border-t" style={{ borderColor: C.linea }}>
+              <p className="pres-titulo text-base">{fuerza}</p>
+              <div>
+                <div className="flex gap-1" aria-hidden="true">
+                  {[1, 2, 3, 4, 5].map(k => (
+                    <span key={k} className="h-2 flex-1 rounded-[1px]" style={{ background: k <= n ? (n === 5 ? C.amarillo : C.verde) : C.elevado }} />
+                  ))}
+                </div>
+                <p className="mt-1.5 text-xs uppercase" style={{ ...mono, color: C.suave }}>{nivel}</p>
+              </div>
+              <p className="text-sm" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 flex items-start gap-3 text-base" style={{ color: C.suave }}>
+          <ArrowRight className="w-5 h-5 shrink-0 mt-0.5" style={{ color: C.verde }} />
+          La oportunidad: una consulta más práctica que varias búsquedas, y sumar a medios, transportistas y organismos como aliados.
+        </p>
       </Diapo>
 
       {/* PESTEL */}
@@ -1550,6 +1666,25 @@ export default function Presentacion() {
               </div>
               <p className="pres-titulo mt-5 text-xl tracking-[-0.02em]">{titulo}</p>
               <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
+            </li>
+          ))}
+        </ol>
+      </Diapo>
+
+      {/* Lean Startup */}
+      <Diapo parte="04" className="justify-center">
+        <Titulo
+          rotulo="Metodología Lean Startup"
+          color={C.verde}
+          titulo="Probar, aprender y ajustar"
+          texto="Cada versión salió de lo que aprendimos con la anterior."
+        />
+        <ol className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {LEAN.map(({ paso, texto }, i) => (
+            <li key={paso} className="border-t pt-6" style={{ borderColor: i === LEAN.length - 1 ? C.amarillo : C.verde }}>
+              <p className="text-xs" style={{ ...mono, color: C.suave }}>0{i + 1}</p>
+              <p className="pres-titulo mt-4 text-xl tracking-[-0.02em]">{paso}</p>
+              <p className="mt-3 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
             </li>
           ))}
         </ol>
