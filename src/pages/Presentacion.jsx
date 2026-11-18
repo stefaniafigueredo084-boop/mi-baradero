@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import {
   Bus, Trash2, CalendarDays, Recycle, MessageSquare, UserCircle,
-  ArrowRight, QrCode, BadgeCheck, Ticket, ScanLine, Check, Clock, Bell,
+  ArrowRight, ArrowLeft, QrCode, BadgeCheck, Ticket, ScanLine, Check, Clock, Bell,
   MapPin, Map as MapIcon, Truck, Leaf, Newspaper, Lightbulb, Wrench, ThumbsUp,
   ThumbsDown, Type, Moon, Volume2, Mic, WifiOff, ShieldCheck, Lock,
 } from 'lucide-react'
@@ -19,12 +19,16 @@ const URL_APP = 'https://mi-baradero.web.app'
 // títulos en Poppins, botón verde y el amarillo/verde de la marca como
 // señal en puntos y detalles.
 
+// Los colores que cambian entre fondo oscuro y fondo blanco salen de
+// variables (ver ESTILOS). Con ?fondo=blanco en la dirección se ve en blanco.
 const C = {
-  fondo: '#0F1D17',
-  elevado: '#1D3328',
-  linea: '#2F4D3F',
-  apagado: '#8FA89B',
-  suave: '#B9CCC1',
+  fondo: 'var(--p-fondo)',
+  elevado: 'var(--p-elevado)',
+  linea: 'var(--p-linea)',
+  apagado: 'var(--p-apagado)',
+  suave: 'var(--p-suave)',
+  tinta: 'var(--p-tinta)',
+  tarjeta: 'var(--p-tarjeta)',
   hueso: '#F1F6F3',
   amarillo: '#F2B53E',
   verde: '#6AAE4E',
@@ -66,24 +70,39 @@ function Rotulo({ children, color = C.amarillo, oscuro = false }) {
   )
 }
 
+// Separa un título en palabras: cada una sube desde atrás de una línea
+// invisible, una detrás de otra.
+function Palabras({ children }) {
+  if (typeof children !== 'string') return children
+  const palabras = children.split(' ')
+  return palabras.map((p, i) => (
+    <span key={i}>
+      <span className="pres-mascara"><span className="pres-palabra" style={{ '--i': i }}>{p}</span></span>
+      {i < palabras.length - 1 ? ' ' : ''}
+    </span>
+  ))
+}
+
 function Titulo({ rotulo, titulo, texto, color }) {
   return (
     <div className="max-w-2xl">
       <Rotulo color={color}>{rotulo}</Rotulo>
-      <h2 className="mt-4 text-[32px] sm:text-[44px] leading-[1.1] tracking-[-0.025em]" style={{ color: C.hueso }}>{titulo}</h2>
+      <h2 className="mt-4 text-[32px] sm:text-[44px] leading-[1.1] tracking-[-0.025em]" style={{ color: C.tinta }}><Palabras>{titulo}</Palabras></h2>
       {texto && <p className="mt-4 text-base leading-normal" style={{ color: C.apagado }}>{texto}</p>}
     </div>
   )
 }
 
 const botonClaro = 'inline-flex items-center gap-2 h-11 px-[14px] rounded-[3px] text-sm bg-[#3D8B68] text-white hover:bg-[#4A9C77] transition-colors duration-150'
-const botonFantasma = 'inline-flex items-center gap-2 h-11 px-[14px] text-sm border border-[#2F4D3F] text-[#F1F6F3] hover:border-[#F1F6F3] transition-colors duration-150'
+const botonFantasma = 'inline-flex items-center gap-2 h-11 px-[14px] text-sm border border-[var(--p-linea)] text-[var(--p-tinta)] hover:border-[var(--p-tinta)] transition-colors duration-150'
 
 // Movimiento: corto y seco, como una herramienta. Si la persona pidió
 // "reducir movimiento" en su equipo, todo aparece quieto.
 const ESTILOS = `
-@keyframes pres-entrar { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
-@keyframes pres-ventana { from { opacity: 0; transform: translateY(24px) scale(.97) } to { opacity: 1; transform: none } }
+.pres, .pres .pres-oscuro { --p-fondo: #0F1D17; --p-elevado: #1D3328; --p-linea: #2F4D3F; --p-apagado: #8FA89B; --p-suave: #B9CCC1; --p-tinta: #F1F6F3; --p-tarjeta: #F1F6F3 }
+.pres.pres-blanco { --p-fondo: #FFFFFF; --p-elevado: #E3EBE6; --p-linea: #C8D7CE; --p-apagado: #5B7366; --p-suave: #3E5A4C; --p-tinta: #0F1D17; --p-tarjeta: #EDF3EF }
+@keyframes pres-entrar { from { opacity: 0; transform: translateY(18px); filter: blur(6px) } to { opacity: 1; transform: none; filter: none } }
+@keyframes pres-ventana { from { opacity: 0; transform: translateY(48px) scale(.94); filter: blur(10px) } to { opacity: 1; transform: none; filter: none } }
 @keyframes pres-cinta { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 @keyframes pres-pulso { 0%, 100% { box-shadow: 0 0 0 0 rgba(242,181,62,.55) } 60% { box-shadow: 0 0 0 6px rgba(242,181,62,0) } }
 @keyframes pres-escaneo { 0%, 100% { top: 8% } 50% { top: 88% } }
@@ -91,8 +110,8 @@ const ESTILOS = `
 @keyframes pres-pulso-verde { 0%, 100% { box-shadow: 0 0 0 0 rgba(106,174,78,.6) } 60% { box-shadow: 0 0 0 10px rgba(106,174,78,0) } }
 @keyframes pres-aviso { 0%, 8% { opacity: 0; transform: translateY(-10px) } 14%, 86% { opacity: 1; transform: none } 92%, 100% { opacity: 0; transform: translateY(-10px) } }
 .pres h1, .pres h2, .pres-titulo { font-family: Poppins, sans-serif; font-weight: 600 }
-.pres-entrar { opacity: 0; animation: pres-entrar .7s cubic-bezier(.2,.7,.2,1) forwards }
-.pres-ventana { opacity: 0; animation: pres-ventana .9s cubic-bezier(.2,.7,.2,1) forwards }
+.pres-entrar { opacity: 0; animation: pres-entrar .9s cubic-bezier(.16,1,.3,1) forwards }
+.pres-ventana { opacity: 0; animation: pres-ventana 1.3s cubic-bezier(.16,1,.3,1) forwards }
 .pres-cinta { animation: pres-cinta 40s linear infinite }
 .pres-pulso { animation: pres-pulso 2s ease-out infinite }
 .pres-escaneo { animation: pres-escaneo 2.4s ease-in-out infinite }
@@ -101,11 +120,49 @@ const ESTILOS = `
 .visto .pres-barra { width: var(--ancho) }
 .pres-flotar { animation: pres-flotar 4s ease-in-out infinite }
 .pres-pulso-verde { animation: pres-pulso-verde 2.4s ease-out infinite }
-[data-aparecer] { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1) }
-[data-aparecer].visto { opacity: 1; transform: none }
+/* Entradas: cada pieza de la pantalla sube, se enfoca y aparece en orden */
+.pres { --pro: cubic-bezier(.16,1,.3,1) }
+.pres-pieza { transition: opacity .9s var(--pro), transform 1.1s var(--pro), filter .9s var(--pro); transition-delay: var(--retraso, 0s) }
+[data-aparecer]:not(.visto) .pres-pieza { opacity: 0; transform: translateY(32px); filter: blur(8px) }
+.pres-mascara { display: inline-block; overflow: hidden; vertical-align: top; padding: .12em 0 .16em; margin: -.12em 0 -.16em }
+.pres-palabra { display: inline-block; transition: transform 1.1s var(--pro); transition-delay: calc(var(--retraso, 0s) + var(--i) * 55ms) }
+[data-aparecer]:not(.visto) .pres-palabra { transform: translateY(110%) }
+@keyframes pres-palabra { from { transform: translateY(110%) } to { transform: none } }
+.pres-entrar .pres-palabra { transform: translateY(110%); animation: pres-palabra 1.1s var(--pro) forwards; animation-delay: calc(.1s + var(--i) * 60ms) }
+.pres-progreso { transform-origin: left; transform: scaleX(0) }
+.pres-numero { transition-duration: 1.4s, 1.6s, 1.2s }
+[data-aparecer]:not(.visto) .pres-numero { transform: translateX(-6%) scale(1.25) }
+
+/* Modo presentación (compu): una pantalla por vez, como diapositivas */
+.pres-modo { height: 100svh; overflow: hidden }
+.pres-modo [data-diapo] { position: fixed; top: 4rem; left: 0; right: 0; bottom: 0; min-height: 0 !important; padding: 3rem 0 4.5rem; justify-content: safe center !important; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; visibility: hidden; opacity: 0; z-index: 1; background: var(--p-fondo) }
+.pres-modo [data-diapo].activa { visibility: visible; opacity: 1; z-index: 2; animation: pres-diapo-entra 1s var(--pro) both }
+.pres-modo [data-diapo].activa.desde-atras { animation-name: pres-diapo-vuelve }
+.pres-modo [data-diapo].saliendo { visibility: visible; z-index: 1; animation: pres-diapo-sale .8s var(--pro) both }
+.pres-modo [data-diapo].saliendo.hacia-atras { animation-name: pres-diapo-sale-abajo }
+@keyframes pres-diapo-entra { from { opacity: 0; transform: translateY(4vh) scale(.985) } to { opacity: 1; transform: none } }
+@keyframes pres-diapo-vuelve { from { opacity: 0; transform: translateY(-4vh) scale(.985) } to { opacity: 1; transform: none } }
+@keyframes pres-diapo-sale { from { opacity: 1; transform: none; filter: none } to { opacity: 0; transform: translateY(-4vh) scale(.96); filter: blur(8px) } }
+@keyframes pres-diapo-sale-abajo { from { opacity: 1; transform: none; filter: none } to { opacity: 0; transform: translateY(4vh) scale(.96); filter: blur(8px) } }
+.pres-modo [data-diapo]:not(.activa):not(.saliendo) .pres-entrar,
+.pres-modo [data-diapo]:not(.activa):not(.saliendo) .pres-ventana,
+.pres-modo [data-diapo]:not(.activa):not(.saliendo) .pres-palabra { animation: none }
+.pres-modo .pres-progreso { transition: transform .9s var(--pro) }
+.pres-modo footer { position: fixed; left: 0; bottom: 0; z-index: 15; border: 0 }
+.pres-modo footer > div { padding: 1.5rem 1.25rem; font-size: 12px }
+.pres-modo footer > div > span:first-child { display: none }
+
+/* Telón verde al empezar cada parte */
+.pres-telon { position: fixed; inset: 0; z-index: 30; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 1.5rem; background: #3D8B68; color: #fff; transform: translateX(-101%); animation: pres-telon 1.3s cubic-bezier(.76,0,.24,1) forwards }
+.pres-telon > * { opacity: 0; animation: pres-telon-texto 1.3s ease forwards }
+@keyframes pres-telon { 0% { transform: translateX(-101%) } 40%, 60% { transform: none } 100% { transform: translateX(101%) } }
+@keyframes pres-telon-texto { 0%, 25% { opacity: 0; transform: translateX(-40px) } 45%, 60% { opacity: 1; transform: none } 80%, 100% { opacity: 0; transform: translateX(40px) } }
 @media (prefers-reduced-motion: reduce) {
   .pres-barra { width: var(--ancho) !important; transition: none !important }
-  .pres-entrar, .pres-ventana, [data-aparecer] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important }
+  .pres-entrar, .pres-ventana, [data-aparecer], .pres-pieza, .pres-palabra { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; transition: none !important }
+  .pres-modo [data-diapo].activa, .pres-modo [data-diapo].saliendo { animation: none !important }
+  .pres-modo [data-diapo].saliendo { visibility: hidden }
+  .pres-telon { display: none !important }
   .pres-cinta, .pres-pulso, .pres-escaneo, .pres-aviso, .pres-flotar, .pres-pulso-verde { animation: none !important }
 }
 `
@@ -119,7 +176,7 @@ function Punto({ color = C.amarillo, vivo = false }) {
 // panel. Los textos son los de la app, sin horarios inventados.
 function Celular() {
   return (
-    <div className="w-[230px] sm:w-[250px] rounded-[2.4rem] p-2 border" style={{ background: '#0B1612', borderColor: C.linea }}>
+    <div className="pres-oscuro w-[230px] sm:w-[250px] rounded-[2.4rem] p-2 border" style={{ background: '#0B1612', borderColor: C.linea }}>
       <div className="relative rounded-[2rem] overflow-hidden" style={{ background: C.hueso, color: '#0F1D17' }}>
         <div className="flex justify-center pt-2"><span className="w-16 h-4 rounded-full bg-[#0F1D17]" /></div>
 
@@ -171,7 +228,7 @@ function VentanaPanel() {
     { etiqueta: 'Tiendas de apps', valor: '0', detalle: 'se instala desde el navegador', color: C.amarillo },
   ]
   return (
-    <div className="rounded-[10px] overflow-hidden border" style={{ background: '#0B1612', borderColor: C.elevado }}>
+    <div className="pres-oscuro rounded-[10px] overflow-hidden border" style={{ background: '#0B1612', borderColor: C.elevado }}>
       <div className="flex items-center gap-3 px-4 h-10 border-b" style={{ borderColor: C.elevado }}>
         <span className="flex gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-[#2F4D3F]" />
@@ -187,7 +244,7 @@ function VentanaPanel() {
         {filas.map(({ etiqueta, valor, detalle, color }, i) => (
           <div key={etiqueta} className={`p-5 border-b ${i % 2 === 0 ? 'border-r' : ''}`} style={{ borderColor: C.elevado }}>
             <p className="text-xs uppercase leading-tight" style={{ ...mono, color: C.suave }}>{etiqueta}</p>
-            <p className="mt-3 text-[36px] leading-none tracking-[-0.031em]" style={{ color: C.hueso }}>{valor}</p>
+            <p className="mt-3 text-[36px] leading-none tracking-[-0.031em]" style={{ color: C.tinta }}>{valor}</p>
             <p className="mt-2 flex items-center gap-1.5 text-xs" style={{ color: C.apagado }}>
               <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />
               {detalle || 'funcionando hoy'}
@@ -198,7 +255,7 @@ function VentanaPanel() {
       <div className="p-5">
         <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Reclamo</p>
         <div className="mt-3 flex items-center justify-between gap-3 border rounded-[3px] px-3 h-11" style={{ borderColor: C.linea }}>
-          <span className="text-sm" style={{ ...mono, color: C.hueso }}>#K3F9QA</span>
+          <span className="text-sm" style={{ ...mono, color: C.tinta }}>#K3F9QA</span>
           <span className="text-xs uppercase" style={{ ...mono, color: C.verde }}>Respondido</span>
         </div>
         <p className="mt-2 text-xs" style={{ color: C.apagado }}>Ejemplo del formato del código de seguimiento</p>
@@ -333,13 +390,13 @@ const FUTURO = [
 // integrante arranque su parte con un corte claro.
 function PortadaParte({ parte }) {
   return (
-    <Diapo id={parte.id} parte={parte.n} className="justify-center">
+    <Diapo id={parte.id} parte={parte.n} portada={parte.titulo} className="justify-center">
       <p className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Parte {parte.n} de 04</p>
-      <p className="pres-titulo mt-4 text-[96px] sm:text-[160px] leading-none tracking-[-0.06em]" style={{ color: C.elevado }}>{parte.n}</p>
-      <h2 className="-mt-6 sm:-mt-10 text-[40px] sm:text-[64px] leading-none tracking-[-0.04em]">{parte.titulo}</h2>
+      <p className="pres-titulo pres-numero mt-4 text-[96px] sm:text-[160px] leading-none tracking-[-0.06em]" style={{ color: C.elevado }}>{parte.n}</p>
+      <h2 className="-mt-6 sm:-mt-10 text-[40px] sm:text-[64px] leading-none tracking-[-0.04em]"><Palabras>{parte.titulo}</Palabras></h2>
       <p className="mt-5 text-lg max-w-xl" style={{ color: C.apagado }}>{parte.texto}</p>
       <div className="mt-10 h-px w-full max-w-md" style={{ background: C.linea }}>
-        <div className="h-px" style={{ width: `${Number(parte.n) * 25}%`, background: C.amarillo }} />
+        <div className="pres-barra h-px" style={{ '--ancho': `${Number(parte.n) * 25}%`, background: C.amarillo }} />
       </div>
     </Diapo>
   )
@@ -347,12 +404,13 @@ function PortadaParte({ parte }) {
 
 // Cada pantalla de la presentación. En computadora ocupa el alto de la
 // pantalla, para poder pasar de una a otra con el teclado.
-function Diapo({ id, parte, className = '', children, ancho = true }) {
+function Diapo({ id, parte, className = '', children, ancho = true, portada = false }) {
   return (
     <section
       id={id}
       data-diapo
       data-parte={parte}
+      data-portada={portada ? `${parte} · ${portada}` : undefined}
       className={`scroll-mt-16 lg:min-h-[calc(100svh-4rem)] flex flex-col py-20 ${className}`}
     >
       <div data-aparecer className={ancho ? 'w-full max-w-[1200px] mx-auto px-4 sm:px-6' : 'w-full'}>
@@ -363,11 +421,11 @@ function Diapo({ id, parte, className = '', children, ancho = true }) {
 }
 
 function Tarjeta({ children, className = '' }) {
-  return <div className={`rounded-[10px] border p-6 ${className}`} style={{ borderColor: C.elevado }}>{children}</div>
+  return <div className={`pres-tarjeta rounded-[10px] border p-6 ${className}`} style={{ borderColor: C.elevado }}>{children}</div>
 }
 
 function TarjetaClara({ children, className = '' }) {
-  return <div className={`rounded-[20px] p-6 sm:p-10 ${className}`} style={{ background: C.hueso, color: '#0F1D17' }}>{children}</div>
+  return <div className={`pres-tarjeta-clara rounded-[20px] p-6 sm:p-10 ${className}`} style={{ background: C.tarjeta, color: '#0F1D17' }}>{children}</div>
 }
 
 function Mini({ titulo, children }) {
@@ -381,53 +439,182 @@ function Mini({ titulo, children }) {
 
 export default function Presentacion() {
   const raiz = useRef(null)
+  const blanco = new URLSearchParams(window.location.search).get('fondo') === 'blanco'
   const [actual, setActual] = useState({ i: 0, total: 1, parte: '01' })
 
-  // Cada bloque marcado con data-aparecer sube suavemente al entrar en pantalla
+  // En compu se ve como presentación: una pantalla por vez. En el
+  // celular (o con ?modo=pagina) queda como página para ir bajando.
+  const pideModo = () => new URLSearchParams(window.location.search).get('modo') !== 'pagina' &&
+    window.matchMedia('(min-width: 1024px)').matches
+  const [modo, setModo] = useState(pideModo)
   useEffect(() => {
-    const bloques = raiz.current.querySelectorAll('[data-aparecer]')
-    const obs = new IntersectionObserver(entradas => {
-      entradas.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target) }
-      })
-    }, { threshold: 0.1 })
-    bloques.forEach(b => obs.observe(b))
-    return () => obs.disconnect()
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const cambio = () => setModo(pideModo())
+    mq.addEventListener('change', cambio)
+    return () => mq.removeEventListener('change', cambio)
   }, [])
 
-  // Marca en qué pantalla estamos (para el contador de abajo)
+  const [n, setN] = useState(0)
+  const anterior = useRef(0)
+  const total = useRef(1)
+  const [telon, setTelon] = useState(null)
+  const progreso = useRef(null)
+  const diapos = () => [...raiz.current.querySelectorAll('[data-diapo]')]
+  const ir = useCallback(d => setN(x => Math.max(0, Math.min(total.current - 1, x + d))), [])
+
+  // Cada pantalla aparece por partes, en el orden en que se leen: el
+  // título palabra por palabra, después textos, tarjetas y listas.
   useEffect(() => {
-    const diapos = [...raiz.current.querySelectorAll('[data-diapo]')]
-    const obs = new IntersectionObserver(entradas => {
-      entradas.forEach(e => {
-        if (e.isIntersecting) {
-          const i = diapos.indexOf(e.target)
-          setActual({ i, total: diapos.length, parte: e.target.dataset.parte })
-        }
+    total.current = diapos().length
+    raiz.current.querySelectorAll('[data-aparecer]').forEach(b => {
+      let k = 0
+      b.querySelectorAll('.pres-tarjeta-clara, .pres-tarjeta, .pres-oscuro, h2, h3, p, li, tr, figure, table').forEach(el => {
+        const padre = el.parentElement.closest('.pres-tarjeta, .pres-oscuro, figure, li, tr, table')
+        if (padre && b.contains(padre)) return
+        if (el.tagName === 'TABLE' && el.querySelector('tr')) return
+        el.style.setProperty('--retraso', `${Math.min(k * 0.07, 0.9).toFixed(2)}s`)
+        if (!el.querySelector('.pres-palabra')) el.classList.add('pres-pieza')
+        k += el.querySelector('.pres-palabra') ? 3 : 1
       })
-    }, { rootMargin: '-45% 0px -45% 0px' })
-    diapos.forEach(d => obs.observe(d))
-    return () => obs.disconnect()
+    })
   }, [])
+
+  // Modo página: las cosas aparecen al bajar, y la barrita y el
+  // contador siguen el lugar de la página.
+  useEffect(() => {
+    if (modo) return
+    const lista = diapos()
+    lista.forEach(d => d.classList.remove('activa', 'saliendo', 'desde-atras', 'hacia-atras'))
+    const aparecer = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visto'); aparecer.unobserve(e.target) }
+    }), { threshold: 0.1 })
+    raiz.current.querySelectorAll('[data-aparecer]').forEach(b => aparecer.observe(b))
+    const contar = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) setActual({ i: lista.indexOf(e.target), total: lista.length, parte: e.target.dataset.parte })
+    }), { rootMargin: '-45% 0px -45% 0px' })
+    lista.forEach(d => contar.observe(d))
+    let cuadro = 0
+    const medir = () => {
+      cuadro = 0
+      const alto = document.documentElement.scrollHeight - window.innerHeight
+      if (progreso.current) progreso.current.style.transform = `scaleX(${alto > 0 ? window.scrollY / alto : 0})`
+    }
+    const alMover = () => { if (!cuadro) cuadro = requestAnimationFrame(medir) }
+    medir()
+    window.addEventListener('scroll', alMover, { passive: true })
+    return () => { aparecer.disconnect(); contar.disconnect(); window.removeEventListener('scroll', alMover); cancelAnimationFrame(cuadro) }
+  }, [modo])
+
+  // Si una pantalla no entra entera, se achica un poco para que entre
+  const encajar = d => {
+    const hijos = [...d.children]
+    hijos.forEach(h => { h.style.zoom = '' })
+    const relleno = parseFloat(getComputedStyle(d).paddingTop) + parseFloat(getComputedStyle(d).paddingBottom)
+    const alto = d.scrollHeight - relleno
+    const lugar = d.clientHeight - relleno
+    if (alto > lugar) hijos.forEach(h => { h.style.zoom = Math.max(0.7, lugar / alto).toFixed(3) })
+  }
+  useEffect(() => {
+    if (!modo) { diapos().forEach(d => [...d.children].forEach(h => { h.style.zoom = '' })); return }
+    const alCambiar = () => { const d = raiz.current.querySelector('[data-diapo].activa'); if (d) encajar(d) }
+    window.addEventListener('resize', alCambiar)
+    return () => window.removeEventListener('resize', alCambiar)
+  }, [modo])
+
+  // Modo presentación: cambiar de pantalla con animación de entrada y salida
+  useEffect(() => {
+    if (!modo) return
+    const lista = diapos()
+    const previa = anterior.current
+    const atras = n < previa
+    lista.forEach((d, i) => {
+      d.classList.remove('saliendo', 'hacia-atras', 'desde-atras')
+      d.classList.toggle('activa', i === n)
+      if (i !== n && i !== previa) d.querySelector('[data-aparecer]')?.classList.remove('visto')
+    })
+    const actualDiapo = lista[n]
+    if (atras) actualDiapo.classList.add('desde-atras')
+    if (previa !== n && lista[previa]) lista[previa].classList.add('saliendo', ...(atras ? ['hacia-atras'] : []))
+    actualDiapo.scrollTop = 0
+    encajar(actualDiapo)
+    const conTelon = previa !== n && !atras && actualDiapo.dataset.portada
+    if (conTelon) setTelon({ clave: n, texto: actualDiapo.dataset.portada })
+    const t1 = setTimeout(() => actualDiapo.querySelector('[data-aparecer]')?.classList.add('visto'), conTelon ? 650 : 150)
+    const t2 = setTimeout(() => {
+      if (lista[previa] && previa !== n) {
+        lista[previa].classList.remove('saliendo', 'hacia-atras')
+        lista[previa].querySelector('[data-aparecer]')?.classList.remove('visto')
+      }
+    }, 850)
+    anterior.current = n
+    setActual({ i: n, total: lista.length, parte: actualDiapo.dataset.parte })
+    if (progreso.current) progreso.current.style.transform = `scaleX(${lista.length > 1 ? n / (lista.length - 1) : 0})`
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [n, modo])
 
   // Para presentar: flechas, espacio y "avanzar página" (también los
-  // punteros de presentación) pasan a la pantalla siguiente o anterior.
+  // punteros de presentación). En modo presentación también la rueda
+  // del mouse, deslizar el dedo y los enlaces del índice.
   useEffect(() => {
+    const activa = () => raiz.current.querySelector('[data-diapo].activa')
+    const puedeBajar = (d, abajo) => d && (abajo ? d.scrollTop + d.clientHeight < d.scrollHeight - 2 : d.scrollTop > 0)
+
     const alTocar = e => {
       const adelante = ['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)
       const atras = ['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)
+      if (modo && (e.key === 'Home' || e.key === 'End')) { e.preventDefault(); setN(e.key === 'Home' ? 0 : total.current - 1); return }
       if (!adelante && !atras) return
       e.preventDefault()
-      const diapos = [...raiz.current.querySelectorAll('[data-diapo]')]
-      const tope = 64 + 4
+      if (modo) { ir(adelante ? 1 : -1); return }
+      const lista = diapos()
       const destino = adelante
-        ? diapos.find(d => d.getBoundingClientRect().top > tope)
-        : [...diapos].reverse().find(d => d.getBoundingClientRect().top < -4)
+        ? lista.find(d => d.getBoundingClientRect().top > 68)
+        : [...lista].reverse().find(d => d.getBoundingClientRect().top < -4)
       destino?.scrollIntoView({ behavior: 'smooth' })
     }
+
+    let quieto = 0
+    const rueda = e => {
+      if (!modo || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return
+      const abajo = e.deltaY > 0
+      if (puedeBajar(activa(), abajo)) return
+      e.preventDefault()
+      const ahora = Date.now()
+      const libre = ahora > quieto
+      quieto = Math.max(quieto, ahora + 220)
+      if (libre && Math.abs(e.deltaY) > 8) { quieto = ahora + 900; ir(abajo ? 1 : -1) }
+    }
+
+    let y0 = null
+    const tocaInicio = e => { y0 = e.touches[0].clientY }
+    const tocaFin = e => {
+      if (!modo || y0 === null) return
+      const dy = y0 - e.changedTouches[0].clientY
+      y0 = null
+      if (Math.abs(dy) > 60 && !puedeBajar(activa(), dy > 0)) ir(dy > 0 ? 1 : -1)
+    }
+
+    const enlace = e => {
+      const a = e.target.closest('a[href^="#"]')
+      if (!modo || !a) return
+      const i = diapos().findIndex(d => d.id === a.getAttribute('href').slice(1))
+      if (i >= 0) { e.preventDefault(); setN(i) }
+    }
+
+    const nodo = raiz.current
     window.addEventListener('keydown', alTocar)
-    return () => window.removeEventListener('keydown', alTocar)
-  }, [])
+    window.addEventListener('wheel', rueda, { passive: false })
+    window.addEventListener('touchstart', tocaInicio, { passive: true })
+    window.addEventListener('touchend', tocaFin)
+    nodo.addEventListener('click', enlace)
+    return () => {
+      window.removeEventListener('keydown', alTocar)
+      window.removeEventListener('wheel', rueda)
+      window.removeEventListener('touchstart', tocaInicio)
+      window.removeEventListener('touchend', tocaFin)
+      nodo.removeEventListener('click', enlace)
+    }
+  }, [modo, ir])
 
   // La letra de los rótulos se carga solo en esta página, para no sumarle peso a la app
   useEffect(() => {
@@ -441,13 +628,20 @@ export default function Presentacion() {
   return (
     <div
       ref={raiz}
-      className="pres min-h-screen antialiased"
-      style={{ background: C.fondo, color: C.hueso, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 400 }}
+      className={`pres min-h-screen antialiased ${blanco ? 'pres-blanco' : ''} ${modo ? 'pres-modo' : ''}`}
+      style={{ background: C.fondo, color: C.tinta, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 400 }}
     >
       <style>{ESTILOS}</style>
+      {modo && telon && (
+        <div key={telon.clave} className="pres-telon" onAnimationEnd={e => e.target === e.currentTarget && setTelon(null)}>
+          <span className="text-sm uppercase" style={mono}>Parte {telon.texto.split(' · ')[0]}</span>
+          <span className="pres-titulo text-[56px] leading-none tracking-[-0.04em]">{telon.texto.split(' · ')[1]}</span>
+        </div>
+      )}
 
       {/* Barra de arriba */}
       <header className="sticky top-0 z-20 border-b" style={{ background: C.fondo, borderColor: C.elevado }}>
+        <div ref={progreso} className="pres-progreso absolute left-0 right-0 -bottom-px h-[2px]" style={{ background: '#3D8B68' }} />
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <a href="#inicio" className="flex items-center gap-2.5">
             <img src="/logo-mibaradero.png" alt="" className="h-7 w-auto rounded-[3px] bg-white p-0.5" />
@@ -455,7 +649,7 @@ export default function Presentacion() {
           </a>
           <nav className="hidden md:flex items-center gap-6 text-sm uppercase" style={{ color: C.apagado }}>
             {PARTES.map(p => (
-              <a key={p.id} href={`#${p.id}`} className="flex items-center gap-2 hover:text-white transition-colors" style={actual.parte === p.n ? { color: C.hueso } : undefined}>
+              <a key={p.id} href={`#${p.id}`} className="flex items-center gap-2 hover:text-[var(--p-tinta)] transition-colors" style={actual.parte === p.n ? { color: C.tinta } : undefined}>
                 <span className="text-xs" style={{ ...mono, color: actual.parte === p.n ? C.amarillo : C.linea }}>{p.n}</span>
                 {p.titulo}
               </a>
@@ -467,9 +661,19 @@ export default function Presentacion() {
 
       {/* Contador para quien presenta */}
       <div className="hidden lg:flex fixed bottom-5 right-5 z-20 items-center gap-3 rounded-[3px] border px-3 h-9 text-xs uppercase" style={{ ...mono, background: C.fondo, borderColor: C.elevado, color: C.apagado }}>
+        {modo && (
+          <button type="button" onClick={() => ir(-1)} disabled={n === 0} aria-label="Pantalla anterior" className="-ml-1 p-1 disabled:opacity-30 hover:text-[var(--p-tinta)] transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+        )}
         <Punto vivo /> Parte {actual.parte}
         <span style={{ color: C.linea }}>|</span>
         {String(actual.i + 1).padStart(2, '0')} / {String(actual.total).padStart(2, '0')}
+        {modo && (
+          <button type="button" onClick={() => ir(1)} disabled={n === actual.total - 1} aria-label="Pantalla siguiente" className="-mr-1 p-1 disabled:opacity-30 hover:text-[var(--p-tinta)] transition-colors">
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* ═════════════════ PARTE 01 · EL PROYECTO ═════════════════ */}
@@ -480,7 +684,7 @@ export default function Presentacion() {
           <div className="pres-entrar">
             <Rotulo>Una app para Baradero, hecha en Baradero</Rotulo>
             <h1 className="mt-6 text-[44px] sm:text-[60px] lg:text-[72px] leading-none tracking-[-0.04em]">
-              Toda la ciudad en el celular de cada vecino
+              <Palabras>Toda la ciudad en el celular de cada vecino</Palabras>
             </h1>
             <p className="mt-6 text-base leading-normal max-w-md" style={{ color: C.apagado }}>
               Mi Baradero junta la combi, la recolección de residuos, los eventos, los Puntos Verdes y los reclamos
@@ -525,7 +729,7 @@ export default function Presentacion() {
               <a href={`#${p.id}`} className="group grid grid-cols-[56px_1fr] sm:grid-cols-[96px_1fr_auto] items-center gap-4 py-6 border-b transition-colors" style={{ borderColor: C.elevado }}>
                 <span className="text-sm" style={{ ...mono, color: C.amarillo }}>{p.n}</span>
                 <span>
-                  <span className="pres-titulo block text-2xl sm:text-[32px] tracking-[-0.03em] group-hover:text-white">{p.titulo}</span>
+                  <span className="pres-titulo block text-2xl sm:text-[32px] tracking-[-0.03em] group-hover:text-[var(--p-tinta)]">{p.titulo}</span>
                   <span className="block mt-1 text-sm" style={{ color: C.apagado }}>{p.texto}</span>
                 </span>
                 <ArrowRight className="hidden sm:block w-5 h-5 transition-transform group-hover:translate-x-1" style={{ color: C.linea }} />
@@ -693,7 +897,7 @@ export default function Presentacion() {
           {SERVICIOS.map(({ Icon, titulo, texto }) => (
             <Tarjeta key={titulo}>
               <Icon className="w-5 h-5" style={{ color: C.verde }} />
-              <p className="pres-titulo mt-5 text-base" style={{ color: C.hueso }}>{titulo}</p>
+              <p className="pres-titulo mt-5 text-base" style={{ color: C.tinta }}>{titulo}</p>
               <p className="mt-2 text-sm leading-[1.43]" style={{ color: C.apagado }}>{texto}</p>
             </Tarjeta>
           ))}
@@ -849,7 +1053,7 @@ export default function Presentacion() {
               <li className="flex gap-3"><Recycle className="w-5 h-5 shrink-0" style={{ color: C.verde }} /> Qué materiales recibe cada punto.</li>
               <li className="flex gap-3"><MapPin className="w-5 h-5 shrink-0" style={{ color: C.verde }} /> “Cómo llegar”, que abre el recorrido en el celular.</li>
             </ul>
-            <div className="mt-8 relative h-[118px] rounded-[3px] overflow-hidden" style={{ background: '#0B1612' }}>
+            <div className="pres-oscuro mt-8 relative h-[118px] rounded-[3px] overflow-hidden" style={{ background: '#0B1612' }}>
               {/* Dibujo de mapa: calles en grilla y puntos */}
               <div className="absolute inset-0 opacity-60" style={{ backgroundImage: `linear-gradient(${C.elevado} 1px, transparent 1px), linear-gradient(90deg, ${C.elevado} 1px, transparent 1px)`, backgroundSize: '28px 28px' }} />
               {[[18, 30], [46, 62], [70, 28], [84, 70]].map(([x, y], i) => (
@@ -903,7 +1107,7 @@ export default function Presentacion() {
             </div>
             <div className="mt-6 flex items-center justify-between gap-3 border rounded-[3px] px-4 h-12" style={{ borderColor: C.linea }}>
               <span className="text-xs uppercase" style={{ ...mono, color: C.suave }}>Código de seguimiento</span>
-              <span style={{ ...mono, color: C.hueso }}>#K3F9QA</span>
+              <span style={{ ...mono, color: C.tinta }}>#K3F9QA</span>
             </div>
           </div>
         </div>
@@ -1093,7 +1297,7 @@ export default function Presentacion() {
                 <li key={t}>
                   <div className="flex items-baseline justify-between gap-4 text-sm">
                     <span>{t}</span>
-                    <span style={{ ...mono, color: C.hueso }}>{v}%</span>
+                    <span style={{ ...mono, color: C.tinta }}>{v}%</span>
                   </div>
                   <div className="mt-2 h-2 rounded-[2px]" style={{ background: C.elevado }}>
                     <div className="pres-barra h-2 rounded-[2px]" style={{ '--ancho': `${Math.max(v, 0.5)}%`, background: color }} />
@@ -1111,7 +1315,7 @@ export default function Presentacion() {
         <Titulo rotulo="En palabras de los vecinos" titulo="Lo que nos escribieron" />
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {OPINIONES.map(([quien, texto], i) => (
-            <figure key={quien} className={`rounded-[10px] p-6 flex flex-col justify-between ${i === 0 ? '' : 'border'}`} style={i === 0 ? { background: C.hueso, color: '#0F1D17' } : { borderColor: C.elevado }}>
+            <figure key={quien} className={`rounded-[10px] p-6 flex flex-col justify-between ${i === 0 ? '' : 'border'}`} style={i === 0 ? { background: C.tarjeta, color: '#0F1D17' } : { borderColor: C.elevado }}>
               <blockquote className="pres-titulo text-lg leading-snug tracking-[-0.01em]">“{texto}”</blockquote>
               <figcaption className="mt-6 text-xs uppercase" style={{ ...mono, color: i === 0 ? '#3E5A4C' : C.suave }}>{quien} · Facebook</figcaption>
             </figure>
@@ -1292,7 +1496,7 @@ export default function Presentacion() {
               Azul Saladin · Valentín Orduña · Gonzalo Santin
             </p>
           </div>
-          <div className="rounded-[10px] p-6 w-full max-w-[480px] lg:ml-auto" style={{ background: C.hueso, color: '#0F1D17' }}>
+          <div className="rounded-[10px] p-6 w-full max-w-[480px] lg:ml-auto" style={{ background: C.tarjeta, color: '#0F1D17' }}>
             <Rotulo oscuro>Probala ahora</Rotulo>
             <p className="pres-titulo mt-4 text-[32px] sm:text-[36px] leading-[1.1] tracking-[-0.031em]">Escaneá el código con el celular</p>
             <div className="mt-6 flex items-end justify-between gap-4">
@@ -1318,7 +1522,7 @@ export default function Presentacion() {
 
       <footer className="border-t" style={{ borderColor: C.elevado }}>
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row gap-3 justify-between text-sm" style={{ color: C.apagado }}>
-          <span className="text-xs uppercase" style={{ ...mono, color: C.hueso }}>Mi Baradero · E.S.T. N°1 Vuelta de Obligado</span>
+          <span className="text-xs uppercase" style={{ ...mono, color: C.tinta }}>Mi Baradero · E.S.T. N°1 Vuelta de Obligado</span>
           <span>No es el sitio oficial de la Municipalidad de Baradero</span>
         </div>
       </footer>
