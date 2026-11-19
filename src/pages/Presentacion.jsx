@@ -994,6 +994,36 @@ export default function Presentacion() {
         </ol>
       </Diapo>
 
+      {/* Panel: antes y después */}
+      <Diapo parte="01">
+        <Titulo
+          rotulo="El panel, antes y después"
+          color={C.verde}
+          titulo="Más simple para trabajar"
+          texto="Le sacamos colores y adornos para que se vea como una herramienta de trabajo, distinta de la app de los vecinos."
+        />
+        <div className="mt-10 grid lg:grid-cols-2 gap-6">
+          {[['Antes', '/historia/panel-antes.jpg', C.linea], ['Ahora', '/historia/panel-ahora.jpg', C.verde]].map(([cuando, img, color]) => (
+            <figure key={cuando}>
+              <figcaption className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.suave }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} /> {cuando}
+              </figcaption>
+              <div className="mt-3 rounded-[10px] overflow-hidden border" style={{ borderColor: C.elevado }}>
+                <img src={img} alt={`Panel de trabajadores ${cuando.toLowerCase()}`} loading="lazy" className="w-full aspect-[1440/760] object-cover object-top" />
+              </div>
+            </figure>
+          ))}
+        </div>
+        <ul className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {PANEL_CAMBIOS.map(({ antes, ahora }) => (
+            <li key={ahora} className="border-t pt-4 text-sm" style={{ borderColor: C.linea }}>
+              <p className="line-through" style={{ color: C.apagado }}>{antes}</p>
+              <p className="mt-1.5 flex gap-2"><Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: C.verde }} /> {ahora}</p>
+            </li>
+          ))}
+        </ul>
+      </Diapo>
+
       {/* Lean Startup */}
       <Diapo parte="01" className="justify-center">
         <Titulo
@@ -1464,36 +1494,6 @@ export default function Presentacion() {
           <Mini titulo="Historial">Registro de actividad: quién cambió qué y cuándo.</Mini>
           <Mini titulo="Buscar por código">Atención al Vecino encuentra cualquier reclamo con su código.</Mini>
         </div>
-      </Diapo>
-
-      {/* Panel: antes y después */}
-      <Diapo parte="03">
-        <Titulo
-          rotulo="El panel, antes y después"
-          color={C.verde}
-          titulo="Más simple para trabajar"
-          texto="Le sacamos colores y adornos para que se vea como una herramienta de trabajo, distinta de la app de los vecinos."
-        />
-        <div className="mt-10 grid lg:grid-cols-2 gap-6">
-          {[['Antes', '/historia/panel-antes.jpg', C.linea], ['Ahora', '/historia/panel-ahora.jpg', C.verde]].map(([cuando, img, color]) => (
-            <figure key={cuando}>
-              <figcaption className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.suave }}>
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} /> {cuando}
-              </figcaption>
-              <div className="mt-3 rounded-[10px] overflow-hidden border" style={{ borderColor: C.elevado }}>
-                <img src={img} alt={`Panel de trabajadores ${cuando.toLowerCase()}`} loading="lazy" className="w-full aspect-[1440/760] object-cover object-top" />
-              </div>
-            </figure>
-          ))}
-        </div>
-        <ul className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PANEL_CAMBIOS.map(({ antes, ahora }) => (
-            <li key={ahora} className="border-t pt-4 text-sm" style={{ borderColor: C.linea }}>
-              <p className="line-through" style={{ color: C.apagado }}>{antes}</p>
-              <p className="mt-1.5 flex gap-2"><Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: C.verde }} /> {ahora}</p>
-            </li>
-          ))}
-        </ul>
       </Diapo>
 
             {/* Instalable y sin conexión */}
