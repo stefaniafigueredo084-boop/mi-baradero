@@ -389,6 +389,15 @@ const DISENOS = [
   { fecha: '6 de agosto de 2026', titulo: 'En el celular', img: '/historia/2026-08-celular.jpg', texto: 'El primer prototipo funcionando en un celular, ya publicado en internet.' },
 ]
 
+// Antes y después del panel de trabajadores (capturas reales: versión
+// del 10/11/2026 antes del cambio, y la actual).
+const PANEL_CAMBIOS = [
+  { antes: 'Encabezado grande y con color', ahora: 'Encabezado finito, con la cuenta a la derecha' },
+  { antes: 'Secciones como botones grandes', ahora: 'Secciones en una fila, marcadas con una línea' },
+  { antes: 'Cada registro en una tarjeta suelta', ahora: 'Una lista tipo tabla, con cuántos registros hay' },
+  { antes: 'Botones de color y a la izquierda', ahora: 'Botones sobrios y a mano, del lado derecho' },
+]
+
 const HISTORIA = [
   { fecha: 'Junio 2026', titulo: 'El primer prototipo', img: '/historia/2026-06-prototipo.jpg', texto: 'Portada, servicios y las pantallas de Combi, Residuos, Eventos, Puntos Verdes y Perfil. Todavía sin datos reales.' },
   { fecha: 'Agosto 2026', titulo: 'Se conecta y crece', img: '/historia/2026-08-combi.jpg', texto: 'Base de datos, panel de trabajadores, pasaje de la combi con QR, accesibilidad, asistente por voz y Tachín.' },
@@ -1455,6 +1464,36 @@ export default function Presentacion() {
           <Mini titulo="Historial">Registro de actividad: quién cambió qué y cuándo.</Mini>
           <Mini titulo="Buscar por código">Atención al Vecino encuentra cualquier reclamo con su código.</Mini>
         </div>
+      </Diapo>
+
+      {/* Panel: antes y después */}
+      <Diapo parte="03">
+        <Titulo
+          rotulo="El panel, antes y después"
+          color={C.verde}
+          titulo="Más simple para trabajar"
+          texto="Le sacamos colores y adornos para que se vea como una herramienta de trabajo, distinta de la app de los vecinos."
+        />
+        <div className="mt-10 grid lg:grid-cols-2 gap-6">
+          {[['Antes', '/historia/panel-antes.jpg', C.linea], ['Ahora', '/historia/panel-ahora.jpg', C.verde]].map(([cuando, img, color]) => (
+            <figure key={cuando}>
+              <figcaption className="flex items-center gap-2 text-xs uppercase" style={{ ...mono, color: C.suave }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} /> {cuando}
+              </figcaption>
+              <div className="mt-3 rounded-[10px] overflow-hidden border" style={{ borderColor: C.elevado }}>
+                <img src={img} alt={`Panel de trabajadores ${cuando.toLowerCase()}`} loading="lazy" className="w-full aspect-[1440/760] object-cover object-top" />
+              </div>
+            </figure>
+          ))}
+        </div>
+        <ul className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {PANEL_CAMBIOS.map(({ antes, ahora }) => (
+            <li key={ahora} className="border-t pt-4 text-sm" style={{ borderColor: C.linea }}>
+              <p className="line-through" style={{ color: C.apagado }}>{antes}</p>
+              <p className="mt-1.5 flex gap-2"><Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: C.verde }} /> {ahora}</p>
+            </li>
+          ))}
+        </ul>
       </Diapo>
 
             {/* Instalable y sin conexión */}
